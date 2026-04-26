@@ -4,7 +4,7 @@ Setup->
   tailwind css -done
   shadcn -done
   zod -done
-  tanstack query
-  zustand
-  argon2
+  tanstack query -done
+  zustand -done
+  argon2 -done
   
