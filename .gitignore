@@ -1,0 +1,72 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+pnpm-debug.log*
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+out/
+
+# Frontend (Vite)
+.vite/
+
+# Backend outputs
+/apps/backend/dist/
+
+# Development
+.env
+.env.local
+.env*.local
+.env.*.local
+
+# Turbo
+.turbo/
+.turbocache/
+
+# Testing
+coverage/
+*.lcov
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Cache
+.eslintcache
+.prettierignore
+
+# Misc
+.cache/
+dist-ssr/
+*.local
+
+routeTree.gen.ts
