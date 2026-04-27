@@ -12,11 +12,14 @@ import { Input } from "../ui/input";
 import { Controller, useForm } from "react-hook-form";
 import { Link } from "@tanstack/react-router";
 
+
 interface Test {
-  email: string;
-  password: string;
+    name:string;
+    email: string;
+    password: string;
+    confirmPassword:string;
 }
-export function Login() {
+export function SignUp() {
   const form = useForm<Test>();
   function onSubmit() {}
   return (
@@ -27,12 +30,24 @@ export function Login() {
       <Card className="fixed top-1/4 left-1/2 -translate-x-1/2 w-full max-w-md bg-wood shadow-[inset_0_2px_4px_rgba(255,255,255,0.1)]">
         <CardHeader>
           <div className="flex justify-center">
-            <CardTitle>LOG IN</CardTitle>
+            <CardTitle>SIGN UP</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
-          <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
+          <form id="form-rhf" onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup>
+                <Controller
+                name="name"
+                control={form.control}
+                render={() => (
+                  <Field>
+                    <FieldLabel>Name</FieldLabel>
+                    <Input type="text"></Input>
+                  </Field>
+                )}
+              />
+            
+            
               <Controller
                 name="email"
                 control={form.control}
@@ -53,6 +68,16 @@ export function Login() {
                   </Field>
                 )}
               />
+              <Controller
+                name="confirmPassword"
+                control={form.control}
+                render={() => (
+                  <Field>
+                    <FieldLabel>Confirm Password</FieldLabel>
+                    <Input type="text"></Input>
+                  </Field>
+                )}
+              />
             </FieldGroup>
           </form>
         </CardContent>
@@ -65,11 +90,11 @@ export function Login() {
             >
               Reset
             </Button>
-            <Button type="submit" form="form-rhf-demo">
+            <Button type="submit" form="form-rhf">
               Submit
             </Button>
           </Field>
-                <Link to="/signup" className="underline"> Or Sign In</Link>
+                <Link to="/login" className="underline"> Or Log In</Link>
         </CardFooter>
       </Card>
     </div>
