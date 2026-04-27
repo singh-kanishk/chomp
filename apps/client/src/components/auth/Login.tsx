@@ -11,13 +11,24 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "../ui/input";
 import { Controller, useForm } from "react-hook-form";
 import { Link } from "@tanstack/react-router";
+import { LogInSchema,type LoginParams } from "@chomp/shared";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-interface Test {
-  email: string;
-  password: string;
-}
+
 export function Login() {
-  const form = useForm<Test>();
+  const { 
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors, isSubmitting },} = useForm<LoginParams>(
+    {
+      resolver: zodResolver(LogInSchema),
+          defaultValues: {            
+            email: "",
+            password: "",
+          },
+    }
+  );
   function onSubmit() {}
   return (
     <div
@@ -31,25 +42,37 @@ export function Login() {
           </div>
         </CardHeader>
         <CardContent>
-          <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
+          <form id="login-form" onSubmit={handleSubmit(onSubmit)}>
             <FieldGroup>
               <Controller
                 name="email"
-                control={form.control}
-                render={() => (
+                control={control}
+                render={({ field }) => (
                   <Field>
-                    <FieldLabel>E-mail</FieldLabel>
-                    <Input type="text"></Input>
+                    <FieldLabel>Name</FieldLabel>
+                    {/* Spread the field props here to connect to RHF */}
+                    <Input type="text" {...field} />
+                    {errors.email && (
+                      <span className="text-sm text-red-500">
+                        {errors.email.message}
+                      </span>
+                    )}
                   </Field>
                 )}
               />
               <Controller
                 name="password"
-                control={form.control}
-                render={() => (
+                control={control}
+                render={({ field }) => (
                   <Field>
-                    <FieldLabel>Password</FieldLabel>
-                    <Input type="text"></Input>
+                    <FieldLabel>Name</FieldLabel>
+                    {/* Spread the field props here to connect to RHF */}
+                    <Input type="text" {...field} />
+                    {errors.password && (
+                      <span className="text-sm text-red-500">
+                        {errors.password.message}
+                      </span>
+                    )}
                   </Field>
                 )}
               />
@@ -61,12 +84,13 @@ export function Login() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => form.reset()}
+              onClick={() => reset()}
+              disabled={isSubmitting}
             >
               Reset
             </Button>
-            <Button type="submit" form="form-rhf-demo">
-              Submit
+            <Button type="submit" form="signup-form" disabled={isSubmitting}>
+              {isSubmitting ? "Submitting..." : "Submit"}
             </Button>
           </Field>
                 <Link to="/signup" className="underline"> Or Sign In</Link>

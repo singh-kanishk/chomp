@@ -10,18 +10,31 @@ import {
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "../ui/input";
 import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "@tanstack/react-router";
+import { SignUpSchema, type SignUpParams } from "@chomp/shared";
 
-
-interface Test {
-    name:string;
-    email: string;
-    password: string;
-    confirmPassword:string;
-}
 export function SignUp() {
-  const form = useForm<Test>();
-  function onSubmit() {}
+  const {
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<SignUpParams>({
+    resolver: zodResolver(SignUpSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
+
+  function onSubmit(data: SignUpParams) {
+    // This will only fire if Zod validation passes
+    console.log("Valid data ready to send:", data);
+  }
+
   return (
     <div
       className={`h-screen w-screen bg-cover bg-center`}
@@ -34,47 +47,69 @@ export function SignUp() {
           </div>
         </CardHeader>
         <CardContent>
-          <form id="form-rhf" onSubmit={form.handleSubmit(onSubmit)}>
+          <form id="signup-form" onSubmit={handleSubmit(onSubmit)}>
             <FieldGroup>
-                <Controller
+              <Controller
                 name="name"
-                control={form.control}
-                render={() => (
+                control={control}
+                render={({ field }) => (
                   <Field>
                     <FieldLabel>Name</FieldLabel>
-                    <Input type="text"></Input>
+                    {/* Spread the field props here to connect to RHF */}
+                    <Input type="text" {...field} />
+                    {errors.name && (
+                      <span className="text-sm text-red-500">
+                        {errors.name.message}
+                      </span>
+                    )}
                   </Field>
                 )}
               />
-            
-            
+
               <Controller
                 name="email"
-                control={form.control}
-                render={() => (
+                control={control}
+                render={({ field }) => (
                   <Field>
                     <FieldLabel>E-mail</FieldLabel>
-                    <Input type="text"></Input>
+                    <Input type="email" {...field} />
+                    {errors.email && (
+                      <span className="text-sm text-red-500">
+                        {errors.email.message}
+                      </span>
+                    )}
                   </Field>
                 )}
               />
+
               <Controller
                 name="password"
-                control={form.control}
-                render={() => (
+                control={control}
+                render={({ field }) => (
                   <Field>
                     <FieldLabel>Password</FieldLabel>
-                    <Input type="text"></Input>
+                    <Input type="password" {...field} />
+                    {errors.password && (
+                      <span className="text-sm text-red-500">
+                        {errors.password.message}
+                      </span>
+                    )}
                   </Field>
                 )}
               />
+
               <Controller
                 name="confirmPassword"
-                control={form.control}
-                render={() => (
+                control={control}
+                render={({ field }) => (
                   <Field>
                     <FieldLabel>Confirm Password</FieldLabel>
-                    <Input type="text"></Input>
+                    <Input type="password" {...field} />
+                    {errors.confirmPassword && (
+                      <span className="text-sm text-red-500">
+                        {errors.confirmPassword.message}
+                      </span>
+                    )}
                   </Field>
                 )}
               />
@@ -86,15 +121,18 @@ export function SignUp() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => form.reset()}
+              onClick={() => reset()}
+              disabled={isSubmitting}
             >
               Reset
             </Button>
-            <Button type="submit" form="form-rhf">
-              Submit
+            <Button type="submit" form="signup-form" disabled={isSubmitting}>
+              {isSubmitting ? "Submitting..." : "Submit"}
             </Button>
           </Field>
-                <Link to="/login" className="underline"> Or Log In</Link>
+          <Link to="/login" className="underline mt-4">
+            Or Log In
+          </Link>
         </CardFooter>
       </Card>
     </div>
