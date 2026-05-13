@@ -8,12 +8,11 @@ dist/
 build/
 *.tsbuildinfo
 out/
+/apps/*/dist/
+/packages/*/dist/
 
 # Frontend (Vite)
 .vite/
-
-# Backend outputs
-/apps/backend/dist/
 
 # Development
 .env

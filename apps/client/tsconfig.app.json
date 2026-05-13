@@ -22,7 +22,8 @@
     "noFallthroughCasesInSwitch": true,
     
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@chomp/*": ["../../packages/*/src"]
     }
   },
   "include": ["src"]

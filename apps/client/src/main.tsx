@@ -8,6 +8,7 @@ import {
 } from '@tanstack/react-query'
 // Import the generated route tree
 import { routeTree } from './routeTree.gen'
+import { Toaster } from './components/ui/sonner'
 
 const queryClient = new QueryClient()
 // Create a new router instance
@@ -29,6 +30,7 @@ if (!rootElement.innerHTML) {
     <StrictMode>
       <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
+      <Toaster richColors closeButton />
       </QueryClientProvider>
     </StrictMode>
     ,
