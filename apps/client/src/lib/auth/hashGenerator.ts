@@ -1,12 +1,16 @@
 import { argon2id, blake3 } from "hash-wasm";
 const encoder = new TextEncoder();
 
+
+export function generateSaltUuid(){
+    return crypto.randomUUID();
+}
 export async function generateMasterHash(
   password: string,
   salt: string,
 ): Promise<Uint8Array> {
   try {
-    const hash = (await argon2id({
+    return  (await argon2id({
       password: password,
       salt: encoder.encode(salt + ":master"),
       parallelism: 1,
@@ -15,21 +19,21 @@ export async function generateMasterHash(
       hashLength: 32,
       outputType: "binary",
     })) as Uint8Array;
-    return hash;
+
   } catch {
     throw new Error("Error while generating hash");
   }
 }
 export async function generateAuthHash(masterHash: Uint8Array, salt: string) {
   try {
-    const hash = await blake3({
+    return await blake3({
       initKey: masterHash,
       hashLen: 32,
       data: encoder.encode(salt + ":auth"),
     });
-    return hash;
+
   } catch {
-    throw new Error("Error hile generating hash");
+    throw new Error("Error while generating hash");
   }
 }
 export async function generateEncryptionKey(
@@ -37,13 +41,12 @@ export async function generateEncryptionKey(
   salt: string,
 ) {
   try {
-    const hash = await blake3({
+    return await blake3({
       initKey: masterHash,
       hashLen: 32,
       data: encoder.encode(salt + ":key"),
     });
-    return hash;
   } catch {
-    throw new Error("Error hile generating key");
+    throw new Error("Error while generating key");
   }
 }

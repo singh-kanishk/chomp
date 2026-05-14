@@ -15,6 +15,6 @@ export const secretsTable = pgTable("secrets", {
   userId: uuid("user_id")
     .primaryKey()
     .references(() => usersTable.userId, { onDelete: "cascade" }),
-  saltUuid: uuid("salt_uuid").notNull().defaultRandom(),
+  saltUuid: uuid("salt_uuid").notNull(),
   authHash: text("auth_hash").notNull(),
 });

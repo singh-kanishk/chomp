@@ -48,7 +48,7 @@ authRouter.post("/signup", async (req: Request, res: Response) => {
         async (tx)=>{
           const result = await tx.insert(usersTable).values({email: body.email,name: body.name}).returning({insertedId:usersTable.userId});
           const id = result[0].insertedId
-          const salt =await tx.insert(secretsTable).values({userId: id,authHash:body.authHash}).returning({salt:secretsTable.saltUuid});
+          const salt =await tx.insert(secretsTable).values({userId: id,authHash:body.authHash,saltUuid:body.salt}).returning({salt:secretsTable.saltUuid});
           return salt[0];
         }
     )

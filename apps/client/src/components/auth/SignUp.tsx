@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import authBg from "../../assets/auth_page.png";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,15 +9,15 @@ import {
 } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "../ui/input";
-import { Controller, useForm, useWatch } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "@tanstack/react-router";
+import {Link, useNavigate} from "@tanstack/react-router";
 import {SignUpSchema, type SignUpParams, type ApiResponse, type SignupResponse} from "@chomp/shared";
 import { toast } from "sonner";
 import { apiCall } from "@/lib/api-call-wrapper";
-import {useMutation, type UseMutationResult, useQuery} from "@tanstack/react-query";
+import {useMutation, type UseMutationResult} from "@tanstack/react-query";
 import { useUserStore } from "@/store/useUserStore";
-import { generateAuthHash, generateMasterHash } from "@/lib/auth/hashGenerator";
+import {generateAuthHash, generateMasterHash, generateSaltUuid} from "@/lib/auth/hashGenerator";
 import  {type SignupRequest} from '@chomp/shared'
 
 
@@ -26,6 +25,7 @@ function SignUp() {
   const setMasterHash = useUserStore((state) => state.setMasterHash);
   const setUserEmail = useUserStore((state) => state.setEmail);
   const setSalt = useUserStore((state) => state.setSalt);
+  const navigate=useNavigate({from:'/signup'});
 
   const {
     handleSubmit,
@@ -44,38 +44,38 @@ function SignUp() {
   });
 
   // --- PRE-LOGIN UUID FETCH LOGIC ---
-  const emailValue = useWatch({ control, name: "email" });
-
-  const isValidEmail =
-    emailValue && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue);
-
-  const  preLoginData  = useQuery({
-    queryKey: ["preLoginUuid", emailValue],
-    queryFn: async () => {
-      return await apiCall<{ uuid: string }>({
-        url: `/auth/salt?email=${encodeURIComponent(emailValue)}`,
-        method: "GET",
-      });
-    },
-    enabled: !!isValidEmail,
-    staleTime: 1000 * 60 * 5,
-  });
-
-  useEffect(() => {
-
-    if (preLoginData?.data?.body) {
-      setSalt(preLoginData.data.body.uuid);
-      setUserEmail(emailValue);
-    }
-  }, [preLoginData, setSalt, setUserEmail, emailValue]);
-  // ----------------------------------
-
-  // 1. Define the mutation at the top level of the component
+  // const emailValue = useWatch({ control, name: "email" });
+  //
+  // const isValidEmail =
+  //   emailValue && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue);
+  //
+  // const  preLoginData  = useQuery({
+  //   queryKey: ["preLoginUuid", emailValue],
+  //   queryFn: async () => {
+  //     return await apiCall<{ uuid: string }>({
+  //       url: `/auth/salt?email=${encodeURIComponent(emailValue)}`,
+  //       method: "GET",
+  //     });
+  //   },
+  //   enabled: !!isValidEmail,
+  //   staleTime: 1000 * 60 * 5,
+  // });
+  //
+  // useEffect(() => {
+  //
+  //   if (preLoginData?.data?.body) {
+  //     setSalt(preLoginData.data.body.uuid);
+  //     setUserEmail(emailValue);
+  //   }
+  // }, [preLoginData, setSalt, setUserEmail, emailValue]);
+  // // ----------------------------------
+  //
+  // // 1. Define the mutation at the top level of the component
 
   const signUpMutation:UseMutationResult<ApiResponse<SignupResponse>,Error,SignupRequest>   = useMutation({
     mutationFn: async (safePayload) => {
+
       return apiCall({
-        
         url: "/auth/signup",
         method: "POST",
         config: {
@@ -85,53 +85,44 @@ function SignUp() {
       });
     },
     onSuccess: () => {
-
-      const result = signUpMutation.data||''
-      if(result){
-        setSalt(result.body?.salt||'')
-      }
-      toast.success("Form Submitted Successfully", {
-        position: "top-right",
-      });
       reset();
     },
-    onError: () => {
-      toast.error("Unsuccessful Form Submission", {
-        description: "Something went wrong",
-        position: "top-right",
       });
-    },
-  });
 
   // 2. Handle the cryptographic work in the submit function
   async function onSubmit(data: SignUpParams) {
-    // Avoid stale closures by getting the freshest UUID directly from Zustand
-    const currentUuid = useUserStore.getState().salt;
-
-    if (!currentUuid) {
-      toast.error("Security Error", {
-        description: "Missing server salt. Please try typing your email again.",
-        position: "top-right"
-      });
-      return;
-    }
 
     try {
-      // Pass the password (if your function requires it) along with the email and uuid
-      const masterHash = await generateMasterHash(data.email, currentUuid);
-      setMasterHash(masterHash);
-      
-      const authHash = await generateAuthHash(masterHash, currentUuid);
 
-      // Convert Uint8Array to a standard array for JSON transmission if necessary
-       
+      const saltUuid= generateSaltUuid();
+      const masterHash = await generateMasterHash(data.email, saltUuid);
 
-      // 3. Trigger the mutation with the safe payload
+      const authHash = await generateAuthHash(masterHash, saltUuid);
+
       signUpMutation.mutate({
         name: data.name,
         email: data.email,
-        authHash: authHash, 
+        authHash: authHash,
+        salt: saltUuid
       });
+
+      if(signUpMutation.isError) {
+        toast.error("Unsuccessful Form Submission", {
+          description: "Something went wrong",
+          position: "top-right",
+        });
+      }
+      if(signUpMutation.isSuccess) {
+
+        setMasterHash(masterHash);
+        setUserEmail(data.email);
+        setSalt(saltUuid);
+        toast.success("Signed Up Successfully", {
+          position: "top-right",
+        });
+        navigate({to:'/dashboard'})
+      }
+
     } catch (error) {
       console.error(error);
       toast.error("Encryption Failed", {
