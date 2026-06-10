@@ -3,47 +3,11 @@ import { db } from "../../index.js";
 import { secretsTable, usersTable } from "../../db/schema.js";
 import { eq } from "drizzle-orm";
 export const authRouter = express.Router();
-import {type ApiResponse, type SignupRequest, SignUpSchema} from "@chomp/shared";
+import {type ApiResponse, SignUpSchema} from "@chomp/shared";
 import argon2 from "argon2";
 import {z} from 'zod'
 
 
-
-authRouter.get(`/salt`, async (req: Request, res: Response) => {
-  try {
-    const { email } = req.query;
-
-    const result = await db
-      .select({
-        salt: secretsTable.saltUuid,
-      })
-      .from(secretsTable)
-      .innerJoin(usersTable, eq(secretsTable.userId, usersTable.userId))
-      .where(eq(usersTable.email, email as string))
-      .limit(1);
-
-    const response: ApiResponse<{ uuid: string }> = {
-      statusCode: 200,
-      success: true,
-      body: { uuid: result[0].salt },
-      message: "Salt Provided",
-    };
-    res.status(200).json(response);
-  } catch (error) {
-    let errorMessage;
-    if (error instanceof Error) {
-      errorMessage = error.message;
-    } else {
-      errorMessage = "Unknown Error";
-    }
-    const obj: ApiResponse<null> = {
-      success: false,
-      statusCode: 500,
-      message: "Unknown Error",
-    };
-    res.status(500).json(obj);
-  }
-});
 
 const signupRequestSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -91,3 +55,40 @@ authRouter.post("/signup", async (req: Request, res: Response) => {
     res.status(500).json(obj);
   }
 });
+
+// authRouter.get(`/salt`, async (req: Request, res: Response) => {
+//   try {
+//     const { email } = req.query;
+//
+//     const result = await db
+//         .select({
+//           salt: secretsTable.saltUuid,
+//         })
+//         .from(secretsTable)
+//         .innerJoin(usersTable, eq(secretsTable.userId, usersTable.userId))
+//         .where(eq(usersTable.email, email as string))
+//         .limit(1);
+//
+//     const response: ApiResponse<{ uuid: string }> = {
+//       statusCode: 200,
+//       success: true,
+//       body: { uuid: result[0].salt },
+//       message: "Salt Provided",
+//     };
+//     res.status(200).json(response);
+//   } catch (error) {
+//     let errorMessage;
+//     if (error instanceof Error) {
+//       errorMessage = error.message;
+//     } else {
+//       errorMessage = "Unknown Error";
+//     }
+//     const obj: ApiResponse<null> = {
+//       success: false,
+//       statusCode: 500,
+//       message: "Unknown Error",
+//     };
+//     res.status(500).json(obj);
+//   }
+//
+// });

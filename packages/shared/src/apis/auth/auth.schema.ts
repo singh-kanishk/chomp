@@ -24,5 +24,19 @@ export const SignUpSchema = z
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
-  
+
+
+export const LogInSchema = z
+    .object({
+        email: z.string().email({ message: "Invalid email address" }),
+        password: z
+            .string()
+            .regex(
+                passwordRegex,
+                { message: "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character" }
+            )
+    })
+
+
 export type SignUpParams = z.infer<typeof SignUpSchema>;
+export type LoginParams= z.infer<typeof LogInSchema>;

@@ -1,6 +1,3 @@
-export const getSharedMessage = (): string => {
-  return "Hello from the @repo/shared package!";
-};
 
 export type UserContext = {
   id: string;
@@ -13,7 +10,6 @@ export const BaseUrl = {
   db: "http://localhost:5433",
 } as const;
 
-export * from "./zod/form/login-form";
-export * from "./zod/form/signup-form";
+export * from "./apis/auth/auth.schema";
 export * from "./types";
-export * from "./zod/api/auth/auth-payload";
+export * from "./apis/auth/auth-payload";
