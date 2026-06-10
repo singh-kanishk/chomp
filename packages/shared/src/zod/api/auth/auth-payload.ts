@@ -1,11 +1,10 @@
-export interface LoginPayload{
-    uuid:string;
+export interface LoginPayload {
+  uuid: string;
 }
 
-
-export interface SignupRequest{
-    name: string;
-    email: string;
-    authHash: string;
-    salt: string;
+export interface SignupDTO {
+  name: string;
+  email: string;
+  authHash: string;
+  salt: string;
 }
