@@ -1,9 +1,0 @@
-POST http://localhost:5173/signup HTTP/1.1
-content-type: application/json
-
-{
-    "name": "sample",
-    "email":"kanishk@gmail.com",
-    "password":"HelloWorld123@",
-    "confirmPassword":"HelloWorld123@"
-}
