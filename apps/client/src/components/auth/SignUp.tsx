@@ -11,21 +11,26 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "../ui/input";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {Link, useNavigate} from "@tanstack/react-router";
-import {SignUpSchema, type SignUpParams, type ApiResponse, type SignupResponse} from "@chomp/shared";
+import { Link, useNavigate } from "@tanstack/react-router";
+import {
+  SignUpSchema,
+  type SignUpParams,
+  type ApiResponse,
+  type SignupRequest
+} from "@chomp/shared";
 import { toast } from "sonner";
 import { apiCall } from "@/lib/api-call-wrapper";
-import {useMutation, type UseMutationResult} from "@tanstack/react-query";
+import { useMutation, type UseMutationResult } from "@tanstack/react-query";
 import { useUserStore } from "@/store/useUserStore";
-import {generateAuthHash, generateMasterHash, generateSaltUuid} from "@/lib/auth/hashGenerator";
-import  {type SignupRequest} from '@chomp/shared'
+import * as Comlink from "comlink";
+import { type HashingService, generateSaltUuid } from "@/workers/hash";
 
-
-function SignUp() {
+export function SignUp() {
   const setMasterHash = useUserStore((state) => state.setMasterHash);
   const setUserEmail = useUserStore((state) => state.setEmail);
+  const setEncryptionKey = useUserStore((state) => state.setEncryptionKey);
   const setSalt = useUserStore((state) => state.setSalt);
-  const navigate=useNavigate({from:'/signup'});
+  const navigate = useNavigate({ from: "/signup" });
 
   const {
     handleSubmit,
@@ -72,9 +77,8 @@ function SignUp() {
   //
   // // 1. Define the mutation at the top level of the component
 
-  const signUpMutation:UseMutationResult<ApiResponse<SignupResponse>,Error,SignupRequest>   = useMutation({
-    mutationFn: async (safePayload) => {
-
+  const signUpMutation: UseMutationResult<ApiResponse<null>,Error,SignupRequest,unknown> = useMutation({
+    mutationFn: async (safePayload:SignupRequest) => {
       return apiCall({
         url: "/auth/signup",
         method: "POST",
@@ -84,51 +88,64 @@ function SignUp() {
         },
       });
     },
-    onSuccess: () => {
-      reset();
-    },
-      });
+  });
 
   // 2. Handle the cryptographic work in the submit function
   async function onSubmit(data: SignUpParams) {
+    const worker = new Worker(
+      new URL("../../workers/hash.ts", import.meta.url),
+      { type: "module" },
+    );
+    const obj = Comlink.wrap<HashingService>(worker);
 
     try {
+      const saltUuid = generateSaltUuid();
+      const masterHash = await obj.generateMasterHash(data.password, saltUuid);
+      const authHash = await obj.generateAuthHash(masterHash, saltUuid);
+      const encryptionKey = await obj.generateEncryptionKey(
+        masterHash,
+        saltUuid,
+      );
 
-      const saltUuid= generateSaltUuid();
-      const masterHash = await generateMasterHash(data.email, saltUuid);
 
-      const authHash = await generateAuthHash(masterHash, saltUuid);
+      signUpMutation.mutate(
+        {
+          name: data.name,
+          email: data.email,
+          authHash: authHash,
+          salt: saltUuid,
+        },
+        {
+          onSuccess: () => {
+            setMasterHash(masterHash);
+            setUserEmail(data.email);
+            setEncryptionKey(encryptionKey);
+            setSalt(saltUuid);
 
-      signUpMutation.mutate({
-        name: data.name,
-        email: data.email,
-        authHash: authHash,
-        salt: saltUuid
-      });
+            toast.success("Signed Up Successfully", {
+              position: "top-right",
+            });
 
-      if(signUpMutation.isError) {
-        toast.error("Unsuccessful Form Submission", {
-          description: "Something went wrong",
-          position: "top-right",
-        });
-      }
-      if(signUpMutation.isSuccess) {
-
-        setMasterHash(masterHash);
-        setUserEmail(data.email);
-        setSalt(saltUuid);
-        toast.success("Signed Up Successfully", {
-          position: "top-right",
-        });
-        navigate({to:'/dashboard'})
-      }
-
+            reset();
+            navigate({ to: "/dashboard" });
+          },
+          onError: (error) => {
+            console.error("Server signup failed:", error);
+            toast.error("Unsuccessful Form Submission", {
+              description: "Something went wrong on the server.",
+              position: "top-right",
+            });
+          },
+        },
+      );
     } catch (error) {
-      console.error(error);
+      console.error("Crypto Worker Failed:", error);
       toast.error("Encryption Failed", {
         description: "Could not generate secure hashes.",
-        position: "top-right"
+        position: "top-right",
       });
+    } finally {
+      worker.terminate();
     }
   }
 
@@ -222,12 +239,14 @@ function SignUp() {
             >
               Reset
             </Button>
-            <Button 
-              type="submit" 
-              form="signup-form" 
+            <Button
+              type="submit"
+              form="signup-form"
               disabled={isSubmitting || signUpMutation.isPending}
             >
-              {(isSubmitting || signUpMutation.isPending) ? "Submitting..." : "Submit"}
+              {isSubmitting || signUpMutation.isPending
+                ? "Submitting..."
+                : "Submit"}
             </Button>
           </Field>
           <Link to="/login" className="underline mt-4">
@@ -238,5 +257,3 @@ function SignUp() {
     </div>
   );
 }
-
-export default SignUp
