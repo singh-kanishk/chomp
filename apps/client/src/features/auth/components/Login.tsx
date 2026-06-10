@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "../ui/input";
+import { Input } from "../../../components/ui/input";
 import { Controller, useForm } from "react-hook-form";
 import { Link } from "@tanstack/react-router";
 import { LogInSchema, type LoginParams } from "@chomp/shared";
