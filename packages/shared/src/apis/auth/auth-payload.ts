@@ -5,7 +5,7 @@ export interface LoginPayload {
 }
 
 export const SignUpRequestZod = z.object({
-  name: string(),
+  encryptedName: string(),
   email: string(),
   authHash: string(),
   salt: string(),

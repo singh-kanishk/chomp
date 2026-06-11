@@ -1,60 +1,10 @@
-import express, { Request, Response } from "express";
-import { db } from "../../index.js";
-import { secretsTable, usersTable } from "../../db/schema.js";
-import { eq } from "drizzle-orm";
+import express from "express";
 export const authRouter = express.Router();
-import {type ApiResponse, SignUpSchema} from "@chomp/shared";
-import argon2 from "argon2";
-import {z} from 'zod'
+import { AuthController } from "../../controllers/auth.controller.js";
 
+const authController = new AuthController();
 
-
-const signupRequestSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email format"),
-  salt: z.string().uuid("Invalid salt format"),
-  authHash: z.string().regex(/^[a-f0-9]{64}$/i, "Invalid auth hash format"),
-});
-
-authRouter.post("/signup", async (req: Request, res: Response) => {
-  try{
-
-    const body= signupRequestSchema.parse(req.body);
-    const serverAuthHash = await argon2.hash(body.authHash, {
-      type: argon2.argon2id,
-      memoryCost: 65536, // 64 MB
-      timeCost: 3,       // 3 passes
-      parallelism: 4,    // utilizes multiple cores if available
-    });
-     await db.transaction(
-        async (tx)=>{
-          const result = await tx.insert(usersTable).values({email: body.email,name: body.name}).returning({insertedId:usersTable.userId});
-          const id = result[0].insertedId
-          await tx.insert(secretsTable).values({userId: id,authHash:serverAuthHash,saltUuid:body.salt});
-        }
-    )
-    const obj: ApiResponse<null>= {
-      success:true,
-      statusCode: 201,
-      message: "User created",
-    }
-    res.status(201).json(obj);
-  }
-  catch(error){
-    let errorMessage;
-    if (error instanceof Error) {
-      errorMessage = error.message;
-    } else {
-      errorMessage = "Unknown Error";
-    }
-    const obj:ApiResponse<null>={
-      success: false,
-      message:"Conflict",
-      statusCode: 500,
-    }
-    res.status(500).json(obj);
-  }
-});
+authRouter.post("/signup", authController.signUp);
 
 // authRouter.get(`/salt`, async (req: Request, res: Response) => {
 //   try {
