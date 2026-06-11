@@ -5,7 +5,7 @@ import { AuthController } from "../../controllers/auth.controller.js";
 const authController = new AuthController();
 
 authRouter.post("/signup", authController.signUp);
-
+authRouter.get("/salt", authController.salt);
 // authRouter.get(`/salt`, async (req: Request, res: Response) => {
 //   try {
 //     const { email } = req.query;

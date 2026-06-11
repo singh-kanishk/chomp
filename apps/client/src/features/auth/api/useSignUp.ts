@@ -43,10 +43,7 @@ export function useSignUpMutation(resetForm: () => void) {
         const response = await apiCall<ApiResponse<null>>({
           url: "/auth/signup",
           method: "POST",
-          config: {
-            body: JSON.stringify(payload),
-            headers: { "Content-Type": "application/json" },
-          },
+          body: payload,
         });
 
         return {
