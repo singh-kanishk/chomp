@@ -1,7 +1,6 @@
 import argon2 from "argon2";
 import { db } from "../index";
 import { usersTable, secretsTable } from "../db/schema";
-import { eq } from "drizzle-orm";
 import { SignUpRequest } from "@chomp/shared";
 
 export class AuthServices {

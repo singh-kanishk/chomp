@@ -40,4 +40,6 @@ export class AuthController {
       });
     }
   };
+
+  public login = async (req: Request, res: Response) => {};
 }
