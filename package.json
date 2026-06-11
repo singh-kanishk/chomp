@@ -15,5 +15,17 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.33.0"
+  "packageManager": "pnpm@10.33.0",
+  "link": "Example for pnpm / npm",
+  "pnpm": {
+    "overrides": {
+      "zod": "^3.24.0"
+    }
+  },
+  "overrides": {
+    "zod": "^3.24.0"
+  },
+  "resolutions": {
+    "zod": "^3.24.0"
+  }
 }
