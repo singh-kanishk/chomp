@@ -40,7 +40,7 @@ export function SignUp() {
 
   const {mutate,isPending} = useSignUpMutation(reset)
 
-  async function submit (data:SignUpParams){
+  async function onSubmit (data:SignUpParams){
     mutate(data);
   }
   return (
@@ -55,7 +55,7 @@ export function SignUp() {
           </div>
         </CardHeader>
         <CardContent>
-          <form id="signup-form" onSubmit={handleSubmit(submit)}>
+          <form id="signup-form" onSubmit={handleSubmit(onSubmit)}>
             <FieldGroup>
               <Controller
                 name="name"

@@ -5,7 +5,9 @@ import { toast } from "sonner";
 import { useUserStore } from "@/store/useUserStore";
 import { apiCall } from "@/lib/api-call-wrapper";
 import { generateSaltUuid, type HashingService } from "@/workers/hash";
-import type { SignUpParams, ApiResponse, SignupDTO } from "@chomp/shared";
+import type { SignUpParams, ApiResponse } from "@chomp/shared";
+import z from "zod";
+import { SignUpRequestZod } from "@chomp/shared";
 import HashWorker from "@/workers/hash?worker";
 
 export function useSignUpMutation(resetForm: () => void) {
@@ -31,12 +33,12 @@ export function useSignUpMutation(resetForm: () => void) {
           salt,
         );
 
-        const payload: SignupDTO = {
+        const payload = SignUpRequestZod.parse({
           name: data.name,
           email: data.email,
           authHash,
           salt: salt,
-        };
+        });
 
         const response = await apiCall<ApiResponse<null>>({
           url: "/auth/signup",
@@ -70,6 +72,17 @@ export function useSignUpMutation(resetForm: () => void) {
     },
     onError: (error) => {
       console.error("Signup lifecycle failed:", error);
+
+      if (error instanceof z.ZodError) {
+        const validationMessage =
+          error.errors[0]?.message || "Invalid form data.";
+        toast.error("Validation Error", {
+          description: validationMessage,
+          position: "top-right",
+        });
+        return;
+      }
+
       toast.error("Unsuccessful Form Submission", {
         description:
           "Something went wrong during local encryption or on the server.",

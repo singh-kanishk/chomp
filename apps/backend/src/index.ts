@@ -2,16 +2,18 @@ import express, { type Request, type Response } from "express";
 import "dotenv/config";
 import { drizzle } from "drizzle-orm/postgres-js";
 import cors from "cors";
-import { authRouter } from "./router/auth/authRoute.js";
+import { authRouter } from "./routes/auth/auth.routes.js";
 
 export const db = drizzle(process.env.DATABASE_URL!);
 
 const app = express();
 const PORT = 3000;
 
-app.use(cors({
-  origin: 'http://localhost:5173',
-}));
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+  }),
+);
 
 app.use(express.json());
 
