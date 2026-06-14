@@ -16,35 +16,33 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { fetchSalt } from "@/services/pre-login";
 import { useUserStore } from "@/store/useUserStore";
+import { useLogInMutation } from "../api/useLogin";
 
 export function LogIn() {
   const { setSalt } = useUserStore();
   const [isSaltReceived, setIsSaltReceived] = useState<boolean>(false);
-  const {
-    handleSubmit,
-    control,
-    reset,
-    trigger,
-    formState: { isSubmitting },
-    setError,
-    getValues,
-    watch,
-  } = useForm<LogInParams>({
-    resolver: zodResolver(LogInSchema),
-    mode: "onBlur",
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
+  const { handleSubmit, control, reset, trigger, setError, getValues, watch } =
+    useForm<LogInParams>({
+      resolver: zodResolver(LogInSchema),
+      mode: "onBlur",
+      defaultValues: {
+        email: "",
+        password: "",
+      },
+    });
 
+  const { mutate, isPending } = useLogInMutation(reset);
   async function onSubmit(data: LogInParams) {
     // TODO: Implement logIn logic
-
+    if (!isSaltReceived) {
+      preLogin();
+      return;
+    }
+    mutate(data);
     console.log("Form submitted with data:", data);
   }
 
-  const watchEmail = watch().email;
+  const watchEmail = watch("email");
   useEffect(() => {
     setIsSaltReceived(false);
   }, [watchEmail]);
@@ -100,7 +98,7 @@ export function LogIn() {
                 )}
               />
 
-              {isSaltReceived || (
+              {!isSaltReceived && (
                 <Button
                   type="button"
                   onClick={(e) => {
@@ -111,22 +109,24 @@ export function LogIn() {
                   Check Email
                 </Button>
               )}
-              <Controller
-                name="password"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Field>
-                    <FieldLabel>Password</FieldLabel>
-                    {/* Spread the field props here to connect to RHF */}
-                    <Input type="password" {...field} />
-                    {fieldState.error && (
-                      <span className="text-sm text-red-800">
-                        {fieldState.error.message}
-                      </span>
-                    )}
-                  </Field>
-                )}
-              />
+              {isSaltReceived && (
+                <Controller
+                  name="password"
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <Field>
+                      <FieldLabel>Password</FieldLabel>
+                      {/* Spread the field props here to connect to RHF */}
+                      <Input type="password" {...field} />
+                      {fieldState.error && (
+                        <span className="text-sm text-red-800">
+                          {fieldState.error.message}
+                        </span>
+                      )}
+                    </Field>
+                  )}
+                />
+              )}
             </FieldGroup>
           </form>
         </CardContent>
@@ -139,16 +139,16 @@ export function LogIn() {
                 setIsSaltReceived(false);
                 reset();
               }}
-              disabled={isSubmitting}
+              disabled={isPending}
             >
               Reset
             </Button>
             <Button
               type="submit"
               form="logIn-form"
-              disabled={isSubmitting || !isSaltReceived}
+              disabled={isPending || !isSaltReceived}
             >
-              {isSubmitting ? "Submitting..." : "Submit"}
+              {isPending ? "Submitting..." : "Submit"}
             </Button>
           </Field>
           <Link to="/signup" className="underline">

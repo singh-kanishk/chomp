@@ -50,7 +50,6 @@ export function useLogInMutation(resetForm: () => void) {
           },
         });
 
-        resetForm();
         return {
           response,
           masterHash,
