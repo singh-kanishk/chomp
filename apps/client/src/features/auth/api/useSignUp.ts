@@ -33,8 +33,9 @@ export function useSignUpMutation(resetForm: () => void) {
           salt,
         );
 
+        const encryptedName = cryptoWorker.encrypt(data.name, encryptionKey);
         const payload: SignUpRequest = SignUpRequestZod.parse({
-          encryptedName: data.name,
+          encryptedName: encryptedName,
           email: data.email,
           authHash,
           salt: salt,
