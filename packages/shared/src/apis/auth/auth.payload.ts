@@ -14,10 +14,8 @@ export const SignUpRequestZod = z.object({
 export type SignUpRequest = z.infer<typeof SignUpRequestZod>;
 
 export const LogInRequestZod = z.object({
-  encryptedName: string(),
   email: string(),
   authHash: string(),
-  salt: string(),
 });
 
 export type LogInRequest = z.infer<typeof LogInRequestZod>;

@@ -1,6 +1,11 @@
 import express, { response } from "express";
 import { Request, Response } from "express";
-import { SignUpRequest, SignUpRequestZod } from "@chomp/shared";
+import {
+  LogInRequest,
+  LogInRequestZod,
+  SignUpRequest,
+  SignUpRequestZod,
+} from "@chomp/shared";
 import { AuthServices } from "../services/auth.services";
 import { ApiResponse } from "@chomp/shared";
 import { EmailSchema } from "@chomp/shared";
@@ -75,5 +80,50 @@ export class AuthController {
       res.status(500).json({ payload });
     }
   };
-  public login = async (req: Request, res: Response) => {};
+  public login = async (req: Request, res: Response) => {
+    try {
+      const { email, authHash }: LogInRequest = LogInRequestZod.parse(req.body);
+      const isUserPresent = await authServices.isUserPresent(email);
+      if (!isUserPresent) {
+        const payload: ApiResponse<null> = {
+          success: false,
+          statusCode: 404,
+          message: "User Not Found",
+        };
+        res.status(404).json(payload);
+        return;
+      }
+      const userData = await authServices.getUserData(email);
+      const isHashCorrect = authServices.compareAuthHash(
+        authHash,
+        userData?.authHash || "",
+      );
+      if (!isHashCorrect) {
+        const payload: ApiResponse<null> = {
+          success: false,
+          statusCode: 409,
+          message: "Internal Server Error",
+        };
+        res.status(409).json(payload);
+        return;
+      }
+      const payload: ApiResponse<null> = {
+        success: true,
+        message: "Successfull Login",
+        statusCode: 200,
+      };
+      res.status(200).json(payload);
+    } catch (error) {
+      let errorMessage: string = "";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      const payload: ApiResponse<null> = {
+        success: false,
+        statusCode: 500,
+        message: errorMessage || "Internal Server Error",
+      };
+      res.status(404).json(payload);
+    }
+  };
 }

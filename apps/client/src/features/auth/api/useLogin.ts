@@ -4,7 +4,7 @@ import * as Comlink from "comlink";
 import { toast } from "sonner";
 import { useUserStore } from "@/store/useUserStore";
 import { apiCall } from "@/lib/api-call-wrapper";
-import { generateSaltUuid, type HashingService } from "@/workers/hash";
+import { type HashingService } from "@/workers/hash";
 import type { LogInParams, ApiResponse, LogInRequest } from "@chomp/shared";
 import z from "zod";
 import { LogInRequestZod } from "@chomp/shared";
@@ -12,7 +12,7 @@ import HashWorker from "@/workers/hash?worker";
 
 export function useLogInMutation(resetForm: () => void) {
   const navigate = useNavigate();
-  const { setMasterHash, setEmail, setEncryptionKey } = useUserStore();
+  const { setMasterHash, setEmail, setEncryptionKey, salt } = useUserStore();
 
   return useMutation({
     mutationFn: async (data: LogInParams) => {
@@ -22,15 +22,18 @@ export function useLogInMutation(resetForm: () => void) {
       const cryptoWorker = Comlink.wrap<HashingService>(worker); //Wrapper for Worker thread functions
 
       try {
-        const salt = generateSaltUuid();
+        const saltFromServer = salt || "";
         const masterHash = await cryptoWorker.generateMasterHash(
           data.password,
-          salt,
+          saltFromServer,
         );
-        const authHash = await cryptoWorker.generateAuthHash(masterHash, salt);
+        const authHash = await cryptoWorker.generateAuthHash(
+          masterHash,
+          saltFromServer,
+        );
         const encryptionKey = await cryptoWorker.generateEncryptionKey(
           masterHash,
-          salt,
+          saltFromServer,
         );
 
         const payload: LogInRequest = LogInRequestZod.parse({
@@ -47,6 +50,7 @@ export function useLogInMutation(resetForm: () => void) {
           },
         });
 
+        resetForm();
         return {
           response,
           masterHash,
@@ -62,7 +66,7 @@ export function useLogInMutation(resetForm: () => void) {
       setEmail(data.email);
       setEncryptionKey(data.encryptionKey);
 
-      toast.success("Signed Up Successfully", { position: "top-right" });
+      toast.success("Logged In Successfully", { position: "top-right" });
       resetForm();
       navigate({ to: "/dashboard" });
     },
@@ -80,8 +84,7 @@ export function useLogInMutation(resetForm: () => void) {
       }
 
       toast.error("Unsuccessful Form Submission", {
-        description:
-          "Something went wrong during local encryption or on the server.",
+        description: "Something went wrong.",
         position: "top-right",
       });
     },

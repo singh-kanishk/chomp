@@ -12,7 +12,7 @@ export class AuthServices {
     const user = await db.query.usersTable.findFirst({
       where: (users, { eq }) => eq(users.email, email),
     });
-    return user ? true : false;
+    return user && user.isActive ? true : false;
   }
   public async createUser(body: SignUpRequest) {
     await db.transaction(async (tx) => {
@@ -37,5 +37,22 @@ export class AuthServices {
       .from(secretsTable)
       .where(eq(secretsTable.userId, userId));
     return salt[0].salt;
+  }
+  public async getUserData(email: string) {
+    const userData = await db.query.usersTable.findFirst({
+      where: (users, { eq }) => eq(users.email, email),
+    });
+    const secretData = await db.query.secretsTable.findFirst({
+      where: (secret, { eq }) => eq(secret.userId, userData?.userId || ""),
+    });
+    let payload;
+    if (userData && secretData) {
+      const { userId, ...userTableData } = userData;
+      payload = { ...userTableData, authHash: secretData.authHash };
+    }
+    return payload;
+  }
+  public async compareAuthHash(serverHash: string, dbHash: string) {
+    return await argon2.verify(dbHash, serverHash);
   }
 }

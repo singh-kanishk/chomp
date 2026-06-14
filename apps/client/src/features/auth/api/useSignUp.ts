@@ -33,7 +33,10 @@ export function useSignUpMutation(resetForm: () => void) {
           salt,
         );
 
-        const encryptedName = cryptoWorker.encrypt(data.name, encryptionKey);
+        const encryptedName = await cryptoWorker.encrypt(
+          data.name,
+          encryptionKey,
+        );
         const payload: SignUpRequest = SignUpRequestZod.parse({
           encryptedName: encryptedName,
           email: data.email,
@@ -64,9 +67,11 @@ export function useSignUpMutation(resetForm: () => void) {
       setEncryptionKey(data.encryptionKey);
       setSalt(data.salt);
 
-      toast.success("Signed Up Successfully", { position: "top-right" });
+      toast.success("Signed Up Successfully Log In To Dashboard", {
+        position: "top-right",
+      });
       resetForm();
-      navigate({ to: "/dashboard" });
+      navigate({ to: "/login" });
     },
     onError: (error) => {
       console.error("Signup lifecycle failed:", error);
