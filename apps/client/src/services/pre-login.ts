@@ -6,5 +6,6 @@ export async function fetchSalt(email: string) {
     url: `/auth/salt?email=${encodeURIComponent(verifiedEmail.email)}`,
     method: "GET",
   });
-  return salt.body || "";
+  if (salt.success) return salt.body || "";
+  else throw new Error("Invalid User");
 }

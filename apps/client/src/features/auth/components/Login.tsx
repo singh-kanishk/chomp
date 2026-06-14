@@ -13,20 +13,22 @@ import { Controller, useForm } from "react-hook-form";
 import { Link } from "@tanstack/react-router";
 import { LogInSchema, type LogInParams } from "@chomp/shared";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { fetchSalt } from "@/services/pre-login";
 import { useUserStore } from "@/store/useUserStore";
 
 export function LogIn() {
   const { setSalt } = useUserStore();
-  const [isSaltReceived, SetIsSaltReceived] = useState<boolean>(false);
+  const [isSaltReceived, setIsSaltReceived] = useState<boolean>(false);
   const {
     handleSubmit,
     control,
     reset,
     trigger,
     formState: { isSubmitting },
+    setError,
     getValues,
+    watch,
   } = useForm<LogInParams>({
     resolver: zodResolver(LogInSchema),
     mode: "onBlur",
@@ -38,20 +40,35 @@ export function LogIn() {
 
   async function onSubmit(data: LogInParams) {
     // TODO: Implement logIn logic
+
     console.log("Form submitted with data:", data);
   }
+
+  const watchEmail = watch().email;
+  useEffect(() => {
+    setIsSaltReceived(false);
+  }, [watchEmail]);
+
   async function preLogin() {
     const isEmailValid = await trigger("email");
     if (!isEmailValid) return;
     const email = getValues("email");
     try {
       const salt = await fetchSalt(email);
-      SetIsSaltReceived(true);
-      setSalt(salt);
+      if (salt) {
+        setIsSaltReceived(true);
+        setSalt(salt);
+      }
     } catch (error) {
-      console.error("Error: Validating Email Re-Enter Email");
+      setError(
+        "email",
+        { message: (error as Error).message },
+        { shouldFocus: true },
+      );
+      console.error("Error: Invalid User or Re-Enter Email");
     }
   }
+
   return (
     <div
       className={`h-screen w-screen bg-cover bg-center`}
@@ -118,7 +135,10 @@ export function LogIn() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => reset()}
+              onClick={() => {
+                setIsSaltReceived(false);
+                reset();
+              }}
               disabled={isSubmitting}
             >
               Reset
@@ -126,7 +146,7 @@ export function LogIn() {
             <Button
               type="submit"
               form="logIn-form"
-              disabled={isSubmitting && isSaltReceived}
+              disabled={isSubmitting || !isSaltReceived}
             >
               {isSubmitting ? "Submitting..." : "Submit"}
             </Button>
