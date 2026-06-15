@@ -44,8 +44,8 @@ export function useLogInMutation(resetForm: () => void) {
         const response = await apiCall<ApiResponse<null>>({
           url: "/auth/LogIn",
           method: "POST",
+          body: payload,
           config: {
-            body: JSON.stringify(payload),
             headers: { "Content-Type": "application/json" },
           },
         });

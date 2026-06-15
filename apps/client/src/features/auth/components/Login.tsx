@@ -152,7 +152,6 @@ export function LogIn() {
             </Button>
           </Field>
           <Link to="/signup" className="underline">
-            {" "}
             Or Sign Up
           </Link>
         </CardFooter>

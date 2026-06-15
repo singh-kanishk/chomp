@@ -1,4 +1,3 @@
-import express, { response } from "express";
 import { Request, Response } from "express";
 import {
   LogInRequest,
@@ -9,6 +8,8 @@ import {
 import { AuthServices } from "../services/auth.services";
 import { ApiResponse } from "@chomp/shared";
 import { EmailSchema } from "@chomp/shared";
+import jwt from "jsonwebtoken";
+import { JwtPayloadZod } from "@chomp/shared";
 
 const authServices = new AuthServices();
 export class AuthController {
@@ -22,7 +23,7 @@ export class AuthController {
           statusCode: 409,
           message: "User Already Exists",
         };
-        return res.status(409).json({ response });
+        return res.status(409).json(response);
       }
 
       const hashedAuthHash = await authServices.hashService(body.authHash);
@@ -35,18 +36,16 @@ export class AuthController {
       };
       res.status(201).json(response);
     } catch (error) {
-      if (error instanceof Error) {
-        console.error(error.message);
-      }
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      console.error("SignUp Error:", errorMessage);
 
       const response: ApiResponse<null> = {
         success: false,
         statusCode: 500,
         message: "Internal Server Error",
       };
-      res.status(500).json({
-        response,
-      });
+      res.status(500).json(response);
     }
   };
 
@@ -70,14 +69,16 @@ export class AuthController {
         body: salt,
       };
       return res.status(200).json(response);
-    } catch {
-      console.error("Internal Server Error");
-      const payload: ApiResponse<null> = {
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      console.error("Get Salt Error:", errorMessage);
+      const response: ApiResponse<null> = {
         success: false,
         statusCode: 500,
         message: "Internal Server Error",
       };
-      res.status(500).json({ payload });
+      res.status(500).json(response);
     }
   };
   public login = async (req: Request, res: Response) => {
@@ -94,19 +95,32 @@ export class AuthController {
         return;
       }
       const userData = await authServices.getUserData(email);
-      const isHashCorrect = authServices.compareAuthHash(
+      const isHashCorrect = await authServices.compareAuthHash(
         authHash,
         userData?.authHash || "",
       );
       if (!isHashCorrect) {
         const payload: ApiResponse<null> = {
           success: false,
-          statusCode: 409,
-          message: "Internal Server Error",
+          statusCode: 401,
+          message: "Invalid credentials",
         };
-        res.status(409).json(payload);
+        res.status(401).json(payload);
         return;
       }
+      const accessToken = authServices.generateAccessToken({ email });
+      const refreshToken = authServices.generateRefreshToken({ email });
+
+      res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        sameSite: "strict",
+        maxAge: 15 * 60 * 1000,
+      });
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        sameSite: "strict",
+        maxAge: 15 * 24 * 60 * 60 * 1000,
+      });
       const payload: ApiResponse<null> = {
         success: true,
         message: "Successfull Login",
@@ -114,16 +128,66 @@ export class AuthController {
       };
       res.status(200).json(payload);
     } catch (error) {
-      let errorMessage: string = "";
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      console.error("Login Error:", errorMessage);
       const payload: ApiResponse<null> = {
         success: false,
         statusCode: 500,
-        message: errorMessage || "Internal Server Error",
+        message: "Internal Server Error",
       };
-      res.status(404).json(payload);
+      res.status(500).json(payload);
+    }
+  };
+  public refresh = async (req: Request, res: Response) => {
+    const { refreshToken } = req.cookies;
+    if (!refreshToken) {
+      const payload: ApiResponse<null> = {
+        statusCode: 401,
+        success: false,
+        message: "User Needs To Re Authenticate",
+      };
+      res.status(401).json(payload);
+      return;
+    }
+    try {
+      const decoded = authServices.checkRefreshToken(refreshToken);
+      const { email } = JwtPayloadZod.parse(decoded);
+      const isRefreshTokenRelatedToUSer =
+        await authServices.verifyRefreshTokenToUser(email, refreshToken);
+      if (!isRefreshTokenRelatedToUSer) {
+        const payload: ApiResponse<null> = {
+          statusCode: 409,
+          success: false,
+          message: "Incorrect Token Re Log In",
+        };
+        res.status(409).json(payload);
+        return;
+      }
+      const newAccessToken = authServices.generateAccessToken({ email });
+
+      // 5. Attach the new Access Token to the response as a cookie
+      res.cookie("accessToken", newAccessToken, {
+        httpOnly: true,
+        sameSite: "strict",
+        maxAge: 15 * 60 * 1000,
+      });
+
+      // 6. Send success response so the frontend knows it can retry its failed request
+      res.status(200).json({ message: "Access token successfully refreshed" });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      console.error("Refresh Token Error:", errorMessage);
+      res.clearCookie("accessToken");
+      res.clearCookie("refreshToken", { path: "/api/auth/refresh" });
+
+      const payload: ApiResponse<null> = {
+        statusCode: 403,
+        success: false,
+        message: "Invalid or expired refresh session. Please log in again.",
+      };
+      res.status(403).json(payload);
     }
   };
 }

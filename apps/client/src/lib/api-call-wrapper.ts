@@ -1,4 +1,5 @@
 import { BaseUrl, type ApiResponse } from "@chomp/shared";
+import { useNavigate } from "@tanstack/react-router";
 
 interface ApiCall {
   url: string;
@@ -21,6 +22,7 @@ export async function apiCall<T>({
         "Content-Type": "application/json",
         ...config?.headers,
       },
+      credentials: "include",
       body: body ? JSON.stringify(body) : undefined,
     };
 
@@ -30,12 +32,18 @@ export async function apiCall<T>({
     if (response.status === 401 && url !== "/refresh") {
       const refreshResponse = await fetch(BaseUrl.server + "/refresh", {
         method: "POST",
+        credentials: "include",
       });
 
       if (refreshResponse.ok) {
         // Retry the original request exactly as it was
         response = await fetch(BaseUrl.server + url, finalConfig);
-      }
+      } else
+        return {
+          statusCode: 401,
+          success: false,
+          message: "Session Finished Re Login",
+        };
     }
 
     // 2. Safe JSON Parsing
@@ -46,7 +54,8 @@ export async function apiCall<T>({
       return {
         success: false,
         statusCode: response.status,
-        message: result.message || `Request failed with status ${response.status}`,
+        message:
+          result.message || `Request failed with status ${response.status}`,
         error: result.error || "API_ERROR",
       };
     }

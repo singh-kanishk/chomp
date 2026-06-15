@@ -19,3 +19,8 @@ export const LogInRequestZod = z.object({
 });
 
 export type LogInRequest = z.infer<typeof LogInRequestZod>;
+
+export const JwtPayloadZod = z.object({
+  email: string(),
+});
+export type JwtPayloadInterface = z.infer<typeof JwtPayloadZod>;
