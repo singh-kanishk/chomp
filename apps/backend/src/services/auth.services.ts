@@ -7,6 +7,17 @@ import jwt from "jsonwebtoken";
 import { type JwtPayloadInterface } from "@chomp/shared";
 
 export class AuthServices {
+  private async getUserIdFromEmail(email: string) {
+    const query = await db
+      .select({ userId: usersTable.userId })
+      .from(usersTable)
+      .where(eq(usersTable.email, email));
+    if (query.length === 0) {
+      throw new Error("User Not Found");
+    }
+    const { userId } = query[0];
+    return userId;
+  }
   public async hashService(data: string) {
     return await argon2.hash(data);
   }
@@ -40,7 +51,7 @@ export class AuthServices {
     if (userIdObj.length === 0) {
       return;
     }
-    const { userId } = userIdObj[0];
+    const userId = await this.getUserIdFromEmail(email);
     const salt = await db
       .select({ salt: secretsTable.saltUuid })
       .from(secretsTable)
@@ -48,18 +59,24 @@ export class AuthServices {
     if (salt.length > 0) return salt[0].salt;
   }
   public async getUserData(email: string) {
-    const userData = await db.query.usersTable.findFirst({
-      where: (users, { eq }) => eq(users.email, email),
-    });
-    const secretData = await db.query.secretsTable.findFirst({
-      where: (secret, { eq }) => eq(secret.userId, userData?.userId || ""),
-    });
-    let payload;
-    if (userData && secretData) {
-      const { userId, ...userTableData } = userData;
-      payload = { ...userTableData, authHash: secretData.authHash };
+    const result = await db
+      .select({
+        userId: usersTable.userId,
+        name: usersTable.name,
+        email: usersTable.email,
+        authHash: secretsTable.authHash,
+      })
+      .from(usersTable)
+      .innerJoin(secretsTable, eq(usersTable.userId, secretsTable.userId))
+      .where(eq(usersTable.email, email))
+      .limit(1);
+
+    // result will be an array: [] if no user found, or [{ userId, name, email, authHash }]
+    if (result.length === 0) {
+      return null;
     }
-    return payload;
+
+    return result[0];
   }
   public async compareAuthHash(receivedHash: string, dbHash: string) {
     return await argon2.verify(dbHash, receivedHash);
@@ -74,14 +91,7 @@ export class AuthServices {
     }
   }
   public async verifyRefreshTokenToUser(email: string, refreshToken: string) {
-    const userIdQuery = await db
-      .select({ userId: usersTable.userId })
-      .from(usersTable)
-      .where(eq(usersTable.email, email));
-    if (userIdQuery.length === 0) {
-      return false;
-    }
-    const { userId } = userIdQuery[0];
+    const userId = await this.getUserIdFromEmail(email);
     const checkRefreshToken = await db
       .select({ refreshToken: sessionTable.refreshToken })
       .from(sessionTable)
@@ -100,5 +110,15 @@ export class AuthServices {
   public generateRefreshToken(payload: JwtPayloadInterface) {
     const refreshKey = process.env.JWT_SECRET_KEY_REFRESH_TOKEN || "";
     return jwt.sign(payload, refreshKey, { expiresIn: 15 * 24 * 60 * 60 });
+  }
+  public async storeRefreshToken(refreshToken: string, email: string) {
+    try {
+      const userId = await this.getUserIdFromEmail(email);
+      const query = await db
+        .insert(sessionTable)
+        .values({ userId, refreshToken });
+    } catch (error) {
+      throw error;
+    }
   }
 }

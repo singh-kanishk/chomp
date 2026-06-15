@@ -21,7 +21,7 @@ export const secretsTable = pgTable("secrets", {
 });
 
 export const sessionTable = pgTable("session", {
-  userId: text("user_id").references(() => usersTable.userId, {
+  userId: uuid("user_id").references(() => usersTable.userId, {
     onDelete: "cascade",
   }),
   refreshToken: text("refresh_token").primaryKey(),

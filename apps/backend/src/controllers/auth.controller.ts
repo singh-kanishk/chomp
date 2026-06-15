@@ -121,6 +121,7 @@ export class AuthController {
         sameSite: "strict",
         maxAge: 15 * 24 * 60 * 60 * 1000,
       });
+      await authServices.storeRefreshToken(refreshToken, email);
       const payload: ApiResponse<null> = {
         success: true,
         message: "Successfull Login",

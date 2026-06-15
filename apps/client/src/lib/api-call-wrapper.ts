@@ -1,5 +1,4 @@
 import { BaseUrl, type ApiResponse } from "@chomp/shared";
-import { useNavigate } from "@tanstack/react-router";
 
 interface ApiCall {
   url: string;
