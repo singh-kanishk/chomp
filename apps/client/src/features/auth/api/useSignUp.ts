@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useUserStore } from "@/store/useUserStore";
 import { apiCall } from "@/lib/api-call-wrapper";
 import { generateSaltUuid, type HashingService } from "@/workers/hash";
-import type { SignUpParams, ApiResponse, SignUpRequest } from "@chomp/shared";
+import type { SignUpParams, SignUpRequest } from "@chomp/shared";
 import z from "zod";
 import { SignUpRequestZod } from "@chomp/shared";
 import HashWorker from "@/workers/hash?worker";

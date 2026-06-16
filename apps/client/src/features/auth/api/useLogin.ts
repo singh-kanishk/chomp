@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useUserStore } from "@/store/useUserStore";
 import { apiCall } from "@/lib/api-call-wrapper";
 import { type HashingService } from "@/workers/hash";
-import type { LogInParams, ApiResponse, LogInRequest } from "@chomp/shared";
+import type { LogInParams, LogInRequest } from "@chomp/shared";
 import z from "zod";
 import { LogInRequestZod } from "@chomp/shared";
 import HashWorker from "@/workers/hash?worker";

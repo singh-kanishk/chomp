@@ -6,40 +6,12 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-    --font-heading: var(--font-mono);
-    --font-mono: 'JetBrains Mono Variable', monospace;
-    --color-sidebar-ring: var(--sidebar-ring);
-    --color-sidebar-border: var(--sidebar-border);
-    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-    --color-sidebar-accent: var(--sidebar-accent);
-    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-    --color-sidebar-primary: var(--sidebar-primary);
-    --color-sidebar-foreground: var(--sidebar-foreground);
-    --color-sidebar: var(--sidebar);
-    --color-chart-5: var(--chart-5);
-    --color-chart-4: var(--chart-4);
-    --color-chart-3: var(--chart-3);
-    --color-chart-2: var(--chart-2);
-    --color-chart-1: var(--chart-1);
-    --color-ring: var(--ring);
-    --color-input: var(--input);
-    --color-border: var(--border);
-    --color-destructive: var(--destructive);
-    --color-accent-foreground: var(--accent-foreground);
-    --color-accent: var(--accent);
-    --color-muted-foreground: var(--muted-foreground);
-    --color-muted: var(--muted);
-    --color-secondary-foreground: var(--secondary-foreground);
-    --color-secondary: var(--secondary);
-    --color-primary-foreground: var(--primary-foreground);
-    --color-primary: var(--primary);
-    --color-popover-foreground: var(--popover-foreground);
-    --color-popover: var(--popover);
-    --color-card-foreground: var(--card-foreground);
-    --color-card: var(--card);
-    --color-foreground: var(--foreground);
-    --color-background: var(--background);
-    --color-wood:hsl(31, 27%, 53%);
+    /* Merged Typography */
+    --font-heading: "Anybody", sans-serif;
+    --font-mono: "Space Mono", monospace;
+    --font-body: "JetBrains Mono", monospace;
+    
+    /* Standard Shadcn Radius Math */
     --radius-sm: calc(var(--radius) * 0.6);
     --radius-md: calc(var(--radius) * 0.8);
     --radius-lg: var(--radius);
@@ -49,8 +21,8 @@
     --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* LIGHT MODE: Standard Shadcn setup */
 :root {
-    --color-wood:hsl(31, 27%, 53%);
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
     --card: oklch(1 0 0);
@@ -69,65 +41,129 @@
     --border: oklch(0.922 0 0);
     --input: oklch(0.922 0 0);
     --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
     --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
 }
 
+/* DARK MODE: Your Custom Stitch Theme */
 .dark {
-    --color-wood:hsl(31, 27%, 53%);
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
+    /* Base Cave Colors */
+    --background: #131313;
+    --foreground: #e5e2e1;
+    
+    /* Stone Slab Elements */
+    --card: #201f1f;
+    --card-foreground: #e5e2e1;
+    --popover: #1c1b1b;
+    --popover-foreground: #e5e2e1;
+    
+    /* Primary (Lizard Green) */
+    --primary: #c3cc8c;
+    --primary-foreground: #2d3404;
+    
+    /* Secondary (Torch Orange) */
+    --secondary: #ffb77d;
+    --secondary-foreground: #4d2600;
+    
+    /* Muted & Outlines */
+    --muted: #2a2a2a;
+    --muted-foreground: #919283;
+    --accent: #2a2a2a;
+    --accent-foreground: #e5e2e1;
+    
+    /* Error / Monster Red */
+    --destructive: #ffb4ab;
+    --destructive-foreground: #690005;
+    
+    /* Borders & Interaction */
+    --border: #47483c;
+    --input: #201f1f;
+    --ring: #ffb77d;
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    }
+  }
   body {
     @apply bg-background text-foreground;
-    }
+    font-family: var(--font-body);
+  }
   html {
-    @apply font-mono;
-    }
+    /* Set default font to body, headings will use the variable in components */
+    @apply font-mono; 
+  }
+}
+
+/* --- Your Custom Stitch UI Elements --- */
+
+.cave-bg {
+  background-image: 
+    linear-gradient(rgba(19, 19, 19, 0.94), rgba(19, 19, 19, 0.94)),
+    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255, 183, 125, 0.04) 39px, rgba(255, 183, 125, 0.04) 40px),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255, 183, 125, 0.04) 39px, rgba(255, 183, 125, 0.04) 40px);
+  background-size: 100% 100%, 40px 40px, 40px 40px;
+}
+
+.stone-slab {
+  background: var(--card);
+  border: 2px solid var(--border);
+  box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.6);
+  position: relative;
+}
+
+.stone-slab::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100" height="100" filter="url(%23n)" opacity="0.04"/></svg>');
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hover-ignite {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hover-ignite:hover {
+  border-color: var(--secondary);
+  box-shadow: 0 0 12px rgba(255, 183, 125, 0.35), inset 0 0 16px rgba(0,0,0,0.6);
+}
+
+.torch-fab {
+  background: var(--muted);
+  border: 2px solid var(--secondary);
+  box-shadow: 0 0 16px rgba(255, 183, 125, 0.45);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.torch-fab:hover {
+  transform: scale(1.06);
+  box-shadow: 0 0 24px rgba(255, 183, 125, 0.7), 0 0 8px rgba(255, 183, 125, 0.3) inset;
+}
+
+.monster-gauge {
+  background: conic-gradient(from 180deg at 50% 50%, var(--destructive) 0deg, var(--secondary) 90deg, var(--primary) 180deg, transparent 180deg);
+  border-radius: 50% 50% 0 0;
+}
+
+.gauge-cover {
+  background: var(--muted);
+  border-radius: 50% 50% 0 0;
+}
+
+/* Custom Scrollbar for Prehistoric layout */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border: 2px solid var(--background);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary);
 }
