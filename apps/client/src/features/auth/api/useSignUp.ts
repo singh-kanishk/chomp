@@ -44,12 +44,14 @@ export function useSignUpMutation(resetForm: () => void) {
           salt: salt,
         });
 
-        const response = await apiCall<ApiResponse<null>>({
+        const response = await apiCall<null>({
           url: "/auth/signup",
           method: "POST",
           body: payload,
         });
-
+        if (response.success === false) {
+          throw new Error(response.message);
+        }
         return {
           response,
           masterHash,

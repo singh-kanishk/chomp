@@ -51,7 +51,7 @@ export class AuthServices {
     if (userIdObj.length === 0) {
       return;
     }
-    const userId = await this.getUserIdFromEmail(email);
+    const { userId } = userIdObj[0];
     const salt = await db
       .select({ salt: secretsTable.saltUuid })
       .from(secretsTable)
@@ -114,6 +114,7 @@ export class AuthServices {
   public async storeRefreshToken(refreshToken: string, email: string) {
     try {
       const userId = await this.getUserIdFromEmail(email);
+
       const query = await db
         .insert(sessionTable)
         .values({ userId, refreshToken });

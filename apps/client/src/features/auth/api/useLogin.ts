@@ -41,14 +41,17 @@ export function useLogInMutation(resetForm: () => void) {
           authHash,
         });
 
-        const response = await apiCall<ApiResponse<null>>({
-          url: "/auth/LogIn",
+        const response = await apiCall<null>({
+          url: "/auth/login",
           method: "POST",
           body: payload,
           config: {
             headers: { "Content-Type": "application/json" },
           },
         });
+        if (response.success === false) {
+          throw new Error(response.message);
+        }
 
         return {
           response,

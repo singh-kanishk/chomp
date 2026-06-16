@@ -28,8 +28,8 @@ export async function apiCall<T>({
     let response = await fetch(BaseUrl.server + url, finalConfig);
 
     // 1. Handle Token Refresh
-    if (response.status === 401 && url !== "/refresh") {
-      const refreshResponse = await fetch(BaseUrl.server + "/refresh", {
+    if (response.status === 401 && url !== "/auth/refresh") {
+      const refreshResponse = await fetch(BaseUrl.server + "/auth/refresh", {
         method: "POST",
         credentials: "include",
       });
