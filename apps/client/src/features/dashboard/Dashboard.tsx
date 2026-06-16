@@ -25,6 +25,7 @@ import GeneratorView from "./components/GeneratorView";
 import SecurityAuditView from "./components/SecurityAuditView";
 import SettingsView from "./components/SettingsView";
 import PortalModal from "./components/PortalModal";
+import { Button } from "@/components/ui/button";
 
 export function Dashboard() {
   // State configuration with localStorage persistence
@@ -285,12 +286,12 @@ export function Dashboard() {
                   />
                 </div>
 
-                <button
+                <Button
                   type="submit"
                   className="w-full bg-[#4b5320] border-2 border-[#c3cc8c] text-[#bdc787] hover:bg-[#c3cc8c] hover:text-[#2d3404] py-3.5 font-mono text-xs uppercase tracking-wider font-bold transition-all shadow-md cursor-pointer flex items-center justify-center gap-1.5"
                 >
                   <UserCheck className="w-4 h-4" /> Unlock Cavern Gates
-                </button>
+                </Button>
               </form>
 
               {lockError && (
@@ -327,7 +328,7 @@ export function Dashboard() {
         {/* Navigation panel Links */}
         <div className="flex-1 py-6 flex flex-col gap-1.5 select-none font-mono">
           {/* Vault Tab */}
-          <button
+          <Button
             onClick={() => {
               setActiveTab("vault");
               setSelectedGroup("All");
@@ -342,10 +343,10 @@ export function Dashboard() {
             <span className="text-xs font-bold uppercase tracking-wider">
               Vault Dashboard
             </span>
-          </button>
+          </Button>
 
           {/* Key Generator Tab */}
-          <button
+          <Button
             onClick={() => setActiveTab("generator")}
             className={`flex items-center gap-4 px-4 py-3 text-left transition-all relative border-r-2 ${
               activeTab === "generator"
@@ -357,10 +358,10 @@ export function Dashboard() {
             <span className="text-xs font-bold uppercase tracking-wider">
               Generator Forge
             </span>
-          </button>
+          </Button>
 
           {/* Security Tab */}
-          <button
+          <Button
             onClick={() => setActiveTab("audit")}
             className={`flex items-center gap-4 px-4 py-3 text-left transition-all relative border-r-2 ${
               activeTab === "audit"
@@ -372,10 +373,10 @@ export function Dashboard() {
             <span className="text-xs font-bold uppercase tracking-wider">
               Security Sentinel
             </span>
-          </button>
+          </Button>
 
           {/* Settings Tab */}
-          <button
+          <Button
             onClick={() => setActiveTab("settings")}
             className={`flex items-center gap-4 px-4 py-3 text-left transition-all relative border-r-2 ${
               activeTab === "settings"
@@ -387,7 +388,7 @@ export function Dashboard() {
             <span className="text-xs font-bold uppercase tracking-wider">
               Slab Settings
             </span>
-          </button>
+          </Button>
 
           {/* Sidebar Category Links */}
           <div className="mt-6 px-4">
@@ -397,7 +398,7 @@ export function Dashboard() {
             <div className="flex flex-col gap-0.5">
               {(["Personal", "Work", "Social", "Finance"] as GroupType[]).map(
                 (grp) => (
-                  <button
+                  <Button
                     key={grp}
                     onClick={() => {
                       setActiveTab("vault");
@@ -411,7 +412,7 @@ export function Dashboard() {
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-[#c8c7b8]" />
                     {grp}
-                  </button>
+                  </Button>
                 ),
               )}
             </div>
@@ -420,7 +421,7 @@ export function Dashboard() {
 
         {/* Sidebar Footer Controls */}
         <div className="p-6 border-t-2 border-[#47483c] flex flex-col gap-3">
-          <button
+          <Button
             onClick={() => {
               setEditingCredential(null);
               setIsModalOpen(true);
@@ -430,10 +431,10 @@ export function Dashboard() {
           >
             <Plus className="w-4 h-4 text-[#ffb77d]" />
             Secure New Secret
-          </button>
+          </Button>
 
           <div className="flex flex-col gap-1.5 font-mono text-xs">
-            <button
+            <Button
               onClick={() => setShowHelp(true)}
               className="flex items-center gap-3.5 text-[#c8c7b8] hover:text-[#ffb77d] px-3 py-1.5 transition-colors text-left"
             >
@@ -441,8 +442,8 @@ export function Dashboard() {
               <span className="text-[11px] uppercase tracking-wider">
                 Vault Help Scroll
               </span>
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setIsLocked(true)}
               className="flex items-center gap-3.5 text-[#c8c7b8] hover:text-[#ffb4ab] px-3 py-1.5 transition-colors text-left"
               id="sidebar-lock-vault-btn"
@@ -451,7 +452,7 @@ export function Dashboard() {
               <span className="text-[11px] uppercase tracking-wider">
                 Lock Vault Gate
               </span>
-            </button>
+            </Button>
           </div>
         </div>
       </nav>
@@ -481,7 +482,7 @@ export function Dashboard() {
               <span className="text-[#c3cc8c] font-bold">PORT 3000 ACTIVE</span>
             </div>
 
-            <button
+            <Button
               onClick={() =>
                 setCustomPrompt({
                   isOpen: true,
@@ -494,9 +495,9 @@ export function Dashboard() {
             >
               <Bell className="w-4 h-4" />
               <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#ffb77d] rounded-full shadow-[0_0_5px_#ffb77d]" />
-            </button>
+            </Button>
 
-            <button
+            <Button
               onClick={() =>
                 setCustomPrompt({
                   isOpen: true,
@@ -510,9 +511,9 @@ export function Dashboard() {
             >
               <User className="w-3.5 h-3.5" />
               <span>Operator</span>
-            </button>
+            </Button>
 
-            <button
+            <Button
               onClick={() => {
                 setEditingCredential(null);
                 setIsModalOpen(true);
@@ -522,7 +523,7 @@ export function Dashboard() {
             >
               <Plus className="w-3.5 h-3.5 shrink-0" />
               <span>Add Password</span>
-            </button>
+            </Button>
           </div>
         </header>
 
@@ -585,7 +586,7 @@ export function Dashboard() {
       </div>
 
       {/* Floating Action Button bottom right of screen */}
-      <button
+      <Button
         onClick={() => {
           setEditingCredential(null);
           setIsModalOpen(true);
@@ -599,7 +600,7 @@ export function Dashboard() {
         <span className="absolute right-16 bg-[#2a2a2a] border border-[#ffb77d] text-[#ffb77d] text-[10px] font-mono font-bold uppercase tracking-widest px-3 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-md">
           Forge New Crypt
         </span>
-      </button>
+      </Button>
 
       {/* Create / Edit Secrets Dialog Overlay */}
       <PortalModal
@@ -670,12 +671,12 @@ export function Dashboard() {
                   </h4>
                 </div>
               </div>
-              <button
+              <Button
                 onClick={() => setShowHelp(false)}
                 className="w-full mt-5 bg-[#4b5320] border border-[#c3cc8c] text-[#bdc787] py-2 uppercase font-bold tracking-wider hover:bg-[#c3cc8c] hover:text-[#2d3404] transition-all cursor-pointer text-center"
               >
                 Close Scroll
-              </button>
+              </Button>
             </motion.div>
           </div>
         )}
@@ -712,13 +713,13 @@ export function Dashboard() {
               <div className="flex gap-3 justify-end">
                 {customPrompt.type === "confirm" ? (
                   <>
-                    <button
+                    <Button
                       onClick={() => setCustomPrompt(null)}
                       className="px-4 py-2 border border-[#47483c] bg-[#1c1b1b] text-[#c8c7b8] hover:text-[#ffb77d] hover:border-[#ffb77d] uppercase text-[10px] tracking-wider transition-colors cursor-pointer"
                     >
                       Bypass
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => {
                         if (customPrompt.onConfirm) customPrompt.onConfirm();
                         setCustomPrompt(null);
@@ -726,15 +727,15 @@ export function Dashboard() {
                       className="px-5 py-2 bg-[#93000a]/20 border border-[#ffb4ab] text-[#ffb4ab] hover:bg-[#ffb4ab] hover:text-[#131313] uppercase text-[10px] tracking-wider transition-all font-bold cursor-pointer"
                     >
                       EXECUTE HAMMER
-                    </button>
+                    </Button>
                   </>
                 ) : (
-                  <button
+                  <Button
                     onClick={() => setCustomPrompt(null)}
                     className="px-5 py-2 bg-[#4b5320] border border-[#c3cc8c] text-[#bdc787] hover:bg-[#c3cc8c] hover:text-[#2d3404] uppercase text-[10px] tracking-wider transition-all font-bold cursor-pointer"
                   >
                     RESOLVE runes
-                  </button>
+                  </Button>
                 )}
               </div>
             </motion.div>
