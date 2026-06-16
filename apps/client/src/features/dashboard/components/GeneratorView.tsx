@@ -3,12 +3,13 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   Copy,
   Sparkles,
-  Sliders,
   Check,
   Lock,
   ShieldAlert,
   ShieldCheck,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface GeneratorViewProps {
   onAddSecurely: (pass: string) => void;
@@ -36,7 +37,6 @@ export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
     }
 
     let result = "";
-    // Use cryptographically secure values where possible, math.random fallback
     const array = new Uint32Array(length);
     if (window.crypto) {
       window.crypto.getRandomValues(array);
@@ -58,7 +58,6 @@ export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Analyze strength of user generated password
   const getPasswordStrength = (pass: string) => {
     if (!pass || pass.startsWith("Please"))
       return {
@@ -80,7 +79,7 @@ export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
       /[!@#$%^&*()_+~`|}{[\]:;?><,./-=]/.test(pass),
     ].filter(Boolean).length;
 
-    score += countTypes * 12.5; // Up to 50 pts
+    score += countTypes * 12.5;
 
     if (score >= 80)
       return {
@@ -108,7 +107,6 @@ export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
 
   return (
     <div className="space-y-8 select-none max-w-3xl mx-auto">
-      {/* Toast Notification */}
       <AnimatePresence>
         {copied && (
           <motion.div
@@ -145,35 +143,34 @@ export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
       </div>
 
       <div className="stone-slab p-6 md:p-8 border-4 border-[#47483c] space-y-6">
-        {/* Output Area */}
         <div>
           <label className="block text-[11px] font-mono uppercase tracking-wider text-[#c8c7b8]/60 mb-2">
             Generated Runes Key
           </label>
           <div className="relative">
-            <input
+            <Input
               type="text"
               readOnly
               value={password}
               placeholder="Click Chomp & Generate below..."
-              className="w-full bg-[#0e0e0e] border-2 border-[#47483c] px-4 py-3.5 pr-24 text-base font-mono text-[#ffb77d] tracking-wider focus:outline-none placeholder:text-[#c8c7b8]/20 select-all leading-none focus:border-[#ffb77d] transition-all h-14"
+              className="w-full bg-[#0e0e0e] border-2 border-[#47483c] px-4 py-3.5 pr-24 text-base font-mono text-[#ffb77d] tracking-wider focus:outline-none placeholder:text-[#c8c7b8]/20 select-all leading-none focus:border-[#ffb77d] transition-all h-14 rounded-none"
             />
             {password && !password.startsWith("Please") && (
-              <div className="absolute right-2 top-1.5 flex gap-1.5">
-                <button
+              <div className="absolute right-2 top-2 flex gap-1.5">
+                <Button
                   type="button"
                   onClick={copyToClipboard}
-                  className="px-3 py-2 bg-[#201f1f] border border-[#47483c] text-[#c8c7b8] hover:text-[#ffb77d] hover:border-[#ffb77d] font-mono text-xs uppercase tracking-wider transition-colors cursor-pointer"
+                  variant="outline"
+                  className="px-3 h-10 bg-[#201f1f] border-[#47483c] text-[#c8c7b8] hover:text-[#ffb77d] hover:bg-[#201f1f] hover:border-[#ffb77d] font-mono text-xs uppercase tracking-wider transition-colors rounded-none"
                   title="Copy secret key"
                 >
                   <Copy className="w-3.5 h-3.5" />
-                </button>
+                </Button>
               </div>
             )}
           </div>
         </div>
 
-        {/* Password Strength display block */}
         {password && !password.startsWith("Please") && (
           <motion.div
             initial={{ opacity: 0, y: 5 }}
@@ -200,18 +197,16 @@ export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
               <span className="text-stone-400 text-[10px]">
                 Tectonic Strength:
               </span>
-              <div className="h-2 w-32 bg-[#201f1f] border border-[#47483c] p-0.5 w-36">
+              <div className="h-2 w-32 bg-[#201f1f] border border-[#47483c] p-0.5">
                 <div
-                  className={`h-full transition-all duration-55s ${strength.style}`}
+                  className={`h-full transition-all duration-700 ${strength.style}`}
                 />
               </div>
             </div>
           </motion.div>
         )}
 
-        {/* Forge Controls */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-          {/* Slider Column */}
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <span className="font-mono text-xs text-[#c8c7b8] uppercase tracking-wider">
@@ -238,14 +233,12 @@ export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
             </div>
           </div>
 
-          {/* Toggle Switches Column */}
           <div className="space-y-3 font-mono text-xs">
             <span className="block text-[#c8c7b8]/60 uppercase text-[10px] tracking-wider mb-2">
               Allowed Cryptic Blocks
             </span>
 
             <div className="grid grid-cols-2 gap-3">
-              {/* UPPERCASE */}
               <label
                 onClick={() => setIncludeUppercase(!includeUppercase)}
                 className="flex items-center gap-2.5 p-2 bg-[#131313] border border-[#47483c] hover:border-[#ffb77d] transition-colors cursor-pointer"
@@ -258,7 +251,6 @@ export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
                 <span className="text-[#e5e2e1]">A-Z Upper</span>
               </label>
 
-              {/* lowercase */}
               <label
                 onClick={() => setIncludeLowercase(!includeLowercase)}
                 className="flex items-center gap-2.5 p-2 bg-[#131313] border border-[#47483c] hover:border-[#ffb77d] transition-colors cursor-pointer"
@@ -271,7 +263,6 @@ export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
                 <span className="text-[#e5e2e1]">a-z Lower</span>
               </label>
 
-              {/* NUMERALS */}
               <label
                 onClick={() => setIncludeNumbers(!includeNumbers)}
                 className="flex items-center gap-2.5 p-2 bg-[#131313] border border-[#47483c] hover:border-[#ffb77d] transition-colors cursor-pointer"
@@ -284,7 +275,6 @@ export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
                 <span className="text-[#e5e2e1]">0-9 Numbers</span>
               </label>
 
-              {/* SPECIAL SYMBOLS */}
               <label
                 onClick={() => setIncludeSymbols(!includeSymbols)}
                 className="flex items-center gap-2.5 p-2 bg-[#131313] border border-[#47483c] hover:border-[#ffb77d] transition-colors cursor-pointer"
@@ -300,28 +290,28 @@ export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
           </div>
         </div>
 
-        {/* Forge Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-[#47483c]/30">
-          <button
+          <Button
             type="button"
             onClick={generatePassword}
-            className="flex-1 bg-[#4b5320] border-2 border-[#c3cc8c] text-[#bdc787] hover:bg-[#c3cc8c] hover:text-[#2d3404] py-3.5 font-mono text-[13px] uppercase tracking-wider font-bold transition-all shadow-[0_0_10px_rgba(195,204,140,0.15)] hover:shadow-[0_0_20px_rgba(195,204,140,0.4)] flex items-center justify-center gap-2 cursor-pointer"
+            className="flex-1 h-12 bg-[#4b5320] border-2 border-[#c3cc8c] text-[#bdc787] hover:bg-[#c3cc8c] hover:text-[#2d3404] font-mono text-[13px] uppercase tracking-wider font-bold transition-all shadow-[0_0_10px_rgba(195,204,140,0.15)] hover:shadow-[0_0_20px_rgba(195,204,140,0.4)] flex gap-2 rounded-none"
           >
             <Sparkles
               className="w-4 h-4 animate-spin"
               style={{ animationDuration: "3s" }}
             />
             CHOMP & GENERATE KEY
-          </button>
+          </Button>
 
           {password && !password.startsWith("Please") && (
-            <button
+            <Button
               type="button"
               onClick={() => onAddSecurely(password)}
-              className="sm:w-1/3 border-2 border-[#ffb77d] text-[#ffb77d] hover:bg-[#ffb77d] hover:text-[#131313] py-3.5 font-mono text-[12px] uppercase tracking-wider font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              variant="outline"
+              className="sm:w-1/3 h-12 bg-transparent border-2 border-[#ffb77d] text-[#ffb77d] hover:bg-[#ffb77d] hover:text-[#131313] font-mono text-[12px] uppercase tracking-wider font-bold transition-all flex gap-1.5 rounded-none"
             >
               <Lock className="w-4 h-4" /> Deposit In Vault
-            </button>
+            </Button>
           )}
         </div>
       </div>

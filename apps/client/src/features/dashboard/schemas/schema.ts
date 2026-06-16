@@ -1,5 +1,5 @@
-type Group = "Personal" | "Work" | "Social" | "Finance" | "None";
-type Strength = "Strong" | "Medium" | "Weak" | "InValid";
+export type Group = "Personal" | "Work" | "Social" | "Finance" | "None";
+export type Strength = "Strong" | "Medium" | "Weak" | "InValid";
 export interface Credential {
   id: string;
   name: string;
@@ -27,4 +27,4 @@ export interface CredentialStoreInterface extends Credential {
 
 export type TabType = "vault" | "generator" | "audit" | "settings";
 
-export type GroupType = "All" | "Personal" | "Work" | "Social" | "Finance";
+export type GroupType = "All" | Group;

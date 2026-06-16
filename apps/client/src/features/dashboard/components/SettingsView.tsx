@@ -3,15 +3,14 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   Settings,
   Save,
-  Database,
   Trash2,
   ShieldAlert,
   Check,
   RefreshCw,
-  Key,
   Download,
-  Upload,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import type { Credential } from "../schemas/schema";
 
 interface SettingsViewProps {
@@ -45,9 +44,7 @@ export default function SettingsView({
     const dataStr = exportCredentials();
     const dataUri =
       "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
-
     const exportFileDefaultName = "chomp_vault_lithic_backup.json";
-
     const linkElement = document.createElement("a");
     linkElement.setAttribute("href", dataUri);
     linkElement.setAttribute("download", exportFileDefaultName);
@@ -58,17 +55,12 @@ export default function SettingsView({
     try {
       setImportError(null);
       const parsed = JSON.parse(importText);
-      if (!Array.isArray(parsed)) {
+      if (!Array.isArray(parsed))
         throw new Error("Backup must be an array of password secrets!");
-      }
-
-      // Basic validation
       const isValid = parsed.every(
         (item) => item.name && item.username && item.password && item.group,
       );
-      if (!isValid) {
-        throw new Error("Invalid secret format inside the arrays!");
-      }
+      if (!isValid) throw new Error("Invalid secret format inside the arrays!");
 
       onImportBackup(parsed);
       setImportDone(true);
@@ -81,7 +73,6 @@ export default function SettingsView({
 
   return (
     <div className="space-y-8 select-none max-w-4xl mx-auto">
-      {/* Toast Confirmed */}
       <AnimatePresence>
         {saveSuccess && (
           <motion.div
@@ -119,7 +110,6 @@ export default function SettingsView({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Master Sentinel Key configuration */}
         <div className="stone-slab p-6 border-2 border-[#47483c] flex flex-col justify-between space-y-4">
           <div>
             <h3 className="font-headline text-base text-[#e5e2e1] uppercase tracking-wider mb-2">
@@ -139,23 +129,23 @@ export default function SettingsView({
               <label className="block text-[10px] uppercase text-[#c8c7b8] mb-1 tracking-wider">
                 Fortress Access Passphrase
               </label>
-              <input
+              <Input
                 type={showKey ? "text" : "password"}
                 value={masterKey}
                 onChange={(e) => setMasterKey(e.target.value)}
-                className="w-full bg-[#0e0e0e] border border-[#47483c] px-3 py-2 text-[#ffb77d] focus:outline-none focus:border-[#ffb77d] h-10 select-all"
+                className="bg-[#0e0e0e] border-[#47483c] text-[#ffb77d] focus:border-[#ffb77d] h-10 select-all rounded-none"
               />
             </div>
 
             <div className="flex items-center gap-3 py-1">
-              <button
+              <Button
                 type="button"
+                variant="outline"
                 onClick={() => setShowKey(!showKey)}
-                className="text-[10px] uppercase border border-[#47483c] hover:border-[#ffb77d] text-[#c8c7b8] hover:text-[#ffb77d] px-2.5 py-1.5 transition-colors"
-                id="toggle-master-reveal-btn"
+                className="h-8 text-[10px] uppercase bg-transparent border-[#47483c] hover:border-[#ffb77d] text-[#c8c7b8] hover:text-[#ffb77d] hover:bg-transparent rounded-none"
               >
                 {showKey ? "Hide Secrecy" : "Reveal Secrecy"}
-              </button>
+              </Button>
 
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
@@ -170,16 +160,15 @@ export default function SettingsView({
               </label>
             </div>
 
-            <button
+            <Button
               type="submit"
-              className="w-full bg-[#4b5320] border border-[#c3cc8c] hover:bg-[#c3cc8c] hover:text-[#2d3404] text-[#bdc787] font-bold py-2.5 uppercase tracking-wider transition-all shadow-[0_0_8px_rgba(195,204,140,0.1)] flex items-center justify-center gap-1.5 cursor-pointer"
+              className="w-full h-10 bg-[#4b5320] border border-[#c3cc8c] hover:bg-[#c3cc8c] hover:text-[#2d3404] text-[#bdc787] font-bold uppercase tracking-wider transition-all shadow-[0_0_8px_rgba(195,204,140,0.1)] gap-1.5 rounded-none"
             >
               <Save className="w-4 h-4" /> Save Fortress Key
-            </button>
+            </Button>
           </form>
         </div>
 
-        {/* Database backup / storage systems */}
         <div className="stone-slab p-6 border-2 border-[#47483c] flex flex-col justify-between space-y-4">
           <div>
             <h3 className="font-headline text-base text-[#e5e2e1] uppercase tracking-wider mb-2">
@@ -192,15 +181,15 @@ export default function SettingsView({
           </div>
 
           <div className="space-y-3 pt-4 font-mono text-xs flex-1 flex flex-col justify-end">
-            <button
+            <Button
               type="button"
+              variant="outline"
               onClick={handleDownloadBackup}
-              className="w-full bg-[#201f1f] border border-[#47483c] hover:border-[#ffb77d] text-[#e5e2e1] hover:text-[#ffb77d] font-bold py-2.5 uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              className="w-full h-10 bg-[#201f1f] border-[#47483c] hover:border-[#ffb77d] text-[#e5e2e1] hover:text-[#ffb77d] hover:bg-[#201f1f] font-bold uppercase tracking-wider transition-all gap-1.5 rounded-none"
             >
               <Download className="w-4 h-4" /> Export Backup file
-            </button>
+            </Button>
 
-            {/* Import container block */}
             <div className="bg-[#131313] border border-[#47483c] p-3 space-y-2">
               <span className="text-[10px] uppercase text-[#c8c7b8] tracking-wider block">
                 Import JSON Runes
@@ -210,7 +199,7 @@ export default function SettingsView({
                 onChange={(e) => setImportText(e.target.value)}
                 placeholder="Paste JSON array backup string..."
                 rows={2}
-                className="w-full bg-[#0e0e0e] border border-[#47483c] px-2 py-1.5 text-[11px] font-mono text-[#ffb77d] focus:outline-none focus:border-[#ffb77d] resize-none"
+                className="w-full bg-[#0e0e0e] border border-[#47483c] px-2 py-1.5 text-[11px] font-mono text-[#ffb77d] focus:outline-none focus:border-[#ffb77d] resize-none outline-none"
               />
               {importError && (
                 <p className="text-[#ffb4ab] text-[10px] font-mono uppercase tracking-wide">
@@ -222,20 +211,19 @@ export default function SettingsView({
                   Import completed successfully!
                 </p>
               )}
-              <button
+              <Button
                 type="button"
                 onClick={handleImportJSON}
                 disabled={!importText}
-                className="w-full bg-[#4b5320] text-[#bdc787] disabled:bg-stone-800 disabled:text-stone-500 py-1.5 uppercase font-mono text-[10px] tracking-wider block border border-[#c3cc8c]/40 cursor-pointer text-center"
+                className="w-full h-8 bg-[#4b5320] text-[#bdc787] hover:bg-[#c3cc8c] hover:text-[#2d3404] disabled:bg-[#1c1b1b] disabled:text-[#47483c] uppercase font-mono text-[10px] tracking-wider border border-[#c3cc8c]/40 rounded-none"
               >
                 Assemble JSON Secrets
-              </button>
+              </Button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Dangerous/Tectonic structural maintenance actions */}
       <section className="stone-slab p-6 border-4 border-[#ffb4ab]/30 bg-[#93000a]/5 space-y-4">
         <div className="flex items-center gap-2.5 text-[#ffb4ab]">
           <ShieldAlert className="w-6 h-6 animate-pulse" />
@@ -251,21 +239,23 @@ export default function SettingsView({
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 pt-2">
-          <button
+          <Button
             type="button"
+            variant="outline"
             onClick={onResetToDefaults}
-            className="flex-1 border border-[#ffb77d] text-[#ffb77d] hover:bg-[#ffb77d] hover:text-[#131313] py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            className="flex-1 h-10 bg-transparent border-[#ffb77d] text-[#ffb77d] hover:bg-[#ffb77d] hover:text-[#131313] font-mono text-xs uppercase tracking-wider font-bold transition-all gap-1.5 rounded-none"
           >
             <RefreshCw className="w-4 h-4" /> Reset database to initial mock
-          </button>
+          </Button>
 
-          <button
+          <Button
             type="button"
+            variant="destructive"
             onClick={onClearVault}
-            className="flex-1 bg-[#93000a]/20 border border-[#ffb4ab] text-[#ffb4ab] hover:bg-[#ffb4ab] hover:text-[#131313] py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm hover:shadow-[0_0_10px_rgba(255,180,171,0.25)]"
+            className="flex-1 h-10 bg-[#93000a]/20 border border-[#ffb4ab] text-[#ffb4ab] hover:bg-[#ffb4ab] hover:text-[#131313] font-mono text-xs uppercase tracking-wider font-bold transition-all gap-1.5 shadow-sm hover:shadow-[0_0_10px_rgba(255,180,171,0.25)] rounded-none"
           >
             <Trash2 className="w-4 h-4" /> PURGE ALL VAULT SECRETS
-          </button>
+          </Button>
         </div>
       </section>
     </div>

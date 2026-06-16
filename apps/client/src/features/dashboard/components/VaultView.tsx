@@ -6,18 +6,16 @@ import {
   Eye,
   EyeOff,
   PlusCircle,
-  Filter,
   ArrowUpDown,
   Trash2,
   Edit,
   ExternalLink,
-  Shield,
-  ChevronDown,
-  ChevronUp,
   AlertTriangle,
   Sparkles,
   Search,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import type { Credential, GroupType } from "../schemas/schema";
 
 interface VaultViewProps {
@@ -51,7 +49,6 @@ export default function VaultView({
   const [sortBy, setSortBy] = useState<"name" | "strength" | "group">("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
-  // Clipboard copy handler
   const copyToClipboard = (
     text: string,
     id: string,
@@ -66,7 +63,6 @@ export default function VaultView({
     }, 2000);
   };
 
-  // Toggle reveal password
   const toggleReveal = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (revealedIds.includes(id)) {
@@ -76,7 +72,6 @@ export default function VaultView({
     }
   };
 
-  // Filter passwords
   const filteredCredentials = credentials.filter((cred) => {
     const matchesGroup =
       selectedGroup === "All" || cred.group === selectedGroup;
@@ -89,7 +84,6 @@ export default function VaultView({
     return matchesGroup && matchesSearch;
   });
 
-  // Sort passwords
   const sortedCredentials = [...filteredCredentials].sort((a, b) => {
     let comparison = 0;
     if (sortBy === "name") {
@@ -112,7 +106,6 @@ export default function VaultView({
     }
   };
 
-  // Dynamic Security Health calculations
   const calculateSecurityScore = () => {
     if (credentials.length === 0) return 100;
     let scoreTotal = 0;
@@ -125,30 +118,21 @@ export default function VaultView({
   };
 
   const securityScore = calculateSecurityScore();
-
   const getHealthLevelText = (score: number) => {
     if (score >= 80) return "Security Health: Strong";
     if (score >= 50) return "Security Health: Guarded";
     return "Security Health: Critical Danger";
   };
-
   const getHealthLevelColor = (score: number) => {
     if (score >= 80) return "text-[#c3cc8c] bg-[#4b5320]/40 border-[#c3cc8c]";
     if (score >= 50) return "text-[#ffb77d] bg-[#fd8b00]/10 border-[#ffb77d]";
     return "text-[#ffb4ab] bg-[#93000a]/20 border-[#ffb4ab] animate-pulse";
   };
-
-  // Determine angle for physical dial needle
-  // Score 0 -> -90 deg (left)
-  // Score 100 -> 90 deg (right)
   const needleRotation = -90 + (securityScore / 100) * 180;
-
-  // Render group tabs helper
   const groups: GroupType[] = ["All", "Personal", "Work", "Social", "Finance"];
 
   return (
     <div className="space-y-10 select-none">
-      {/* Toast Notification Container */}
       <AnimatePresence>
         {copiedId && (
           <motion.div
@@ -172,9 +156,7 @@ export default function VaultView({
         )}
       </AnimatePresence>
 
-      {/* Header / Security Gauge Area */}
       <section className="stone-slab p-6 sm:p-8 border-4 border-[#47483c]">
-        {/* Decorative corner carvings */}
         <div className="absolute top-2 left-2 text-[9px] font-mono text-[#c8c7b8]/20 tracking-tighter">
           ⊞ S_SLAB_00
         </div>
@@ -207,18 +189,14 @@ export default function VaultView({
             </div>
           </div>
 
-          {/* Security Health Gauge and Dial Needle */}
           <div className="flex flex-col items-center">
             <div className="relative w-48 h-24 overflow-hidden mb-2">
-              {/* Colored dial gauge background */}
               <div className="monster-gauge w-48 h-48 absolute top-0 left-0" />
-              {/* Center spacer covering the center of conic gradient */}
               <div className="gauge-cover w-40 h-40 absolute top-4 left-4 flex items-end justify-center pb-3">
                 <span className="font-headline text-3xl font-black text-[#c3cc8c] tracking-tighter mb-1 select-none">
                   {securityScore}%
                 </span>
               </div>
-              {/* Dial Needle */}
               <div
                 className="absolute bottom-0 left-1/2 w-1.5 h-18 bg-[#ffb77d] origin-bottom rounded-full shadow-[0_0_8px_#ffb77d] transition-transform duration-1000 ease-out"
                 style={{
@@ -226,9 +204,10 @@ export default function VaultView({
                 }}
               />
             </div>
-
             <span
-              className={`text-[11px] font-mono uppercase tracking-widest px-3 py-1 border transition-colors ${getHealthLevelColor(securityScore)}`}
+              className={`text-[11px] font-mono uppercase tracking-widest px-3 py-1 border transition-colors ${getHealthLevelColor(
+                securityScore,
+              )}`}
             >
               {getHealthLevelText(securityScore)}
             </span>
@@ -236,7 +215,6 @@ export default function VaultView({
         </div>
       </section>
 
-      {/* Quick Access Grid */}
       <section className="space-y-4">
         <h3 className="font-headline text-xl text-[#e5e2e1] uppercase tracking-wider flex items-center gap-2">
           <span className="text-[#ffb77d]">✦</span> Quick Access
@@ -258,16 +236,18 @@ export default function VaultView({
                     {firstChar}
                   </div>
                   <div className="flex gap-1.5">
-                    <button
+                    <Button
                       onClick={(e) => {
                         e.stopPropagation();
                         copyToClipboard(cred.password, cred.id, "password");
                       }}
-                      className="p-1.5 border border-[#47483c] hover:border-[#ffb77d] hover:text-[#ffb77d] text-[#c8c7b8] bg-[#131313] transition-colors"
+                      size="icon-sm"
+                      variant="outline"
+                      className="border-[#47483c] hover:border-[#ffb77d] hover:text-[#ffb77d] text-[#c8c7b8] bg-[#131313]"
                       title="Copy Password"
                     >
                       <Copy className="w-4 h-4" />
-                    </button>
+                    </Button>
                   </div>
                 </div>
 
@@ -283,7 +263,13 @@ export default function VaultView({
                       {cred.group}
                     </span>
                     <span
-                      className={`font-bold ${cred.strength === "Strong" ? "text-[#c3cc8c]" : cred.strength === "Medium" ? "text-[#ffb77d]" : "text-[#ffb4ab]"}`}
+                      className={`font-bold ${
+                        cred.strength === "Strong"
+                          ? "text-[#c3cc8c]"
+                          : cred.strength === "Medium"
+                            ? "text-[#ffb77d]"
+                            : "text-[#ffb4ab]"
+                      }`}
                     >
                       • {cred.strength}
                     </span>
@@ -293,7 +279,6 @@ export default function VaultView({
             );
           })}
 
-          {/* Add Shortcut Card */}
           <div
             onClick={onAddPasswordClick}
             className="stone-slab hover-ignite p-5 cursor-pointer flex flex-col justify-between aspect-square border-dashed border-[#47483c] hover:bg-[#ffb77d]/5 group transition-all"
@@ -311,55 +296,55 @@ export default function VaultView({
         </div>
       </section>
 
-      {/* Credential Vault Table Area */}
       <section className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3 pb-2">
           <h3 className="font-headline text-xl text-[#e5e2e1] uppercase tracking-wider flex items-center gap-2">
             <span className="text-[#ffb77d]">✦</span> Credential Vault
           </h3>
 
-          {/* Table Control Buttons */}
           <div className="flex items-center gap-2">
             <div className="relative">
-              <input
+              <Input
                 type="text"
                 placeholder="Live search vault..."
                 value={searchQuery}
                 onChange={(e) => onSearchQueryChange(e.target.value)}
-                className="bg-[#0e0e0e] border border-[#47483c] pl-8 pr-3 py-1 text-xs text-[#e5e2e1] focus:outline-none focus:border-[#ffb77d] focus:ring-1 focus:ring-[#ffb77d] font-mono placeholder:text-[#c8c7b8]/40 h-8 transition-colors"
+                className="bg-[#0e0e0e] border-[#47483c] pl-8 pr-3 py-1 text-xs text-[#e5e2e1] focus:outline-none focus:border-[#ffb77d] focus:ring-1 focus:ring-[#ffb77d] font-mono placeholder:text-[#c8c7b8]/40 h-8 transition-colors rounded-none"
               />
               <Search className="w-3.5 h-3.5 text-[#c8c7b8]/40 absolute left-2.5 top-1/2 -translate-y-1/2" />
             </div>
 
-            <button
+            <Button
               onClick={() => toggleSort("name")}
-              className={`p-1.5 border border-[#47483c] h-8 flex items-center gap-1 bg-[#201f1f] text-xs font-mono uppercase tracking-wider text-[#c8c7b8] hover:border-[#ffb77d] hover:text-[#ffb77d] transition-colors cursor-pointer ${sortBy === "name" ? "border-[#ffb77d] text-[#ffb77d]" : ""}`}
+              variant="outline"
+              className={`h-8 flex items-center gap-1 bg-[#201f1f] border-[#47483c] text-xs font-mono uppercase tracking-wider text-[#c8c7b8] hover:border-[#ffb77d] hover:text-[#ffb77d] rounded-none ${
+                sortBy === "name" ? "border-[#ffb77d] text-[#ffb77d]" : ""
+              }`}
               title="Sort Alphabetically"
             >
               <ArrowUpDown className="w-3.5 h-3.5" />
               <span className="hidden md:inline">Sort</span>
-            </button>
+            </Button>
           </div>
         </div>
 
-        {/* Group Tab Category Filters */}
         <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-none antialiased">
           {groups.map((group) => (
-            <button
+            <Button
               key={group}
               onClick={() => onSelectGroup(group)}
-              className={`px-4 py-1.5 font-mono text-xs uppercase tracking-widest transition-all cursor-pointer border ${
+              variant="outline"
+              className={`px-4 py-1.5 h-auto font-mono text-xs uppercase tracking-widest rounded-none ${
                 selectedGroup === group
-                  ? "bg-[#4b5320] border-[#c3cc8c] text-[#bdc787] shadow-[0_0_10px_rgba(195,204,140,0.15)]"
-                  : "bg-[#201f1f] border-[#47483c] text-[#c8c7b8] hover:border-[#ffb77d] hover:text-[#ffb77d]"
+                  ? "bg-[#4b5320] border-[#c3cc8c] text-[#bdc787] hover:bg-[#4b5320] hover:text-[#bdc787] shadow-[0_0_10px_rgba(195,204,140,0.15)]"
+                  : "bg-[#201f1f] border-[#47483c] text-[#c8c7b8] hover:bg-[#201f1f] hover:border-[#ffb77d] hover:text-[#ffb77d]"
               }`}
             >
               {group}
-            </button>
+            </Button>
           ))}
         </div>
 
-        {/* Main Vault Credentials List Board */}
         <div className="stone-slab border-2 border-[#47483c] p-0 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse select-none">
@@ -385,12 +370,15 @@ export default function VaultView({
                 ) : (
                   sortedCredentials.slice(0, visibleLimit).map((cred) => (
                     <React.Fragment key={cred.id}>
-                      {/* Main Credential Row */}
                       <tr
                         onClick={() =>
                           setExpandedId(expandedId === cred.id ? null : cred.id)
                         }
-                        className={`hover:bg-[#353534]/50 cursor-pointer transition-colors group ${expandedId === cred.id ? "bg-[#353534]/70 border-l-2 border-l-[#ffb77d]" : ""}`}
+                        className={`hover:bg-[#353534]/50 cursor-pointer transition-colors group ${
+                          expandedId === cred.id
+                            ? "bg-[#353534]/70 border-l-2 border-l-[#ffb77d]"
+                            : ""
+                        }`}
                       >
                         <td className="p-4 font-bold text-[#e5e2e1] flex items-center gap-3">
                           <div className="w-8 h-8 bg-[#131313] border border-[#47483c] flex items-center justify-center text-[#ffb77d] font-headline select-none">
@@ -413,9 +401,11 @@ export default function VaultView({
                                 ? cred.password
                                 : "••••••••••••"}
                             </span>
-                            <button
+                            <Button
                               onClick={(e) => toggleReveal(cred.id, e)}
-                              className="text-[#c8c7b8]/60 hover:text-[#ffb77d] transition-colors p-1"
+                              variant="ghost"
+                              size="icon-xs"
+                              className="text-[#c8c7b8]/60 hover:text-[#ffb77d] hover:bg-transparent"
                               title={
                                 revealedIds.includes(cred.id)
                                   ? "Mask secrecy"
@@ -427,8 +417,8 @@ export default function VaultView({
                               ) : (
                                 <Eye className="w-3.5 h-3.5" />
                               )}
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                               onClick={() =>
                                 copyToClipboard(
                                   cred.password,
@@ -436,11 +426,13 @@ export default function VaultView({
                                   "password",
                                 )
                               }
-                              className="text-[#c8c7b8]/60 hover:text-[#ffb77d] transition-colors p-1"
+                              variant="ghost"
+                              size="icon-xs"
+                              className="text-[#c8c7b8]/60 hover:text-[#ffb77d] hover:bg-transparent"
                               title="Copy passphrase key"
                             >
                               <Copy className="w-3.5 h-3.5" />
-                            </button>
+                            </Button>
                           </div>
                         </td>
                         <td className="p-4">
@@ -470,7 +462,6 @@ export default function VaultView({
                         </td>
                       </tr>
 
-                      {/* Detail Accordion Panel inside rows */}
                       <AnimatePresence>
                         {expandedId === cred.id && (
                           <tr className="bg-[#1c1b1b]/80 border-t border-b border-[#47483c]/50">
@@ -538,7 +529,7 @@ export default function VaultView({
                                 </div>
 
                                 <div className="flex justify-end gap-3 pt-2 border-t border-[#47483c]/30">
-                                  <button
+                                  <Button
                                     onClick={() =>
                                       copyToClipboard(
                                         cred.username,
@@ -546,25 +537,28 @@ export default function VaultView({
                                         "username",
                                       )
                                     }
-                                    className="px-3 py-1.5 bg-[#201f1f] border border-[#47483c] hover:border-[#ffb77d] text-[#c8c7b8] hover:text-[#ffb77d] text-[11px] uppercase tracking-wider transition-colors flex items-center gap-1"
+                                    variant="outline"
+                                    className="px-3 py-1.5 h-auto bg-[#201f1f] border-[#47483c] hover:border-[#ffb77d] text-[#c8c7b8] hover:text-[#ffb77d] text-[11px] uppercase tracking-wider transition-colors gap-1 rounded-none"
                                   >
                                     <Copy className="w-3 h-3" /> Copy username
-                                  </button>
-                                  <button
+                                  </Button>
+                                  <Button
                                     onClick={() => onEditPasswordClick(cred)}
-                                    className="px-3 py-1.5 bg-[#4b5320]/20 border border-[#c3cc8c]/40 hover:border-[#c3cc8c] text-[#c3cc8c] text-[11px] uppercase tracking-wider transition-all flex items-center gap-1"
+                                    variant="outline"
+                                    className="px-3 py-1.5 h-auto bg-[#4b5320]/20 border-[#c3cc8c]/40 hover:border-[#c3cc8c] hover:bg-[#4b5320]/20 text-[#c3cc8c] text-[11px] uppercase tracking-wider transition-all gap-1 rounded-none"
                                   >
                                     <Edit className="w-3 h-3" /> Modify slab
-                                  </button>
-                                  <button
+                                  </Button>
+                                  <Button
                                     onClick={() =>
                                       onDeletePasswordClick(cred.id)
                                     }
-                                    className="px-3 py-1.5 bg-[#93000a]/20 border border-[#ffb4ab]/40 hover:border-[#ffb4ab] text-[#ffb4ab] text-[11px] uppercase tracking-wider transition-all flex items-center gap-1"
+                                    variant="outline"
+                                    className="px-3 py-1.5 h-auto bg-[#93000a]/20 border-[#ffb4ab]/40 hover:border-[#ffb4ab] hover:bg-[#93000a]/20 text-[#ffb4ab] text-[11px] uppercase tracking-wider transition-all gap-1 rounded-none"
                                   >
                                     <Trash2 className="w-3.5 h-3.5" /> Purge
                                     Crypt
-                                  </button>
+                                  </Button>
                                 </div>
                               </motion.div>
                             </td>
@@ -578,29 +572,30 @@ export default function VaultView({
             </table>
           </div>
 
-          {/* Load More Button matching exact style block bottom */}
           {sortedCredentials.length > visibleLimit && (
             <div className="p-4 border-t-2 border-[#47483c] bg-[#2a2a2a] text-center select-none">
-              <button
+              <Button
+                variant="ghost"
                 onClick={() =>
                   setVisibleLimit(
                     Math.min(visibleLimit + 5, sortedCredentials.length),
                   )
                 }
-                className="text-mono text-xs uppercase text-[#ffb77d] hover:text-[#c3cc8c] tracking-widest font-bold transition-colors cursor-pointer"
+                className="text-mono text-xs uppercase text-[#ffb77d] hover:text-[#c3cc8c] tracking-widest font-bold transition-colors hover:bg-transparent"
               >
                 Load More Secrets
-              </button>
+              </Button>
             </div>
           )}
           {visibleLimit > 5 && sortedCredentials.length > 5 && (
             <div className="p-4 border-t border-[#47483c]/30 bg-[#2a2a2a] text-center select-none">
-              <button
+              <Button
+                variant="ghost"
                 onClick={() => setVisibleLimit(5)}
-                className="text-mono text-[10px] uppercase text-[#c8c7b8]/60 hover:text-[#ffb77d] tracking-widest transition-colors cursor-pointer"
+                className="text-mono text-[10px] uppercase text-[#c8c7b8]/60 hover:text-[#ffb77d] tracking-widest transition-colors hover:bg-transparent"
               >
                 Show less secrets
-              </button>
+              </Button>
             </div>
           )}
         </div>

@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, Lock, Eye, EyeOff, Sparkles } from "lucide-react";
-import type { Credential } from "../schemas/schema";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Field, FieldLabel } from "@/components/ui/field";
+import type { Credential, Group, Strength } from "../schemas/schema";
 
 interface PortalModalProps {
   isOpen: boolean;
@@ -19,9 +22,7 @@ export default function PortalModal({
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [group, setGroup] = useState<
-    "Personal" | "Work" | "Social" | "Finance"
-  >("Personal");
+  const [group, setGroup] = useState<Group>("Personal");
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [notes, setNotes] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -44,8 +45,7 @@ export default function PortalModal({
     }
   }, [editingCredential, isOpen]);
 
-  // Analyze password strength
-  const getPasswordStrength = (pass: string): "Strong" | "Medium" | "Weak" => {
+  const getPasswordStrength = (pass: string): Strength => {
     if (pass.length < 6) return "Weak";
     const hasUpperCase = /[A-Z]/.test(pass);
     const hasLowerCase = /[a-z]/.test(pass);
@@ -65,9 +65,8 @@ export default function PortalModal({
   const handleGenerateRandom = () => {
     const chars =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+{}[]";
-    let length = 16;
     let result = "";
-    for (let i = 0; i < length; i++) {
+    for (let i = 0; i < 16; i++) {
       result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     setPassword(result);
@@ -76,14 +75,7 @@ export default function PortalModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !username || !password) return;
-    onSave({
-      name,
-      username,
-      password,
-      group,
-      websiteUrl,
-      notes,
-    });
+    onSave({ name, username, password, group, websiteUrl, notes });
     onClose();
   };
 
@@ -91,7 +83,6 @@ export default function PortalModal({
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Backdrop screen */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -100,7 +91,6 @@ export default function PortalModal({
             className="absolute inset-0 bg-black/80 backdrop-blur-sm"
           />
 
-          {/* Modal Stone Slab container */}
           <motion.div
             initial={{ scale: 0.95, y: 15, opacity: 0 }}
             animate={{ scale: 1, y: 0, opacity: 1 }}
@@ -108,7 +98,6 @@ export default function PortalModal({
             transition={{ type: "spring", damping: 25, stiffness: 350 }}
             className="stone-slab border-4 border-[#47483c] w-full max-w-lg p-6 overflow-hidden relative text-[#e5e2e1]"
           >
-            {/* Ambient fire glow border top */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#ffb77d]/60 to-transparent" />
 
             <div className="flex justify-between items-center mb-6">
@@ -130,7 +119,6 @@ export default function PortalModal({
               <button
                 onClick={onClose}
                 className="p-1 border border-[#47483c] bg-[#1c1b1b] text-[#c8c7b8] hover:text-[#ffb77d] hover:border-[#ffb77d] transition-colors"
-                id="close-modal-btn"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -140,57 +128,57 @@ export default function PortalModal({
               onSubmit={handleSubmit}
               className="space-y-4 font-body text-sm select-none"
             >
-              <div>
-                <label className="block text-[11px] font-mono uppercase tracking-wider text-[#c8c7b8] mb-1">
-                  Website / Application Name *
-                </label>
-                <input
+              <Field>
+                <FieldLabel className="text-[11px] font-mono uppercase text-[#c8c7b8]">
+                  Website / App Name *
+                </FieldLabel>
+                <Input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Amazon, Google, Kraken"
-                  className="w-full bg-[#0e0e0e] border border-[#47483c] px-3 py-2 text-[#e5e2e1] focus:outline-none focus:border-[#ffb77d] focus:ring-1 focus:ring-[#ffb77d] font-mono placeholder:text-[#c8c7b8]/30 transition-all caret-[#ffb77d]"
+                  className="font-mono h-10"
                 />
-              </div>
+              </Field>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[11px] font-mono uppercase tracking-wider text-[#c8c7b8] mb-1">
-                    Username / Login Identifier *
-                  </label>
-                  <input
+                <Field>
+                  <FieldLabel className="text-[11px] font-mono uppercase text-[#c8c7b8]">
+                    Username *
+                  </FieldLabel>
+                  <Input
                     type="text"
                     required
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="User handle, email, ID"
-                    className="w-full bg-[#0e0e0e] border border-[#47483c] px-3 py-2 text-[#e5e2e1] focus:outline-none focus:border-[#ffb77d] focus:ring-1 focus:ring-[#ffb77d] font-mono placeholder:text-[#c8c7b8]/30 transition-all caret-[#ffb77d]"
+                    className="font-mono h-10"
                   />
-                </div>
+                </Field>
 
-                <div>
-                  <label className="block text-[11px] font-mono uppercase tracking-wider text-[#c8c7b8] mb-1 text-left">
-                    Vault Category Group
-                  </label>
+                <Field>
+                  <FieldLabel className="text-[11px] font-mono uppercase text-[#c8c7b8]">
+                    Vault Category
+                  </FieldLabel>
                   <select
                     value={group}
                     onChange={(e) => setGroup(e.target.value as any)}
-                    className="w-full bg-[#0e0e0e] border border-[#47483c] px-3 py-2 text-[#e5e2e1] focus:outline-none focus:border-[#ffb77d] focus:ring-1 focus:ring-[#ffb77d] font-mono text-left transition-all"
+                    className="w-full bg-[#0e0e0e] border border-input h-10 px-3 py-2 text-xs focus:outline-none focus:border-ring focus:ring-1 focus:ring-ring font-mono transition-all"
                   >
                     <option value="Personal">Personal</option>
                     <option value="Work">Work</option>
                     <option value="Social">Social</option>
                     <option value="Finance">Finance</option>
                   </select>
-                </div>
+                </Field>
               </div>
 
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <label className="block text-[11px] font-mono uppercase tracking-wider text-[#c8c7b8]">
-                    Secret Password / Key *
-                  </label>
+              <Field>
+                <div className="flex justify-between items-center w-full">
+                  <FieldLabel className="text-[11px] font-mono uppercase text-[#c8c7b8]">
+                    Secret Password *
+                  </FieldLabel>
                   <button
                     type="button"
                     onClick={handleGenerateRandom}
@@ -199,14 +187,14 @@ export default function PortalModal({
                     <Sparkles className="w-3 h-3" /> Quick Gen
                   </button>
                 </div>
-                <div className="relative">
-                  <input
+                <div className="relative w-full">
+                  <Input
                     type={showPassword ? "text" : "password"}
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter password key..."
-                    className="w-full bg-[#0e0e0e] border border-[#47483c] pl-3 pr-10 py-2 text-[#e5e2e1] focus:outline-none focus:border-[#ffb77d] focus:ring-1 focus:ring-[#ffb77d] font-mono placeholder:text-[#c8c7b8]/30 transition-all caret-[#ffb77d]"
+                    className="font-mono h-10 pr-10"
                   />
                   <button
                     type="button"
@@ -221,78 +209,61 @@ export default function PortalModal({
                   </button>
                 </div>
 
-                {/* Password Strength Indicator inside Form */}
                 {password && (
-                  <div className="mt-2 flex items-center justify-between text-[11px] font-mono">
+                  <div className="mt-1 flex items-center justify-between text-[11px] font-mono w-full">
                     <div className="flex items-center gap-2">
                       <span className="text-[#c8c7b8]/60">Cryptic Weight:</span>
                       <span
-                        className={`font-bold uppercase tracking-wider ${
-                          strength === "Strong"
-                            ? "text-[#c3cc8c]"
-                            : strength === "Medium"
-                              ? "text-[#ffb77d]"
-                              : "text-[#ffb4ab]"
-                        }`}
+                        className={`font-bold uppercase tracking-wider ${strength === "Strong" ? "text-[#c3cc8c]" : strength === "Medium" ? "text-[#ffb77d]" : "text-[#ffb4ab]"}`}
                       >
                         {strength}
                       </span>
                     </div>
-                    <div className="flex gap-1 h-1.5 w-24 bg-[#0e0e0e] border border-[#47483c]">
-                      <div
-                        className={`h-full ${
-                          strength === "Weak"
-                            ? "w-1/3 bg-[#ffb4ab]"
-                            : strength === "Medium"
-                              ? "w-2/3 bg-[#ffb77d]"
-                              : "w-full bg-[#c3cc8c]"
-                        }`}
-                      />
-                    </div>
                   </div>
                 )}
-              </div>
+              </Field>
 
-              <div>
-                <label className="block text-[11px] font-mono uppercase tracking-wider text-[#c8c7b8] mb-1">
+              <Field>
+                <FieldLabel className="text-[11px] font-mono uppercase text-[#c8c7b8]">
                   Website URL (Optional)
-                </label>
-                <input
+                </FieldLabel>
+                <Input
                   type="text"
                   value={websiteUrl}
                   onChange={(e) => setWebsiteUrl(e.target.value)}
                   placeholder="https://example.com"
-                  className="w-full bg-[#0e0e0e] border border-[#47483c] px-3 py-2 text-[#e5e2e1] focus:outline-none focus:border-[#ffb77d] focus:ring-1 focus:ring-[#ffb77d] font-mono placeholder:text-[#c8c7b8]/30 transition-all caret-[#ffb77d]"
+                  className="font-mono h-10"
                 />
-              </div>
+              </Field>
 
-              <div>
-                <label className="block text-[11px] font-mono uppercase tracking-wider text-[#c8c7b8] mb-1">
-                  Secure Hieroglyph Notes / Description (Optional)
-                </label>
+              <Field>
+                <FieldLabel className="text-[11px] font-mono uppercase text-[#c8c7b8]">
+                  Secure Notes (Optional)
+                </FieldLabel>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Write relevant cave instructions..."
                   rows={2}
-                  className="w-full bg-[#0e0e0e] border border-[#47483c] px-3 py-2 text-[#e5e2e1] focus:outline-none focus:border-[#ffb77d] focus:ring-1 focus:ring-[#ffb77d] font-mono placeholder:text-[#c8c7b8]/30 transition-all caret-[#ffb77d] resize-none"
+                  className="w-full bg-[#0e0e0e] border border-input px-3 py-2 text-xs text-foreground focus:outline-none focus:border-ring focus:ring-1 focus:ring-ring font-mono placeholder:text-muted-foreground transition-all resize-none"
                 />
-              </div>
+              </Field>
 
               <div className="pt-2 flex gap-3">
-                <button
+                <Button
                   type="button"
+                  variant="outline"
                   onClick={onClose}
-                  className="w-1/3 border border-[#47483c] bg-[#1c1b1b] hover:bg-[#353534] hover:text-[#ffb77d] py-2.5 font-mono text-[12px] uppercase tracking-wider font-bold transition-colors cursor-pointer"
+                  className="w-1/3 h-10 font-mono text-[12px] uppercase"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
-                  className="w-2/3 bg-[#4b5320] border-2 border-[#c3cc8c] text-[#bdc787] hover:bg-[#c3cc8c] hover:text-[#2d3404] py-2.5 font-mono text-[12px] uppercase tracking-wider font-bold transition-all shadow-[0_0_10px_rgba(195,204,140,0.2)] hover:shadow-[0_0_15px_rgba(195,204,140,0.5)] cursor-pointer"
+                  className="w-2/3 h-10 font-mono text-[12px] uppercase bg-[#4b5320] hover:bg-[#c3cc8c] text-[#bdc787] hover:text-[#2d3404] border border-[#c3cc8c]"
                 >
                   {editingCredential ? "Update Chomp Seal" : "Secure In Cave"}
-                </button>
+                </Button>
               </div>
             </form>
           </motion.div>

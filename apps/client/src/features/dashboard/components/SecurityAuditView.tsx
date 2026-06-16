@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   ShieldCheck,
@@ -7,9 +7,8 @@ import {
   Check,
   RefreshCw,
   Sparkles,
-  Key,
-  ChevronRight,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import type { Credential } from "../schemas/schema";
 
 interface SecurityAuditProps {
@@ -24,13 +23,11 @@ export default function SecurityAuditView({
   const [upgradingId, setUpgradingId] = useState<string | null>(null);
   const [upgradeSuccess, setUpgradeSuccess] = useState<string | null>(null);
 
-  // Analyze credentials
   const total = credentials.length;
   const strong = credentials.filter((c) => c.strength === "Strong");
   const medium = credentials.filter((c) => c.strength === "Medium");
   const weak = credentials.filter((c) => c.strength === "Weak");
 
-  // Find duplicated passwords
   const passwordCounts: { [key: string]: string[] } = {};
   credentials.forEach((c) => {
     if (!passwordCounts[c.password]) {
@@ -46,7 +43,6 @@ export default function SecurityAuditView({
       apps: passwordCounts[p],
     }));
 
-  // Calculate dynamic security score
   const score =
     total > 0
       ? Math.round(
@@ -54,16 +50,12 @@ export default function SecurityAuditView({
         )
       : 100;
 
-  // Upgrade handler
   const handleAutoUpgrade = (id: string, appName: string) => {
     setUpgradingId(id);
-
-    // Generate secure randomized key
     const chars =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+{}[]";
-    let length = 16;
     let result = "";
-    for (let i = 0; i < length; i++) {
+    for (let i = 0; i < 16; i++) {
       result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
 
@@ -77,7 +69,6 @@ export default function SecurityAuditView({
 
   return (
     <div className="space-y-8 select-none max-w-4xl mx-auto">
-      {/* Toast Confirmation for upgrade */}
       <AnimatePresence>
         {upgradeSuccess && (
           <motion.div
@@ -114,7 +105,6 @@ export default function SecurityAuditView({
         </div>
       </div>
 
-      {/* Main Score & Audit Summary cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div className="stone-slab p-6 border-4 flex flex-col justify-between">
           <span className="font-mono text-[10px] uppercase text-[#c8c7b8]/60 tracking-wider block">
@@ -131,8 +121,9 @@ export default function SecurityAuditView({
             </p>
           </div>
           <div className="h-2 bg-[#131313] border border-[#47483c] p-0.5 mt-2">
+            {/* Fixed the typo 'class' here */}
             <div
-              className={`h-full class transition-all duration-1000 ${score >= 80 ? "bg-[#c3cc8c] w-full" : score >= 50 ? "bg-[#ffb77d] w-2/3" : "bg-[#ffb4ab] w-1/3"}`}
+              className={`h-full transition-all duration-1000 ${score >= 80 ? "bg-[#c3cc8c] w-full" : score >= 50 ? "bg-[#ffb77d] w-2/3" : "bg-[#ffb4ab] w-1/3"}`}
               style={{ width: `${score}%` }}
             />
           </div>
@@ -174,8 +165,7 @@ export default function SecurityAuditView({
                     Weak Crypts Detected!
                   </h4>
                   <p className="text-[10px] text-[#c8c7b8] mt-0.5 leading-normal">
-                    {weak.length} entries fail standard security filters length
-                    or characters test.
+                    {weak.length} entries fail standard security filters.
                   </p>
                 </div>
               </div>
@@ -187,7 +177,7 @@ export default function SecurityAuditView({
                     No Weak Crypts
                   </h4>
                   <p className="text-[10px] text-[#c8c7b8] mt-0.5 leading-normal">
-                    All password cells meet minimum strength thresholds.
+                    All password cells meet minimum strength.
                   </p>
                 </div>
               </div>
@@ -201,8 +191,7 @@ export default function SecurityAuditView({
                     Duplicated Key Reuse!
                   </h4>
                   <p className="text-[10px] text-[#c8c7b8] mt-0.5 leading-normal">
-                    {duplicates.length} keys are reused across multiple items,
-                    allowing catastrophic access.
+                    {duplicates.length} keys are reused across multiple items.
                   </p>
                 </div>
               </div>
@@ -214,7 +203,7 @@ export default function SecurityAuditView({
                     Perfect Uniqueness
                   </h4>
                   <p className="text-[10px] text-[#c8c7b8] mt-0.5 leading-normal">
-                    Every app holds completely distinct passwords.
+                    Every app holds distinct passwords.
                   </p>
                 </div>
               </div>
@@ -223,7 +212,6 @@ export default function SecurityAuditView({
         </div>
       </div>
 
-      {/* Weak Passwords upgrade lists */}
       {weak.length > 0 && (
         <section className="space-y-4">
           <h3 className="font-headline text-lg text-[#ffb4ab] uppercase tracking-wider flex items-center gap-2">
@@ -242,20 +230,12 @@ export default function SecurityAuditView({
                   <p className="font-mono text-[10px] text-[#c8c7b8] mt-0.5">
                     User: {cred.username}
                   </p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className="text-[9px] font-mono uppercase bg-[#93000a]/20 border border-[#ffb4ab]/40 text-[#ffb4ab] px-1.5 py-0.5">
-                      Weak Password
-                    </span>
-                    <span className="font-mono text-[10px] text-[#c8c7b8]/40 truncate max-w-[80px]">
-                      ({cred.password})
-                    </span>
-                  </div>
                 </div>
 
-                <button
+                <Button
                   onClick={() => handleAutoUpgrade(cred.id, cred.name)}
                   disabled={upgradingId === cred.id}
-                  className="px-3.5 py-2.5 bg-[#93000a]/30 border border-[#ffb4ab] hover:bg-[#ffb4ab] hover:text-[#131313] disabled:bg-[#1c1b1b] disabled:text-[#c8c7b8]/40 disabled:border-[#47483c] transition-all font-mono text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-sm hover:shadow-[0_0_10px_rgba(255,180,171,0.3)] select-none"
+                  className="px-3.5 py-2.5 h-auto bg-[#93000a]/30 border border-[#ffb4ab] text-[#ffb4ab] hover:bg-[#ffb4ab] hover:text-[#131313] disabled:bg-[#1c1b1b] disabled:text-[#c8c7b8]/40 disabled:border-[#47483c] transition-all font-mono text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-sm hover:shadow-[0_0_10px_rgba(255,180,171,0.3)]"
                 >
                   {upgradingId === cred.id ? (
                     <>
@@ -268,14 +248,13 @@ export default function SecurityAuditView({
                       AUTO-CHOMP
                     </>
                   )}
-                </button>
+                </Button>
               </div>
             ))}
           </div>
         </section>
       )}
 
-      {/* Duplicate / Reused passwords audit */}
       {duplicates.length > 0 && (
         <section className="space-y-4">
           <h3 className="font-headline text-lg text-[#ffb77d] uppercase tracking-wider flex items-center gap-2">
@@ -318,7 +297,6 @@ export default function SecurityAuditView({
         </section>
       )}
 
-      {/* Security is healthy dashboard message */}
       {weak.length === 0 && duplicates.length === 0 && (
         <div className="stone-slab p-8 border-4 border-[#c3cc8c]/40 bg-[#4b5320]/10 flex flex-col items-center text-center space-y-3">
           <div className="w-14 h-14 rounded-full bg-[#4b5320] border-2 border-[#c3cc8c] flex items-center justify-center text-[#c3cc8c]">
