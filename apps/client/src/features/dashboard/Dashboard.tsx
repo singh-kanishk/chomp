@@ -1,5 +1,4 @@
 import { useDashboardStore } from "@/store/useDashboardStore";
-import { useVaultStore } from "@/store/useVaultStore";
 
 // Layout & UI
 import { Sidebar } from "./components/layout/SideBar";

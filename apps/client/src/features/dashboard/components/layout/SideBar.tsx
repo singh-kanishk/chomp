@@ -1,4 +1,12 @@
-import { Lock, HelpCircle, LogOut, Plus } from "lucide-react";
+import {
+  Lock,
+  HelpCircle,
+  LogOut,
+  Plus,
+  Key,
+  ShieldCheck,
+  Settings,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { GroupType } from "../../schemas/schema";
 import { useDashboardStore } from "@/store/useDashboardStore";
@@ -46,7 +54,50 @@ export function Sidebar() {
             Vault Dashboard
           </span>
         </Button>
-        {/* ... Include your other Navigation Buttons (Generator, Security, Settings) here ... */}
+        {/* Key Generator Tab */}
+        <Button
+          onClick={() => setActiveTab("generator")}
+          className={`flex items-center gap-4 px-4 py-3 text-left transition-all relative border-r-2 ${
+            activeTab === "generator"
+              ? "bg-[#4b5320] text-[#bdc787] border-[#c3cc8c] shadow-[0_0_15px_rgba(195,204,140,0.25)]"
+              : "text-[#c8c7b8] hover:text-[#ffb77d] hover:bg-[#353534] border-transparent"
+          }`}
+        >
+          <Key className="w-5 h-5 shrink-0" />
+          <span className="text-xs font-bold uppercase tracking-wider">
+            Generator Forge
+          </span>
+        </Button>
+
+        {/* Security Tab */}
+        <Button
+          onClick={() => setActiveTab("audit")}
+          className={`flex items-center gap-4 px-4 py-3 text-left transition-all relative border-r-2 ${
+            activeTab === "audit"
+              ? "bg-[#4b5320] text-[#bdc787] border-[#c3cc8c] shadow-[0_0_15px_rgba(195,204,140,0.25)]"
+              : "text-[#c8c7b8] hover:text-[#ffb77d] hover:bg-[#353534] border-transparent"
+          }`}
+        >
+          <ShieldCheck className="w-5 h-5 shrink-0" />
+          <span className="text-xs font-bold uppercase tracking-wider">
+            Security Sentinel
+          </span>
+        </Button>
+
+        {/* Settings Tab */}
+        <Button
+          onClick={() => setActiveTab("settings")}
+          className={`flex items-center gap-4 px-4 py-3 text-left transition-all relative border-r-2 ${
+            activeTab === "settings"
+              ? "bg-[#4b5320] text-[#bdc787] border-[#c3cc8c] shadow-[0_0_15px_rgba(195,204,140,0.25)]"
+              : "text-[#c8c7b8] hover:text-[#ffb77d] hover:bg-[#353534] border-transparent"
+          }`}
+        >
+          <Settings className="w-5 h-5 shrink-0" />
+          <span className="text-xs font-bold uppercase tracking-wider">
+            Slab Settings
+          </span>
+        </Button>
 
         <div className="mt-6 px-4">
           <p className="text-[10px] uppercase text-[#c8c7b8]/40 mb-2 font-mono tracking-widest">

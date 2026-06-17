@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Copy,
@@ -25,9 +25,10 @@ export default function GeneratorView() {
   const [includeSymbols, setIncludeSymbols] = useState(true);
   const [copied, setCopied] = useState(false);
 
-  setActiveTab("vault");
-  setSelectedGroup("All");
-  setSearchQuery("Forge");
+  useEffect(() => {
+    setSelectedGroup("All");
+    setSearchQuery("Forge");
+  }, [setSelectedGroup, setSearchQuery]);
 
   const onAddSecurely = (generatedPassword: string) => {
     saveCredential({
@@ -321,7 +322,10 @@ export default function GeneratorView() {
           {password && !password.startsWith("Please") && (
             <Button
               type="button"
-              onClick={() => onAddSecurely(password)}
+              onClick={() => {
+                onAddSecurely(password);
+                setActiveTab("vault");
+              }}
               variant="outline"
               className="sm:w-1/3 h-12 bg-transparent border-2 border-[#ffb77d] text-[#ffb77d] hover:bg-[#ffb77d] hover:text-[#131313] font-mono text-[12px] uppercase tracking-wider font-bold transition-all flex gap-1.5 rounded-none"
             >

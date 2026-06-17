@@ -2,6 +2,13 @@ import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { useDashboardStore } from "@/store/useDashboardStore";
 
+export interface CustomPromptConfig {
+  isOpen: boolean;
+  title: string;
+  message: string;
+  type: "info" | "confirm";
+  onConfirm?: () => void;
+}
 export function CustomPrompt() {
   const { customPrompt, setCustomPrompt } = useDashboardStore();
   const onClose = () => setCustomPrompt(null);
