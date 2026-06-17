@@ -1,16 +1,14 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Lock, UserCheck } from "lucide-react";
+import { useDashboardStore } from "@/store/useDashboardStore";
 
-interface LockScreenProps {
-  isLocked: boolean;
-  onUnlock: () => void;
-}
-
-export function LockScreen({ isLocked, onUnlock }: LockScreenProps) {
+export function LockScreen() {
+  const { isLocked, setIsLocked } = useDashboardStore();
   const [masterPasswordInput, setMasterPasswordInput] = useState("");
   const [lockError, setLockError] = useState(false);
 
+  const onUnlock = () => setIsLocked(false);
   const handleUnlockCavern = (e: React.FormEvent) => {
     e.preventDefault();
     const lowerInput = masterPasswordInput.toLowerCase();

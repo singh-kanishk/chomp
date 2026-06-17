@@ -1,21 +1,36 @@
 import { Search, Bell, User, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useDashboardStore } from "@/store/useDashboardStore";
 
-interface TopbarProps {
-  searchQuery: string;
-  onSearchChange: (val: string) => void;
-  onAddPasswordClick: () => void;
-  onNotificationClick: () => void;
-  onProfileClick: () => void;
-}
+export function Topbar() {
+  const {
+    activeTab,
+    setActiveTab,
+    setSearchQuery,
+    searchQuery,
+    setCustomPrompt,
+    openPortalModal,
+  } = useDashboardStore();
+  const onSearchChange = (val: string) => {
+    setSearchQuery(val);
+    if (activeTab !== "vault") setActiveTab("vault");
+  };
+  const onAddPasswordClick = () => openPortalModal;
+  const onProfileClick = () =>
+    setCustomPrompt({
+      isOpen: true,
+      title: "Vault Operator Signet",
+      message: "Role: Primary Volcanic Vault Operator",
+      type: "info",
+    });
+  const onNotificationClick = () =>
+    setCustomPrompt({
+      isOpen: true,
+      title: "Sentinel System Update",
+      message: "Core Security Audit health score is active.",
+      type: "info",
+    });
 
-export function Topbar({
-  searchQuery,
-  onSearchChange,
-  onAddPasswordClick,
-  onNotificationClick,
-  onProfileClick,
-}: TopbarProps) {
   return (
     <header className="flex justify-between items-center px-8 md:px-16 h-20 border-b-2 border-[#47483c] bg-[#131313] sticky top-0 z-30 select-none">
       <div className="flex items-center gap-3 text-[#c8c7b8]">

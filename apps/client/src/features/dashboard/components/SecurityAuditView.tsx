@@ -9,17 +9,10 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { Credential } from "../schemas/schema";
+import { useVaultStore } from "@/store/useVaultStore";
 
-interface SecurityAuditProps {
-  credentials: Credential[];
-  onUpgradePassword: (id: string, newPass: string) => void;
-}
-
-export default function SecurityAuditView({
-  credentials,
-  onUpgradePassword,
-}: SecurityAuditProps) {
+export default function SecurityAuditView() {
+  const { credentials, upgradePassword } = useVaultStore();
   const [upgradingId, setUpgradingId] = useState<string | null>(null);
   const [upgradeSuccess, setUpgradeSuccess] = useState<string | null>(null);
 
@@ -60,7 +53,7 @@ export default function SecurityAuditView({
     }
 
     setTimeout(() => {
-      onUpgradePassword(id, result);
+      upgradePassword(id, result);
       setUpgradingId(null);
       setUpgradeSuccess(appName);
       setTimeout(() => setUpgradeSuccess(null), 3000);

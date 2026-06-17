@@ -1,11 +1,10 @@
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useDashboardStore } from "@/store/useDashboardStore";
 
-interface FabProps {
-  onClick: () => void;
-}
-
-export function Fab({ onClick }: FabProps) {
+export function Fab() {
+  const { openPortalModal } = useDashboardStore();
+  const onClick = () => openPortalModal;
   return (
     <Button
       onClick={onClick}

@@ -10,12 +10,13 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useVaultStore } from "@/store/useVaultStore";
+import { useDashboardStore } from "@/store/useDashboardStore";
 
-interface GeneratorViewProps {
-  onAddSecurely: (pass: string) => void;
-}
-
-export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
+export default function GeneratorView() {
+  const { saveCredential } = useVaultStore();
+  const { setActiveTab, setSelectedGroup, setSearchQuery } =
+    useDashboardStore();
   const [password, setPassword] = useState("");
   const [length, setLength] = useState(16);
   const [includeUppercase, setIncludeUppercase] = useState(true);
@@ -24,6 +25,20 @@ export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
   const [includeSymbols, setIncludeSymbols] = useState(true);
   const [copied, setCopied] = useState(false);
 
+  setActiveTab("vault");
+  setSelectedGroup("All");
+  setSearchQuery("Forge");
+
+  const onAddSecurely = (generatedPassword: string) => {
+    saveCredential({
+      name: "Unassigned Forge",
+      username: "user_handle",
+      password: generatedPassword,
+      group: "Personal",
+      websiteUrl: "",
+      notes: "Slab key forged inside Primitive Key Generator.",
+    });
+  };
   const generatePassword = () => {
     let charset = "";
     if (includeUppercase) charset += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";

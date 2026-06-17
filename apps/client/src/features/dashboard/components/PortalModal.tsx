@@ -5,20 +5,17 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import type { Credential, Group, Strength } from "../schemas/schema";
+import { useDashboardStore } from "@/store/useDashboardStore";
+import { useVaultStore } from "@/store/useVaultStore";
 
-interface PortalModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: (data: Omit<Credential, "id" | "strength">) => void;
-  editingCredential?: Credential | null;
-}
-
-export default function PortalModal({
-  isOpen,
-  onClose,
-  onSave,
-  editingCredential,
-}: PortalModalProps) {
+export default function PortalModal() {
+  const { isModalOpen, closePortalModal, editingCredential } =
+    useDashboardStore();
+  const { saveCredential } = useVaultStore();
+  const onSave = (data: Omit<Credential, "id" | "strength">) => {
+    saveCredential(data, editingCredential?.id);
+    closePortalModal();
+  };
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -43,7 +40,7 @@ export default function PortalModal({
       setWebsiteUrl("");
       setNotes("");
     }
-  }, [editingCredential, isOpen]);
+  }, [editingCredential, isModalOpen]);
 
   const getPasswordStrength = (pass: string): Strength => {
     if (pass.length < 6) return "Weak";
@@ -76,18 +73,18 @@ export default function PortalModal({
     e.preventDefault();
     if (!name || !username || !password) return;
     onSave({ name, username, password, group, websiteUrl, notes });
-    onClose();
+    closePortalModal();
   };
 
   return (
     <AnimatePresence>
-      {isOpen && (
+      {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onClick={closePortalModal}
             className="absolute inset-0 bg-black/80 backdrop-blur-sm"
           />
 
@@ -117,7 +114,7 @@ export default function PortalModal({
                 </div>
               </div>
               <button
-                onClick={onClose}
+                onClick={closePortalModal}
                 className="p-1 border border-[#47483c] bg-[#1c1b1b] text-[#c8c7b8] hover:text-[#ffb77d] hover:border-[#ffb77d] transition-colors"
               >
                 <X className="w-5 h-5" />
@@ -253,7 +250,7 @@ export default function PortalModal({
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={onClose}
+                  onClick={closePortalModal}
                   className="w-1/3 h-10 font-mono text-[12px] uppercase"
                 >
                   Cancel

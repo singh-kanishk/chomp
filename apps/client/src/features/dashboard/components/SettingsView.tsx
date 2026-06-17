@@ -12,20 +12,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import type { Credential } from "../schemas/schema";
+import { useVaultStore } from "@/store/useVaultStore";
 
-interface SettingsViewProps {
-  onClearVault: () => void;
-  onResetToDefaults: () => void;
-  onImportBackup: (imported: Credential[]) => void;
-  exportCredentials: () => string;
-}
+export default function SettingsView() {
+  const { clearVault, resetToDefaults, importBackup, getExportString } =
+    useVaultStore();
 
-export default function SettingsView({
-  onClearVault,
-  onResetToDefaults,
-  onImportBackup,
-  exportCredentials,
-}: SettingsViewProps) {
+  const onClearVault = () => clearVault();
+  const onResetToDefaults = () => resetToDefaults();
+  const onImportBackup = () => importBackup;
+  const exportCredentials = () => getExportString();
+
   const [masterKey, setMasterKey] = useState("CHOMP_MASTER_GUARD_2026!");
   const [showKey, setShowKey] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);

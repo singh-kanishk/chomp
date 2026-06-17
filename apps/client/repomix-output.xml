@@ -100,7 +100,9 @@ src/
     pre-login.ts
   store/
     useCredentialsStore.ts
+    useDashboardStore.ts
     useUserStore.ts
+    useVaultStore.ts
   workers/
     hash.ts
   index.css
@@ -1196,27 +1198,24 @@ export function BackgroundWatermark() {
 <file path="src/features/dashboard/components/layout/SideBar.tsx">
 import { Lock, HelpCircle, LogOut, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { TabType, GroupType } from "../../schemas/schema";
+import type { GroupType } from "../../schemas/schema";
+import { useDashboardStore } from "@/store/useDashboardStore";
 
-interface SidebarProps {
-  activeTab: TabType;
-  setActiveTab: (tab: TabType) => void;
-  selectedGroup: GroupType;
-  setSelectedGroup: (group: GroupType) => void;
-  onNewSecretClick: () => void;
-  onHelpClick: () => void;
-  onLockClick: () => void;
-}
+export function Sidebar() {
+  const {
+    activeTab,
+    setActiveTab,
+    selectedGroup,
+    setSelectedGroup,
+    openPortalModal,
+    setShowHelp,
+    setIsLocked,
+  } = useDashboardStore();
 
-export function Sidebar({
-  activeTab,
-  setActiveTab,
-  selectedGroup,
-  setSelectedGroup,
-  onNewSecretClick,
-  onHelpClick,
-  onLockClick,
-}: SidebarProps) {
+  const onNewSecretClick = () => openPortalModal();
+  const onHelpClick = () => setShowHelp(true);
+  const onLockClick = () => setIsLocked(true);
+
   return (
     <nav className="fixed left-0 top-0 h-screen w-64 bg-[#2a2a2a] border-r-4 border-[#353534] shadow-[5px_0_0_0_rgba(0,0,0,0.3)] flex flex-col z-40">
       <div className="p-6 border-b-2 border-[#47483c] select-none">
@@ -1311,22 +1310,37 @@ export function Sidebar({
 <file path="src/features/dashboard/components/layout/Topbar.tsx">
 import { Search, Bell, User, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useDashboardStore } from "@/store/useDashboardStore";
 
-interface TopbarProps {
-  searchQuery: string;
-  onSearchChange: (val: string) => void;
-  onAddPasswordClick: () => void;
-  onNotificationClick: () => void;
-  onProfileClick: () => void;
-}
+export function Topbar() {
+  const {
+    activeTab,
+    setActiveTab,
+    setSearchQuery,
+    searchQuery,
+    setCustomPrompt,
+    openPortalModal,
+  } = useDashboardStore();
+  const onSearchChange = (val: string) => {
+    setSearchQuery(val);
+    if (activeTab !== "vault") setActiveTab("vault");
+  };
+  const onAddPasswordClick = () => openPortalModal;
+  const onProfileClick = () =>
+    setCustomPrompt({
+      isOpen: true,
+      title: "Vault Operator Signet",
+      message: "Role: Primary Volcanic Vault Operator",
+      type: "info",
+    });
+  const onNotificationClick = () =>
+    setCustomPrompt({
+      isOpen: true,
+      title: "Sentinel System Update",
+      message: "Core Security Audit health score is active.",
+      type: "info",
+    });
 
-export function Topbar({
-  searchQuery,
-  onSearchChange,
-  onAddPasswordClick,
-  onNotificationClick,
-  onProfileClick,
-}: TopbarProps) {
   return (
     <header className="flex justify-between items-center px-8 md:px-16 h-20 border-b-2 border-[#47483c] bg-[#131313] sticky top-0 z-30 select-none">
       <div className="flex items-center gap-3 text-[#c8c7b8]">
@@ -1375,24 +1389,14 @@ export function Topbar({
 <file path="src/features/dashboard/components/modals/CustomPrompt.tsx">
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
+import { useDashboardStore } from "@/store/useDashboardStore";
 
-export type CustomPromptConfig = {
-  isOpen: boolean;
-  title: string;
-  message: string;
-  type: "info" | "confirm";
-  onConfirm?: () => void;
-};
-
-interface CustomPromptProps {
-  config: CustomPromptConfig | null;
-  onClose: () => void;
-}
-
-export function CustomPrompt({ config, onClose }: CustomPromptProps) {
+export function CustomPrompt() {
+  const { customPrompt, setCustomPrompt } = useDashboardStore();
+  const onClose = () => setCustomPrompt(null);
   return (
     <AnimatePresence>
-      {config?.isOpen && (
+      {customPrompt?.isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <motion.div
             initial={{ opacity: 0 }}
@@ -1411,15 +1415,15 @@ export function CustomPrompt({ config, onClose }: CustomPromptProps) {
             <div className="absolute top-0 left-0 right-0 h-1 bg-[#ffb77d]" />
 
             <h3 className="font-headline text-sm text-[#ffb77d] uppercase tracking-wider mb-3">
-              🔱 {config.title}
+              🔱 {customPrompt.title}
             </h3>
 
             <div className="bg-[#0e0e0e] border border-[#47483c] p-3 text-xs text-[#c8c7b8] leading-relaxed rounded-xs whitespace-pre-line mb-5">
-              {config.message}
+              {customPrompt.message}
             </div>
 
             <div className="flex gap-3 justify-end">
-              {config.type === "confirm" ? (
+              {customPrompt.type === "confirm" ? (
                 <>
                   <Button
                     onClick={onClose}
@@ -1429,7 +1433,7 @@ export function CustomPrompt({ config, onClose }: CustomPromptProps) {
                   </Button>
                   <Button
                     onClick={() => {
-                      if (config.onConfirm) config.onConfirm();
+                      if (customPrompt.onConfirm) customPrompt.onConfirm();
                       onClose();
                     }}
                     className="px-5 py-2 bg-[#93000a]/20 border border-[#ffb4ab] text-[#ffb4ab] hover:bg-[#ffb4ab] hover:text-[#131313] uppercase text-[10px] tracking-wider transition-all font-bold cursor-pointer"
@@ -1457,16 +1461,14 @@ export function CustomPrompt({ config, onClose }: CustomPromptProps) {
 <file path="src/features/dashboard/components/modals/HelpScroll.tsx">
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
+import { useDashboardStore } from "@/store/useDashboardStore";
 
-interface HelpScrollProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export function HelpScroll({ isOpen, onClose }: HelpScrollProps) {
+export function HelpScroll() {
+  const { showHelp, setShowHelp } = useDashboardStore();
+  const onClose = () => setShowHelp(false);
   return (
     <AnimatePresence>
-      {isOpen && (
+      {showHelp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <motion.div
             initial={{ opacity: 0 }}
@@ -1540,20 +1542,19 @@ export function HelpScroll({ isOpen, onClose }: HelpScrollProps) {
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Lock, UserCheck } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useDashboardStore } from "@/store/useDashboardStore";
 
-interface LockScreenProps {
-  isLocked: boolean;
-  onUnlock: () => void;
-}
-
-export function LockScreen({ isLocked, onUnlock }: LockScreenProps) {
+export function LockScreen() {
+  const { isLocked, setIsLocked } = useDashboardStore();
   const [masterPasswordInput, setMasterPasswordInput] = useState("");
   const [lockError, setLockError] = useState(false);
 
+  const onUnlock = () => setIsLocked(false);
   const handleUnlockCavern = (e: React.FormEvent) => {
     e.preventDefault();
-    if (masterPasswordInput.toLowerCase() === "chomp") {
+    const lowerInput = masterPasswordInput.toLowerCase();
+
+    if (lowerInput === "chomp") {
       setLockError(false);
       setMasterPasswordInput("");
       onUnlock();
@@ -1571,7 +1572,79 @@ export function LockScreen({ isLocked, onUnlock }: LockScreenProps) {
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-50 bg-[#131313] flex flex-col items-center justify-center p-4 select-none cave-bg"
         >
-          {/* Include your exact Lock Screen styling and markup here */}
+          {/* Runes matrix in background */}
+          <div
+            className="absolute inset-0 opacity-10 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(255,183,125,0.15) 1px, transparent 1px)",
+              backgroundSize: "24px 24px",
+            }}
+          />
+
+          <motion.div
+            initial={{ scale: 0.95, y: 15 }}
+            animate={{ scale: 1, y: 0 }}
+            transition={{ type: "spring", damping: 20 }}
+            className="stone-slab max-w-md w-full p-8 border-4 border-[#ffb77d]/30 text-center space-y-6 relative"
+          >
+            <div className="absolute top-2 left-2 text-[9px] font-mono text-[#c8c7b8]/20 tracking-widest">
+              GATE_PORT_3000
+            </div>
+
+            <div className="flex flex-col items-center">
+              <div className="w-16 h-16 rounded-full bg-[#2a2a2a] border-2 border-[#ffb77d] flex items-center justify-center text-[#ffb77d] shadow-[0_0_15px_rgba(255,183,125,0.3)] animate-pulse mb-3">
+                <Lock className="w-8 h-8" />
+              </div>
+              <h1 className="font-headline text-3xl font-black text-[#ffb77d] uppercase tracking-tighter">
+                CHOMP VAULT
+              </h1>
+              <p className="font-mono text-xs text-[#c8c7b8]/60 uppercase tracking-widest mt-1">
+                Fortress Security Engaged
+              </p>
+            </div>
+
+            <form onSubmit={handleUnlockCavern} className="space-y-4 pt-2">
+              <div>
+                <label className="block font-mono text-[10px] text-[#c8c7b8] uppercase tracking-widest text-left mb-1.5 justify-center flex gap-1">
+                  Enter master passcode to release seal{" "}
+                  <span className="text-[#ffb77d] font-bold">
+                    (Hint: 'chomp')
+                  </span>
+                </label>
+                <input
+                  type="password"
+                  required
+                  autoFocus
+                  placeholder="Provide gate key..."
+                  value={masterPasswordInput}
+                  onChange={(e) => setMasterPasswordInput(e.target.value)}
+                  className="w-full bg-[#0e0e0e] border-2 border-[#47483c] focus:border-[#ffb77d] px-4 py-3 text-center text-[#ffb77d] font-mono text-sm tracking-widest placeholder:text-[#c8c7b8]/35 focus:outline-none focus:ring-1 focus:ring-[#ffb77d] transition-all caret-[#ffb77d]"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-[#4b5320] border-2 border-[#c3cc8c] text-[#bdc787] hover:bg-[#c3cc8c] hover:text-[#2d3404] py-3.5 font-mono text-xs uppercase tracking-wider font-bold transition-all shadow-md cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <UserCheck className="w-4 h-4" /> Unlock Cavern Gates
+              </button>
+            </form>
+
+            {lockError && (
+              <motion.p
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="font-mono text-xs text-[#ffb4ab] uppercase tracking-wider font-bold"
+              >
+                ⚠️ INCORRECT PATH CODE RUNES. CHOMP DENIES ACCESS.
+              </motion.p>
+            )}
+
+            <p className="text-[10px] font-mono text-[#c8c7b8]/40 leading-relaxed uppercase">
+              Protected by 256-bit volcanic lithic-stone encryption walls.
+            </p>
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
@@ -1582,12 +1655,11 @@ export function LockScreen({ isLocked, onUnlock }: LockScreenProps) {
 <file path="src/features/dashboard/components/ui/Fab.tsx">
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useDashboardStore } from "@/store/useDashboardStore";
 
-interface FabProps {
-  onClick: () => void;
-}
-
-export function Fab({ onClick }: FabProps) {
+export function Fab() {
+  const { openPortalModal } = useDashboardStore();
+  const onClick = () => openPortalModal;
   return (
     <Button
       onClick={onClick}
@@ -1611,12 +1683,13 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   Copy,
   Sparkles,
-  Sliders,
   Check,
   Lock,
   ShieldAlert,
   ShieldCheck,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface GeneratorViewProps {
   onAddSecurely: (pass: string) => void;
@@ -1644,7 +1717,6 @@ export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
     }
 
     let result = "";
-    // Use cryptographically secure values where possible, math.random fallback
     const array = new Uint32Array(length);
     if (window.crypto) {
       window.crypto.getRandomValues(array);
@@ -1666,7 +1738,6 @@ export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Analyze strength of user generated password
   const getPasswordStrength = (pass: string) => {
     if (!pass || pass.startsWith("Please"))
       return {
@@ -1688,7 +1759,7 @@ export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
       /[!@#$%^&*()_+~`|}{[\]:;?><,./-=]/.test(pass),
     ].filter(Boolean).length;
 
-    score += countTypes * 12.5; // Up to 50 pts
+    score += countTypes * 12.5;
 
     if (score >= 80)
       return {
@@ -1716,7 +1787,6 @@ export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
 
   return (
     <div className="space-y-8 select-none max-w-3xl mx-auto">
-      {/* Toast Notification */}
       <AnimatePresence>
         {copied && (
           <motion.div
@@ -1753,35 +1823,34 @@ export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
       </div>
 
       <div className="stone-slab p-6 md:p-8 border-4 border-[#47483c] space-y-6">
-        {/* Output Area */}
         <div>
           <label className="block text-[11px] font-mono uppercase tracking-wider text-[#c8c7b8]/60 mb-2">
             Generated Runes Key
           </label>
           <div className="relative">
-            <input
+            <Input
               type="text"
               readOnly
               value={password}
               placeholder="Click Chomp & Generate below..."
-              className="w-full bg-[#0e0e0e] border-2 border-[#47483c] px-4 py-3.5 pr-24 text-base font-mono text-[#ffb77d] tracking-wider focus:outline-none placeholder:text-[#c8c7b8]/20 select-all leading-none focus:border-[#ffb77d] transition-all h-14"
+              className="w-full bg-[#0e0e0e] border-2 border-[#47483c] px-4 py-3.5 pr-24 text-base font-mono text-[#ffb77d] tracking-wider focus:outline-none placeholder:text-[#c8c7b8]/20 select-all leading-none focus:border-[#ffb77d] transition-all h-14 rounded-none"
             />
             {password && !password.startsWith("Please") && (
-              <div className="absolute right-2 top-1.5 flex gap-1.5">
-                <button
+              <div className="absolute right-2 top-2 flex gap-1.5">
+                <Button
                   type="button"
                   onClick={copyToClipboard}
-                  className="px-3 py-2 bg-[#201f1f] border border-[#47483c] text-[#c8c7b8] hover:text-[#ffb77d] hover:border-[#ffb77d] font-mono text-xs uppercase tracking-wider transition-colors cursor-pointer"
+                  variant="outline"
+                  className="px-3 h-10 bg-[#201f1f] border-[#47483c] text-[#c8c7b8] hover:text-[#ffb77d] hover:bg-[#201f1f] hover:border-[#ffb77d] font-mono text-xs uppercase tracking-wider transition-colors rounded-none"
                   title="Copy secret key"
                 >
                   <Copy className="w-3.5 h-3.5" />
-                </button>
+                </Button>
               </div>
             )}
           </div>
         </div>
 
-        {/* Password Strength display block */}
         {password && !password.startsWith("Please") && (
           <motion.div
             initial={{ opacity: 0, y: 5 }}
@@ -1808,18 +1877,16 @@ export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
               <span className="text-stone-400 text-[10px]">
                 Tectonic Strength:
               </span>
-              <div className="h-2 w-32 bg-[#201f1f] border border-[#47483c] p-0.5 w-36">
+              <div className="h-2 w-32 bg-[#201f1f] border border-[#47483c] p-0.5">
                 <div
-                  className={`h-full transition-all duration-55s ${strength.style}`}
+                  className={`h-full transition-all duration-700 ${strength.style}`}
                 />
               </div>
             </div>
           </motion.div>
         )}
 
-        {/* Forge Controls */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-          {/* Slider Column */}
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <span className="font-mono text-xs text-[#c8c7b8] uppercase tracking-wider">
@@ -1846,14 +1913,12 @@ export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
             </div>
           </div>
 
-          {/* Toggle Switches Column */}
           <div className="space-y-3 font-mono text-xs">
             <span className="block text-[#c8c7b8]/60 uppercase text-[10px] tracking-wider mb-2">
               Allowed Cryptic Blocks
             </span>
 
             <div className="grid grid-cols-2 gap-3">
-              {/* UPPERCASE */}
               <label
                 onClick={() => setIncludeUppercase(!includeUppercase)}
                 className="flex items-center gap-2.5 p-2 bg-[#131313] border border-[#47483c] hover:border-[#ffb77d] transition-colors cursor-pointer"
@@ -1866,7 +1931,6 @@ export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
                 <span className="text-[#e5e2e1]">A-Z Upper</span>
               </label>
 
-              {/* lowercase */}
               <label
                 onClick={() => setIncludeLowercase(!includeLowercase)}
                 className="flex items-center gap-2.5 p-2 bg-[#131313] border border-[#47483c] hover:border-[#ffb77d] transition-colors cursor-pointer"
@@ -1879,7 +1943,6 @@ export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
                 <span className="text-[#e5e2e1]">a-z Lower</span>
               </label>
 
-              {/* NUMERALS */}
               <label
                 onClick={() => setIncludeNumbers(!includeNumbers)}
                 className="flex items-center gap-2.5 p-2 bg-[#131313] border border-[#47483c] hover:border-[#ffb77d] transition-colors cursor-pointer"
@@ -1892,7 +1955,6 @@ export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
                 <span className="text-[#e5e2e1]">0-9 Numbers</span>
               </label>
 
-              {/* SPECIAL SYMBOLS */}
               <label
                 onClick={() => setIncludeSymbols(!includeSymbols)}
                 className="flex items-center gap-2.5 p-2 bg-[#131313] border border-[#47483c] hover:border-[#ffb77d] transition-colors cursor-pointer"
@@ -1908,28 +1970,28 @@ export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
           </div>
         </div>
 
-        {/* Forge Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-[#47483c]/30">
-          <button
+          <Button
             type="button"
             onClick={generatePassword}
-            className="flex-1 bg-[#4b5320] border-2 border-[#c3cc8c] text-[#bdc787] hover:bg-[#c3cc8c] hover:text-[#2d3404] py-3.5 font-mono text-[13px] uppercase tracking-wider font-bold transition-all shadow-[0_0_10px_rgba(195,204,140,0.15)] hover:shadow-[0_0_20px_rgba(195,204,140,0.4)] flex items-center justify-center gap-2 cursor-pointer"
+            className="flex-1 h-12 bg-[#4b5320] border-2 border-[#c3cc8c] text-[#bdc787] hover:bg-[#c3cc8c] hover:text-[#2d3404] font-mono text-[13px] uppercase tracking-wider font-bold transition-all shadow-[0_0_10px_rgba(195,204,140,0.15)] hover:shadow-[0_0_20px_rgba(195,204,140,0.4)] flex gap-2 rounded-none"
           >
             <Sparkles
               className="w-4 h-4 animate-spin"
               style={{ animationDuration: "3s" }}
             />
             CHOMP & GENERATE KEY
-          </button>
+          </Button>
 
           {password && !password.startsWith("Please") && (
-            <button
+            <Button
               type="button"
               onClick={() => onAddSecurely(password)}
-              className="sm:w-1/3 border-2 border-[#ffb77d] text-[#ffb77d] hover:bg-[#ffb77d] hover:text-[#131313] py-3.5 font-mono text-[12px] uppercase tracking-wider font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              variant="outline"
+              className="sm:w-1/3 h-12 bg-transparent border-2 border-[#ffb77d] text-[#ffb77d] hover:bg-[#ffb77d] hover:text-[#131313] font-mono text-[12px] uppercase tracking-wider font-bold transition-all flex gap-1.5 rounded-none"
             >
               <Lock className="w-4 h-4" /> Deposit In Vault
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -1942,27 +2004,25 @@ export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, Lock, Eye, EyeOff, Sparkles } from "lucide-react";
-import type { Credential } from "../schemas/schema";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Field, FieldLabel } from "@/components/ui/field";
+import type { Credential, Group, Strength } from "../schemas/schema";
+import { useDashboardStore } from "@/store/useDashboardStore";
+import { useVaultStore } from "@/store/useVaultStore";
 
-interface PortalModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: (data: Omit<Credential, "id" | "strength">) => void;
-  editingCredential?: Credential | null;
-}
-
-export default function PortalModal({
-  isOpen,
-  onClose,
-  onSave,
-  editingCredential,
-}: PortalModalProps) {
+export default function PortalModal() {
+  const { isModalOpen, closePortalModal, editingCredential } =
+    useDashboardStore();
+  const { saveCredential } = useVaultStore();
+  const onSave = (data: Omit<Credential, "id" | "strength">) => {
+    saveCredential(data, editingCredential?.id);
+    closePortalModal();
+  };
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [group, setGroup] = useState<
-    "Personal" | "Work" | "Social" | "Finance"
-  >("Personal");
+  const [group, setGroup] = useState<Group>("Personal");
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [notes, setNotes] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -1983,10 +2043,9 @@ export default function PortalModal({
       setWebsiteUrl("");
       setNotes("");
     }
-  }, [editingCredential, isOpen]);
+  }, [editingCredential, isModalOpen]);
 
-  // Analyze password strength
-  const getPasswordStrength = (pass: string): "Strong" | "Medium" | "Weak" => {
+  const getPasswordStrength = (pass: string): Strength => {
     if (pass.length < 6) return "Weak";
     const hasUpperCase = /[A-Z]/.test(pass);
     const hasLowerCase = /[a-z]/.test(pass);
@@ -2006,9 +2065,8 @@ export default function PortalModal({
   const handleGenerateRandom = () => {
     const chars =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+{}[]";
-    let length = 16;
     let result = "";
-    for (let i = 0; i < length; i++) {
+    for (let i = 0; i < 16; i++) {
       result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     setPassword(result);
@@ -2017,31 +2075,22 @@ export default function PortalModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !username || !password) return;
-    onSave({
-      name,
-      username,
-      password,
-      group,
-      websiteUrl,
-      notes,
-    });
-    onClose();
+    onSave({ name, username, password, group, websiteUrl, notes });
+    closePortalModal();
   };
 
   return (
     <AnimatePresence>
-      {isOpen && (
+      {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Backdrop screen */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onClick={closePortalModal}
             className="absolute inset-0 bg-black/80 backdrop-blur-sm"
           />
 
-          {/* Modal Stone Slab container */}
           <motion.div
             initial={{ scale: 0.95, y: 15, opacity: 0 }}
             animate={{ scale: 1, y: 0, opacity: 1 }}
@@ -2049,7 +2098,6 @@ export default function PortalModal({
             transition={{ type: "spring", damping: 25, stiffness: 350 }}
             className="stone-slab border-4 border-[#47483c] w-full max-w-lg p-6 overflow-hidden relative text-[#e5e2e1]"
           >
-            {/* Ambient fire glow border top */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#ffb77d]/60 to-transparent" />
 
             <div className="flex justify-between items-center mb-6">
@@ -2069,9 +2117,8 @@ export default function PortalModal({
                 </div>
               </div>
               <button
-                onClick={onClose}
+                onClick={closePortalModal}
                 className="p-1 border border-[#47483c] bg-[#1c1b1b] text-[#c8c7b8] hover:text-[#ffb77d] hover:border-[#ffb77d] transition-colors"
-                id="close-modal-btn"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -2081,57 +2128,57 @@ export default function PortalModal({
               onSubmit={handleSubmit}
               className="space-y-4 font-body text-sm select-none"
             >
-              <div>
-                <label className="block text-[11px] font-mono uppercase tracking-wider text-[#c8c7b8] mb-1">
-                  Website / Application Name *
-                </label>
-                <input
+              <Field>
+                <FieldLabel className="text-[11px] font-mono uppercase text-[#c8c7b8]">
+                  Website / App Name *
+                </FieldLabel>
+                <Input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Amazon, Google, Kraken"
-                  className="w-full bg-[#0e0e0e] border border-[#47483c] px-3 py-2 text-[#e5e2e1] focus:outline-none focus:border-[#ffb77d] focus:ring-1 focus:ring-[#ffb77d] font-mono placeholder:text-[#c8c7b8]/30 transition-all caret-[#ffb77d]"
+                  className="font-mono h-10"
                 />
-              </div>
+              </Field>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[11px] font-mono uppercase tracking-wider text-[#c8c7b8] mb-1">
-                    Username / Login Identifier *
-                  </label>
-                  <input
+                <Field>
+                  <FieldLabel className="text-[11px] font-mono uppercase text-[#c8c7b8]">
+                    Username *
+                  </FieldLabel>
+                  <Input
                     type="text"
                     required
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="User handle, email, ID"
-                    className="w-full bg-[#0e0e0e] border border-[#47483c] px-3 py-2 text-[#e5e2e1] focus:outline-none focus:border-[#ffb77d] focus:ring-1 focus:ring-[#ffb77d] font-mono placeholder:text-[#c8c7b8]/30 transition-all caret-[#ffb77d]"
+                    className="font-mono h-10"
                   />
-                </div>
+                </Field>
 
-                <div>
-                  <label className="block text-[11px] font-mono uppercase tracking-wider text-[#c8c7b8] mb-1 text-left">
-                    Vault Category Group
-                  </label>
+                <Field>
+                  <FieldLabel className="text-[11px] font-mono uppercase text-[#c8c7b8]">
+                    Vault Category
+                  </FieldLabel>
                   <select
                     value={group}
                     onChange={(e) => setGroup(e.target.value as any)}
-                    className="w-full bg-[#0e0e0e] border border-[#47483c] px-3 py-2 text-[#e5e2e1] focus:outline-none focus:border-[#ffb77d] focus:ring-1 focus:ring-[#ffb77d] font-mono text-left transition-all"
+                    className="w-full bg-[#0e0e0e] border border-input h-10 px-3 py-2 text-xs focus:outline-none focus:border-ring focus:ring-1 focus:ring-ring font-mono transition-all"
                   >
                     <option value="Personal">Personal</option>
                     <option value="Work">Work</option>
                     <option value="Social">Social</option>
                     <option value="Finance">Finance</option>
                   </select>
-                </div>
+                </Field>
               </div>
 
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <label className="block text-[11px] font-mono uppercase tracking-wider text-[#c8c7b8]">
-                    Secret Password / Key *
-                  </label>
+              <Field>
+                <div className="flex justify-between items-center w-full">
+                  <FieldLabel className="text-[11px] font-mono uppercase text-[#c8c7b8]">
+                    Secret Password *
+                  </FieldLabel>
                   <button
                     type="button"
                     onClick={handleGenerateRandom}
@@ -2140,14 +2187,14 @@ export default function PortalModal({
                     <Sparkles className="w-3 h-3" /> Quick Gen
                   </button>
                 </div>
-                <div className="relative">
-                  <input
+                <div className="relative w-full">
+                  <Input
                     type={showPassword ? "text" : "password"}
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter password key..."
-                    className="w-full bg-[#0e0e0e] border border-[#47483c] pl-3 pr-10 py-2 text-[#e5e2e1] focus:outline-none focus:border-[#ffb77d] focus:ring-1 focus:ring-[#ffb77d] font-mono placeholder:text-[#c8c7b8]/30 transition-all caret-[#ffb77d]"
+                    className="font-mono h-10 pr-10"
                   />
                   <button
                     type="button"
@@ -2162,78 +2209,61 @@ export default function PortalModal({
                   </button>
                 </div>
 
-                {/* Password Strength Indicator inside Form */}
                 {password && (
-                  <div className="mt-2 flex items-center justify-between text-[11px] font-mono">
+                  <div className="mt-1 flex items-center justify-between text-[11px] font-mono w-full">
                     <div className="flex items-center gap-2">
                       <span className="text-[#c8c7b8]/60">Cryptic Weight:</span>
                       <span
-                        className={`font-bold uppercase tracking-wider ${
-                          strength === "Strong"
-                            ? "text-[#c3cc8c]"
-                            : strength === "Medium"
-                              ? "text-[#ffb77d]"
-                              : "text-[#ffb4ab]"
-                        }`}
+                        className={`font-bold uppercase tracking-wider ${strength === "Strong" ? "text-[#c3cc8c]" : strength === "Medium" ? "text-[#ffb77d]" : "text-[#ffb4ab]"}`}
                       >
                         {strength}
                       </span>
                     </div>
-                    <div className="flex gap-1 h-1.5 w-24 bg-[#0e0e0e] border border-[#47483c]">
-                      <div
-                        className={`h-full ${
-                          strength === "Weak"
-                            ? "w-1/3 bg-[#ffb4ab]"
-                            : strength === "Medium"
-                              ? "w-2/3 bg-[#ffb77d]"
-                              : "w-full bg-[#c3cc8c]"
-                        }`}
-                      />
-                    </div>
                   </div>
                 )}
-              </div>
+              </Field>
 
-              <div>
-                <label className="block text-[11px] font-mono uppercase tracking-wider text-[#c8c7b8] mb-1">
+              <Field>
+                <FieldLabel className="text-[11px] font-mono uppercase text-[#c8c7b8]">
                   Website URL (Optional)
-                </label>
-                <input
+                </FieldLabel>
+                <Input
                   type="text"
                   value={websiteUrl}
                   onChange={(e) => setWebsiteUrl(e.target.value)}
                   placeholder="https://example.com"
-                  className="w-full bg-[#0e0e0e] border border-[#47483c] px-3 py-2 text-[#e5e2e1] focus:outline-none focus:border-[#ffb77d] focus:ring-1 focus:ring-[#ffb77d] font-mono placeholder:text-[#c8c7b8]/30 transition-all caret-[#ffb77d]"
+                  className="font-mono h-10"
                 />
-              </div>
+              </Field>
 
-              <div>
-                <label className="block text-[11px] font-mono uppercase tracking-wider text-[#c8c7b8] mb-1">
-                  Secure Hieroglyph Notes / Description (Optional)
-                </label>
+              <Field>
+                <FieldLabel className="text-[11px] font-mono uppercase text-[#c8c7b8]">
+                  Secure Notes (Optional)
+                </FieldLabel>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Write relevant cave instructions..."
                   rows={2}
-                  className="w-full bg-[#0e0e0e] border border-[#47483c] px-3 py-2 text-[#e5e2e1] focus:outline-none focus:border-[#ffb77d] focus:ring-1 focus:ring-[#ffb77d] font-mono placeholder:text-[#c8c7b8]/30 transition-all caret-[#ffb77d] resize-none"
+                  className="w-full bg-[#0e0e0e] border border-input px-3 py-2 text-xs text-foreground focus:outline-none focus:border-ring focus:ring-1 focus:ring-ring font-mono placeholder:text-muted-foreground transition-all resize-none"
                 />
-              </div>
+              </Field>
 
               <div className="pt-2 flex gap-3">
-                <button
+                <Button
                   type="button"
-                  onClick={onClose}
-                  className="w-1/3 border border-[#47483c] bg-[#1c1b1b] hover:bg-[#353534] hover:text-[#ffb77d] py-2.5 font-mono text-[12px] uppercase tracking-wider font-bold transition-colors cursor-pointer"
+                  variant="outline"
+                  onClick={closePortalModal}
+                  className="w-1/3 h-10 font-mono text-[12px] uppercase"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
-                  className="w-2/3 bg-[#4b5320] border-2 border-[#c3cc8c] text-[#bdc787] hover:bg-[#c3cc8c] hover:text-[#2d3404] py-2.5 font-mono text-[12px] uppercase tracking-wider font-bold transition-all shadow-[0_0_10px_rgba(195,204,140,0.2)] hover:shadow-[0_0_15px_rgba(195,204,140,0.5)] cursor-pointer"
+                  className="w-2/3 h-10 font-mono text-[12px] uppercase bg-[#4b5320] hover:bg-[#c3cc8c] text-[#bdc787] hover:text-[#2d3404] border border-[#c3cc8c]"
                 >
                   {editingCredential ? "Update Chomp Seal" : "Secure In Cave"}
-                </button>
+                </Button>
               </div>
             </form>
           </motion.div>
@@ -2245,7 +2275,7 @@ export default function PortalModal({
 </file>
 
 <file path="src/features/dashboard/components/SecurityAuditView.tsx">
-import React, { useState } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   ShieldCheck,
@@ -2254,30 +2284,20 @@ import {
   Check,
   RefreshCw,
   Sparkles,
-  Key,
-  ChevronRight,
 } from "lucide-react";
-import type { Credential } from "../schemas/schema";
+import { Button } from "@/components/ui/button";
+import { useVaultStore } from "@/store/useVaultStore";
 
-interface SecurityAuditProps {
-  credentials: Credential[];
-  onUpgradePassword: (id: string, newPass: string) => void;
-}
-
-export default function SecurityAuditView({
-  credentials,
-  onUpgradePassword,
-}: SecurityAuditProps) {
+export default function SecurityAuditView() {
+  const { credentials, upgradePassword } = useVaultStore();
   const [upgradingId, setUpgradingId] = useState<string | null>(null);
   const [upgradeSuccess, setUpgradeSuccess] = useState<string | null>(null);
 
-  // Analyze credentials
   const total = credentials.length;
   const strong = credentials.filter((c) => c.strength === "Strong");
   const medium = credentials.filter((c) => c.strength === "Medium");
   const weak = credentials.filter((c) => c.strength === "Weak");
 
-  // Find duplicated passwords
   const passwordCounts: { [key: string]: string[] } = {};
   credentials.forEach((c) => {
     if (!passwordCounts[c.password]) {
@@ -2293,7 +2313,6 @@ export default function SecurityAuditView({
       apps: passwordCounts[p],
     }));
 
-  // Calculate dynamic security score
   const score =
     total > 0
       ? Math.round(
@@ -2301,21 +2320,17 @@ export default function SecurityAuditView({
         )
       : 100;
 
-  // Upgrade handler
   const handleAutoUpgrade = (id: string, appName: string) => {
     setUpgradingId(id);
-
-    // Generate secure randomized key
     const chars =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+{}[]";
-    let length = 16;
     let result = "";
-    for (let i = 0; i < length; i++) {
+    for (let i = 0; i < 16; i++) {
       result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
 
     setTimeout(() => {
-      onUpgradePassword(id, result);
+      upgradePassword(id, result);
       setUpgradingId(null);
       setUpgradeSuccess(appName);
       setTimeout(() => setUpgradeSuccess(null), 3000);
@@ -2324,7 +2339,6 @@ export default function SecurityAuditView({
 
   return (
     <div className="space-y-8 select-none max-w-4xl mx-auto">
-      {/* Toast Confirmation for upgrade */}
       <AnimatePresence>
         {upgradeSuccess && (
           <motion.div
@@ -2361,7 +2375,6 @@ export default function SecurityAuditView({
         </div>
       </div>
 
-      {/* Main Score & Audit Summary cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div className="stone-slab p-6 border-4 flex flex-col justify-between">
           <span className="font-mono text-[10px] uppercase text-[#c8c7b8]/60 tracking-wider block">
@@ -2378,8 +2391,9 @@ export default function SecurityAuditView({
             </p>
           </div>
           <div className="h-2 bg-[#131313] border border-[#47483c] p-0.5 mt-2">
+            {/* Fixed the typo 'class' here */}
             <div
-              className={`h-full class transition-all duration-1000 ${score >= 80 ? "bg-[#c3cc8c] w-full" : score >= 50 ? "bg-[#ffb77d] w-2/3" : "bg-[#ffb4ab] w-1/3"}`}
+              className={`h-full transition-all duration-1000 ${score >= 80 ? "bg-[#c3cc8c] w-full" : score >= 50 ? "bg-[#ffb77d] w-2/3" : "bg-[#ffb4ab] w-1/3"}`}
               style={{ width: `${score}%` }}
             />
           </div>
@@ -2421,8 +2435,7 @@ export default function SecurityAuditView({
                     Weak Crypts Detected!
                   </h4>
                   <p className="text-[10px] text-[#c8c7b8] mt-0.5 leading-normal">
-                    {weak.length} entries fail standard security filters length
-                    or characters test.
+                    {weak.length} entries fail standard security filters.
                   </p>
                 </div>
               </div>
@@ -2434,7 +2447,7 @@ export default function SecurityAuditView({
                     No Weak Crypts
                   </h4>
                   <p className="text-[10px] text-[#c8c7b8] mt-0.5 leading-normal">
-                    All password cells meet minimum strength thresholds.
+                    All password cells meet minimum strength.
                   </p>
                 </div>
               </div>
@@ -2448,8 +2461,7 @@ export default function SecurityAuditView({
                     Duplicated Key Reuse!
                   </h4>
                   <p className="text-[10px] text-[#c8c7b8] mt-0.5 leading-normal">
-                    {duplicates.length} keys are reused across multiple items,
-                    allowing catastrophic access.
+                    {duplicates.length} keys are reused across multiple items.
                   </p>
                 </div>
               </div>
@@ -2461,7 +2473,7 @@ export default function SecurityAuditView({
                     Perfect Uniqueness
                   </h4>
                   <p className="text-[10px] text-[#c8c7b8] mt-0.5 leading-normal">
-                    Every app holds completely distinct passwords.
+                    Every app holds distinct passwords.
                   </p>
                 </div>
               </div>
@@ -2470,7 +2482,6 @@ export default function SecurityAuditView({
         </div>
       </div>
 
-      {/* Weak Passwords upgrade lists */}
       {weak.length > 0 && (
         <section className="space-y-4">
           <h3 className="font-headline text-lg text-[#ffb4ab] uppercase tracking-wider flex items-center gap-2">
@@ -2489,20 +2500,12 @@ export default function SecurityAuditView({
                   <p className="font-mono text-[10px] text-[#c8c7b8] mt-0.5">
                     User: {cred.username}
                   </p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className="text-[9px] font-mono uppercase bg-[#93000a]/20 border border-[#ffb4ab]/40 text-[#ffb4ab] px-1.5 py-0.5">
-                      Weak Password
-                    </span>
-                    <span className="font-mono text-[10px] text-[#c8c7b8]/40 truncate max-w-[80px]">
-                      ({cred.password})
-                    </span>
-                  </div>
                 </div>
 
-                <button
+                <Button
                   onClick={() => handleAutoUpgrade(cred.id, cred.name)}
                   disabled={upgradingId === cred.id}
-                  className="px-3.5 py-2.5 bg-[#93000a]/30 border border-[#ffb4ab] hover:bg-[#ffb4ab] hover:text-[#131313] disabled:bg-[#1c1b1b] disabled:text-[#c8c7b8]/40 disabled:border-[#47483c] transition-all font-mono text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-sm hover:shadow-[0_0_10px_rgba(255,180,171,0.3)] select-none"
+                  className="px-3.5 py-2.5 h-auto bg-[#93000a]/30 border border-[#ffb4ab] text-[#ffb4ab] hover:bg-[#ffb4ab] hover:text-[#131313] disabled:bg-[#1c1b1b] disabled:text-[#c8c7b8]/40 disabled:border-[#47483c] transition-all font-mono text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-sm hover:shadow-[0_0_10px_rgba(255,180,171,0.3)]"
                 >
                   {upgradingId === cred.id ? (
                     <>
@@ -2515,14 +2518,13 @@ export default function SecurityAuditView({
                       AUTO-CHOMP
                     </>
                   )}
-                </button>
+                </Button>
               </div>
             ))}
           </div>
         </section>
       )}
 
-      {/* Duplicate / Reused passwords audit */}
       {duplicates.length > 0 && (
         <section className="space-y-4">
           <h3 className="font-headline text-lg text-[#ffb77d] uppercase tracking-wider flex items-center gap-2">
@@ -2565,7 +2567,6 @@ export default function SecurityAuditView({
         </section>
       )}
 
-      {/* Security is healthy dashboard message */}
       {weak.length === 0 && duplicates.length === 0 && (
         <div className="stone-slab p-8 border-4 border-[#c3cc8c]/40 bg-[#4b5320]/10 flex flex-col items-center text-center space-y-3">
           <div className="w-14 h-14 rounded-full bg-[#4b5320] border-2 border-[#c3cc8c] flex items-center justify-center text-[#c3cc8c]">
@@ -2592,30 +2593,26 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   Settings,
   Save,
-  Database,
   Trash2,
   ShieldAlert,
   Check,
   RefreshCw,
-  Key,
   Download,
-  Upload,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import type { Credential } from "../schemas/schema";
+import { useVaultStore } from "@/store/useVaultStore";
 
-interface SettingsViewProps {
-  onClearVault: () => void;
-  onResetToDefaults: () => void;
-  onImportBackup: (imported: Credential[]) => void;
-  exportCredentials: () => string;
-}
+export default function SettingsView() {
+  const { clearVault, resetToDefaults, importBackup, getExportString } =
+    useVaultStore();
 
-export default function SettingsView({
-  onClearVault,
-  onResetToDefaults,
-  onImportBackup,
-  exportCredentials,
-}: SettingsViewProps) {
+  const onClearVault = () => clearVault();
+  const onResetToDefaults = () => resetToDefaults();
+  const onImportBackup = () => importBackup;
+  const exportCredentials = () => getExportString();
+
   const [masterKey, setMasterKey] = useState("CHOMP_MASTER_GUARD_2026!");
   const [showKey, setShowKey] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -2634,9 +2631,7 @@ export default function SettingsView({
     const dataStr = exportCredentials();
     const dataUri =
       "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
-
     const exportFileDefaultName = "chomp_vault_lithic_backup.json";
-
     const linkElement = document.createElement("a");
     linkElement.setAttribute("href", dataUri);
     linkElement.setAttribute("download", exportFileDefaultName);
@@ -2647,17 +2642,12 @@ export default function SettingsView({
     try {
       setImportError(null);
       const parsed = JSON.parse(importText);
-      if (!Array.isArray(parsed)) {
+      if (!Array.isArray(parsed))
         throw new Error("Backup must be an array of password secrets!");
-      }
-
-      // Basic validation
       const isValid = parsed.every(
         (item) => item.name && item.username && item.password && item.group,
       );
-      if (!isValid) {
-        throw new Error("Invalid secret format inside the arrays!");
-      }
+      if (!isValid) throw new Error("Invalid secret format inside the arrays!");
 
       onImportBackup(parsed);
       setImportDone(true);
@@ -2670,7 +2660,6 @@ export default function SettingsView({
 
   return (
     <div className="space-y-8 select-none max-w-4xl mx-auto">
-      {/* Toast Confirmed */}
       <AnimatePresence>
         {saveSuccess && (
           <motion.div
@@ -2708,7 +2697,6 @@ export default function SettingsView({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Master Sentinel Key configuration */}
         <div className="stone-slab p-6 border-2 border-[#47483c] flex flex-col justify-between space-y-4">
           <div>
             <h3 className="font-headline text-base text-[#e5e2e1] uppercase tracking-wider mb-2">
@@ -2728,23 +2716,23 @@ export default function SettingsView({
               <label className="block text-[10px] uppercase text-[#c8c7b8] mb-1 tracking-wider">
                 Fortress Access Passphrase
               </label>
-              <input
+              <Input
                 type={showKey ? "text" : "password"}
                 value={masterKey}
                 onChange={(e) => setMasterKey(e.target.value)}
-                className="w-full bg-[#0e0e0e] border border-[#47483c] px-3 py-2 text-[#ffb77d] focus:outline-none focus:border-[#ffb77d] h-10 select-all"
+                className="bg-[#0e0e0e] border-[#47483c] text-[#ffb77d] focus:border-[#ffb77d] h-10 select-all rounded-none"
               />
             </div>
 
             <div className="flex items-center gap-3 py-1">
-              <button
+              <Button
                 type="button"
+                variant="outline"
                 onClick={() => setShowKey(!showKey)}
-                className="text-[10px] uppercase border border-[#47483c] hover:border-[#ffb77d] text-[#c8c7b8] hover:text-[#ffb77d] px-2.5 py-1.5 transition-colors"
-                id="toggle-master-reveal-btn"
+                className="h-8 text-[10px] uppercase bg-transparent border-[#47483c] hover:border-[#ffb77d] text-[#c8c7b8] hover:text-[#ffb77d] hover:bg-transparent rounded-none"
               >
                 {showKey ? "Hide Secrecy" : "Reveal Secrecy"}
-              </button>
+              </Button>
 
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
@@ -2759,16 +2747,15 @@ export default function SettingsView({
               </label>
             </div>
 
-            <button
+            <Button
               type="submit"
-              className="w-full bg-[#4b5320] border border-[#c3cc8c] hover:bg-[#c3cc8c] hover:text-[#2d3404] text-[#bdc787] font-bold py-2.5 uppercase tracking-wider transition-all shadow-[0_0_8px_rgba(195,204,140,0.1)] flex items-center justify-center gap-1.5 cursor-pointer"
+              className="w-full h-10 bg-[#4b5320] border border-[#c3cc8c] hover:bg-[#c3cc8c] hover:text-[#2d3404] text-[#bdc787] font-bold uppercase tracking-wider transition-all shadow-[0_0_8px_rgba(195,204,140,0.1)] gap-1.5 rounded-none"
             >
               <Save className="w-4 h-4" /> Save Fortress Key
-            </button>
+            </Button>
           </form>
         </div>
 
-        {/* Database backup / storage systems */}
         <div className="stone-slab p-6 border-2 border-[#47483c] flex flex-col justify-between space-y-4">
           <div>
             <h3 className="font-headline text-base text-[#e5e2e1] uppercase tracking-wider mb-2">
@@ -2781,15 +2768,15 @@ export default function SettingsView({
           </div>
 
           <div className="space-y-3 pt-4 font-mono text-xs flex-1 flex flex-col justify-end">
-            <button
+            <Button
               type="button"
+              variant="outline"
               onClick={handleDownloadBackup}
-              className="w-full bg-[#201f1f] border border-[#47483c] hover:border-[#ffb77d] text-[#e5e2e1] hover:text-[#ffb77d] font-bold py-2.5 uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              className="w-full h-10 bg-[#201f1f] border-[#47483c] hover:border-[#ffb77d] text-[#e5e2e1] hover:text-[#ffb77d] hover:bg-[#201f1f] font-bold uppercase tracking-wider transition-all gap-1.5 rounded-none"
             >
               <Download className="w-4 h-4" /> Export Backup file
-            </button>
+            </Button>
 
-            {/* Import container block */}
             <div className="bg-[#131313] border border-[#47483c] p-3 space-y-2">
               <span className="text-[10px] uppercase text-[#c8c7b8] tracking-wider block">
                 Import JSON Runes
@@ -2799,7 +2786,7 @@ export default function SettingsView({
                 onChange={(e) => setImportText(e.target.value)}
                 placeholder="Paste JSON array backup string..."
                 rows={2}
-                className="w-full bg-[#0e0e0e] border border-[#47483c] px-2 py-1.5 text-[11px] font-mono text-[#ffb77d] focus:outline-none focus:border-[#ffb77d] resize-none"
+                className="w-full bg-[#0e0e0e] border border-[#47483c] px-2 py-1.5 text-[11px] font-mono text-[#ffb77d] focus:outline-none focus:border-[#ffb77d] resize-none outline-none"
               />
               {importError && (
                 <p className="text-[#ffb4ab] text-[10px] font-mono uppercase tracking-wide">
@@ -2811,20 +2798,19 @@ export default function SettingsView({
                   Import completed successfully!
                 </p>
               )}
-              <button
+              <Button
                 type="button"
                 onClick={handleImportJSON}
                 disabled={!importText}
-                className="w-full bg-[#4b5320] text-[#bdc787] disabled:bg-stone-800 disabled:text-stone-500 py-1.5 uppercase font-mono text-[10px] tracking-wider block border border-[#c3cc8c]/40 cursor-pointer text-center"
+                className="w-full h-8 bg-[#4b5320] text-[#bdc787] hover:bg-[#c3cc8c] hover:text-[#2d3404] disabled:bg-[#1c1b1b] disabled:text-[#47483c] uppercase font-mono text-[10px] tracking-wider border border-[#c3cc8c]/40 rounded-none"
               >
                 Assemble JSON Secrets
-              </button>
+              </Button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Dangerous/Tectonic structural maintenance actions */}
       <section className="stone-slab p-6 border-4 border-[#ffb4ab]/30 bg-[#93000a]/5 space-y-4">
         <div className="flex items-center gap-2.5 text-[#ffb4ab]">
           <ShieldAlert className="w-6 h-6 animate-pulse" />
@@ -2840,21 +2826,23 @@ export default function SettingsView({
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 pt-2">
-          <button
+          <Button
             type="button"
+            variant="outline"
             onClick={onResetToDefaults}
-            className="flex-1 border border-[#ffb77d] text-[#ffb77d] hover:bg-[#ffb77d] hover:text-[#131313] py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            className="flex-1 h-10 bg-transparent border-[#ffb77d] text-[#ffb77d] hover:bg-[#ffb77d] hover:text-[#131313] font-mono text-xs uppercase tracking-wider font-bold transition-all gap-1.5 rounded-none"
           >
             <RefreshCw className="w-4 h-4" /> Reset database to initial mock
-          </button>
+          </Button>
 
-          <button
+          <Button
             type="button"
+            variant="destructive"
             onClick={onClearVault}
-            className="flex-1 bg-[#93000a]/20 border border-[#ffb4ab] text-[#ffb4ab] hover:bg-[#ffb4ab] hover:text-[#131313] py-2.5 font-mono text-xs uppercase tracking-wider font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm hover:shadow-[0_0_10px_rgba(255,180,171,0.25)]"
+            className="flex-1 h-10 bg-[#93000a]/20 border border-[#ffb4ab] text-[#ffb4ab] hover:bg-[#ffb4ab] hover:text-[#131313] font-mono text-xs uppercase tracking-wider font-bold transition-all gap-1.5 shadow-sm hover:shadow-[0_0_10px_rgba(255,180,171,0.25)] rounded-none"
           >
             <Trash2 className="w-4 h-4" /> PURGE ALL VAULT SECRETS
-          </button>
+          </Button>
         </div>
       </section>
     </div>
@@ -2871,41 +2859,33 @@ import {
   Eye,
   EyeOff,
   PlusCircle,
-  Filter,
   ArrowUpDown,
   Trash2,
   Edit,
   ExternalLink,
-  Shield,
-  ChevronDown,
-  ChevronUp,
   AlertTriangle,
   Sparkles,
   Search,
 } from "lucide-react";
-import type { Credential, GroupType } from "../schemas/schema";
-
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import type { GroupType } from "../schemas/schema";
+import { useDashboardStore } from "@/store/useDashboardStore";
+import { useVaultStore } from "@/store/useVaultStore";
 interface VaultViewProps {
-  credentials: Credential[];
-  searchQuery: string;
-  onSearchQueryChange: (query: string) => void;
-  selectedGroup: GroupType;
-  onSelectGroup: (group: GroupType) => void;
-  onAddPasswordClick: () => void;
-  onEditPasswordClick: (cred: Credential) => void;
   onDeletePasswordClick: (id: string) => void;
 }
 
-export default function VaultView({
-  credentials,
-  searchQuery,
-  onSearchQueryChange,
-  selectedGroup,
-  onSelectGroup,
-  onAddPasswordClick,
-  onEditPasswordClick,
-  onDeletePasswordClick,
-}: VaultViewProps) {
+export default function VaultView({ onDeletePasswordClick }: VaultViewProps) {
+  const {
+    searchQuery,
+    setSearchQuery,
+    selectedGroup,
+    setSelectedGroup,
+    openPortalModal,
+  } = useDashboardStore();
+  const { credentials } = useVaultStore();
+  const onAddPasswordClick = () => openPortalModal();
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [copiedType, setCopiedType] = useState<"username" | "password" | null>(
     null,
@@ -2916,7 +2896,6 @@ export default function VaultView({
   const [sortBy, setSortBy] = useState<"name" | "strength" | "group">("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
-  // Clipboard copy handler
   const copyToClipboard = (
     text: string,
     id: string,
@@ -2931,7 +2910,6 @@ export default function VaultView({
     }, 2000);
   };
 
-  // Toggle reveal password
   const toggleReveal = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (revealedIds.includes(id)) {
@@ -2941,7 +2919,6 @@ export default function VaultView({
     }
   };
 
-  // Filter passwords
   const filteredCredentials = credentials.filter((cred) => {
     const matchesGroup =
       selectedGroup === "All" || cred.group === selectedGroup;
@@ -2954,7 +2931,6 @@ export default function VaultView({
     return matchesGroup && matchesSearch;
   });
 
-  // Sort passwords
   const sortedCredentials = [...filteredCredentials].sort((a, b) => {
     let comparison = 0;
     if (sortBy === "name") {
@@ -2977,7 +2953,6 @@ export default function VaultView({
     }
   };
 
-  // Dynamic Security Health calculations
   const calculateSecurityScore = () => {
     if (credentials.length === 0) return 100;
     let scoreTotal = 0;
@@ -2990,30 +2965,21 @@ export default function VaultView({
   };
 
   const securityScore = calculateSecurityScore();
-
   const getHealthLevelText = (score: number) => {
     if (score >= 80) return "Security Health: Strong";
     if (score >= 50) return "Security Health: Guarded";
     return "Security Health: Critical Danger";
   };
-
   const getHealthLevelColor = (score: number) => {
     if (score >= 80) return "text-[#c3cc8c] bg-[#4b5320]/40 border-[#c3cc8c]";
     if (score >= 50) return "text-[#ffb77d] bg-[#fd8b00]/10 border-[#ffb77d]";
     return "text-[#ffb4ab] bg-[#93000a]/20 border-[#ffb4ab] animate-pulse";
   };
-
-  // Determine angle for physical dial needle
-  // Score 0 -> -90 deg (left)
-  // Score 100 -> 90 deg (right)
   const needleRotation = -90 + (securityScore / 100) * 180;
-
-  // Render group tabs helper
   const groups: GroupType[] = ["All", "Personal", "Work", "Social", "Finance"];
 
   return (
     <div className="space-y-10 select-none">
-      {/* Toast Notification Container */}
       <AnimatePresence>
         {copiedId && (
           <motion.div
@@ -3037,9 +3003,7 @@ export default function VaultView({
         )}
       </AnimatePresence>
 
-      {/* Header / Security Gauge Area */}
       <section className="stone-slab p-6 sm:p-8 border-4 border-[#47483c]">
-        {/* Decorative corner carvings */}
         <div className="absolute top-2 left-2 text-[9px] font-mono text-[#c8c7b8]/20 tracking-tighter">
           ⊞ S_SLAB_00
         </div>
@@ -3072,18 +3036,14 @@ export default function VaultView({
             </div>
           </div>
 
-          {/* Security Health Gauge and Dial Needle */}
           <div className="flex flex-col items-center">
             <div className="relative w-48 h-24 overflow-hidden mb-2">
-              {/* Colored dial gauge background */}
               <div className="monster-gauge w-48 h-48 absolute top-0 left-0" />
-              {/* Center spacer covering the center of conic gradient */}
               <div className="gauge-cover w-40 h-40 absolute top-4 left-4 flex items-end justify-center pb-3">
                 <span className="font-headline text-3xl font-black text-[#c3cc8c] tracking-tighter mb-1 select-none">
                   {securityScore}%
                 </span>
               </div>
-              {/* Dial Needle */}
               <div
                 className="absolute bottom-0 left-1/2 w-1.5 h-18 bg-[#ffb77d] origin-bottom rounded-full shadow-[0_0_8px_#ffb77d] transition-transform duration-1000 ease-out"
                 style={{
@@ -3091,9 +3051,10 @@ export default function VaultView({
                 }}
               />
             </div>
-
             <span
-              className={`text-[11px] font-mono uppercase tracking-widest px-3 py-1 border transition-colors ${getHealthLevelColor(securityScore)}`}
+              className={`text-[11px] font-mono uppercase tracking-widest px-3 py-1 border transition-colors ${getHealthLevelColor(
+                securityScore,
+              )}`}
             >
               {getHealthLevelText(securityScore)}
             </span>
@@ -3101,7 +3062,6 @@ export default function VaultView({
         </div>
       </section>
 
-      {/* Quick Access Grid */}
       <section className="space-y-4">
         <h3 className="font-headline text-xl text-[#e5e2e1] uppercase tracking-wider flex items-center gap-2">
           <span className="text-[#ffb77d]">✦</span> Quick Access
@@ -3123,16 +3083,18 @@ export default function VaultView({
                     {firstChar}
                   </div>
                   <div className="flex gap-1.5">
-                    <button
+                    <Button
                       onClick={(e) => {
                         e.stopPropagation();
                         copyToClipboard(cred.password, cred.id, "password");
                       }}
-                      className="p-1.5 border border-[#47483c] hover:border-[#ffb77d] hover:text-[#ffb77d] text-[#c8c7b8] bg-[#131313] transition-colors"
+                      size="icon-sm"
+                      variant="outline"
+                      className="border-[#47483c] hover:border-[#ffb77d] hover:text-[#ffb77d] text-[#c8c7b8] bg-[#131313]"
                       title="Copy Password"
                     >
                       <Copy className="w-4 h-4" />
-                    </button>
+                    </Button>
                   </div>
                 </div>
 
@@ -3148,7 +3110,13 @@ export default function VaultView({
                       {cred.group}
                     </span>
                     <span
-                      className={`font-bold ${cred.strength === "Strong" ? "text-[#c3cc8c]" : cred.strength === "Medium" ? "text-[#ffb77d]" : "text-[#ffb4ab]"}`}
+                      className={`font-bold ${
+                        cred.strength === "Strong"
+                          ? "text-[#c3cc8c]"
+                          : cred.strength === "Medium"
+                            ? "text-[#ffb77d]"
+                            : "text-[#ffb4ab]"
+                      }`}
                     >
                       • {cred.strength}
                     </span>
@@ -3158,7 +3126,6 @@ export default function VaultView({
             );
           })}
 
-          {/* Add Shortcut Card */}
           <div
             onClick={onAddPasswordClick}
             className="stone-slab hover-ignite p-5 cursor-pointer flex flex-col justify-between aspect-square border-dashed border-[#47483c] hover:bg-[#ffb77d]/5 group transition-all"
@@ -3176,55 +3143,55 @@ export default function VaultView({
         </div>
       </section>
 
-      {/* Credential Vault Table Area */}
       <section className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3 pb-2">
           <h3 className="font-headline text-xl text-[#e5e2e1] uppercase tracking-wider flex items-center gap-2">
             <span className="text-[#ffb77d]">✦</span> Credential Vault
           </h3>
 
-          {/* Table Control Buttons */}
           <div className="flex items-center gap-2">
             <div className="relative">
-              <input
+              <Input
                 type="text"
                 placeholder="Live search vault..."
                 value={searchQuery}
-                onChange={(e) => onSearchQueryChange(e.target.value)}
-                className="bg-[#0e0e0e] border border-[#47483c] pl-8 pr-3 py-1 text-xs text-[#e5e2e1] focus:outline-none focus:border-[#ffb77d] focus:ring-1 focus:ring-[#ffb77d] font-mono placeholder:text-[#c8c7b8]/40 h-8 transition-colors"
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="bg-[#0e0e0e] border-[#47483c] pl-8 pr-3 py-1 text-xs text-[#e5e2e1] focus:outline-none focus:border-[#ffb77d] focus:ring-1 focus:ring-[#ffb77d] font-mono placeholder:text-[#c8c7b8]/40 h-8 transition-colors rounded-none"
               />
               <Search className="w-3.5 h-3.5 text-[#c8c7b8]/40 absolute left-2.5 top-1/2 -translate-y-1/2" />
             </div>
 
-            <button
+            <Button
               onClick={() => toggleSort("name")}
-              className={`p-1.5 border border-[#47483c] h-8 flex items-center gap-1 bg-[#201f1f] text-xs font-mono uppercase tracking-wider text-[#c8c7b8] hover:border-[#ffb77d] hover:text-[#ffb77d] transition-colors cursor-pointer ${sortBy === "name" ? "border-[#ffb77d] text-[#ffb77d]" : ""}`}
+              variant="outline"
+              className={`h-8 flex items-center gap-1 bg-[#201f1f] border-[#47483c] text-xs font-mono uppercase tracking-wider text-[#c8c7b8] hover:border-[#ffb77d] hover:text-[#ffb77d] rounded-none ${
+                sortBy === "name" ? "border-[#ffb77d] text-[#ffb77d]" : ""
+              }`}
               title="Sort Alphabetically"
             >
               <ArrowUpDown className="w-3.5 h-3.5" />
               <span className="hidden md:inline">Sort</span>
-            </button>
+            </Button>
           </div>
         </div>
 
-        {/* Group Tab Category Filters */}
         <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-none antialiased">
           {groups.map((group) => (
-            <button
+            <Button
               key={group}
-              onClick={() => onSelectGroup(group)}
-              className={`px-4 py-1.5 font-mono text-xs uppercase tracking-widest transition-all cursor-pointer border ${
+              onClick={() => setSelectedGroup(group)}
+              variant="outline"
+              className={`px-4 py-1.5 h-auto font-mono text-xs uppercase tracking-widest rounded-none ${
                 selectedGroup === group
-                  ? "bg-[#4b5320] border-[#c3cc8c] text-[#bdc787] shadow-[0_0_10px_rgba(195,204,140,0.15)]"
-                  : "bg-[#201f1f] border-[#47483c] text-[#c8c7b8] hover:border-[#ffb77d] hover:text-[#ffb77d]"
+                  ? "bg-[#4b5320] border-[#c3cc8c] text-[#bdc787] hover:bg-[#4b5320] hover:text-[#bdc787] shadow-[0_0_10px_rgba(195,204,140,0.15)]"
+                  : "bg-[#201f1f] border-[#47483c] text-[#c8c7b8] hover:bg-[#201f1f] hover:border-[#ffb77d] hover:text-[#ffb77d]"
               }`}
             >
               {group}
-            </button>
+            </Button>
           ))}
         </div>
 
-        {/* Main Vault Credentials List Board */}
         <div className="stone-slab border-2 border-[#47483c] p-0 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse select-none">
@@ -3250,12 +3217,15 @@ export default function VaultView({
                 ) : (
                   sortedCredentials.slice(0, visibleLimit).map((cred) => (
                     <React.Fragment key={cred.id}>
-                      {/* Main Credential Row */}
                       <tr
                         onClick={() =>
                           setExpandedId(expandedId === cred.id ? null : cred.id)
                         }
-                        className={`hover:bg-[#353534]/50 cursor-pointer transition-colors group ${expandedId === cred.id ? "bg-[#353534]/70 border-l-2 border-l-[#ffb77d]" : ""}`}
+                        className={`hover:bg-[#353534]/50 cursor-pointer transition-colors group ${
+                          expandedId === cred.id
+                            ? "bg-[#353534]/70 border-l-2 border-l-[#ffb77d]"
+                            : ""
+                        }`}
                       >
                         <td className="p-4 font-bold text-[#e5e2e1] flex items-center gap-3">
                           <div className="w-8 h-8 bg-[#131313] border border-[#47483c] flex items-center justify-center text-[#ffb77d] font-headline select-none">
@@ -3278,9 +3248,11 @@ export default function VaultView({
                                 ? cred.password
                                 : "••••••••••••"}
                             </span>
-                            <button
+                            <Button
                               onClick={(e) => toggleReveal(cred.id, e)}
-                              className="text-[#c8c7b8]/60 hover:text-[#ffb77d] transition-colors p-1"
+                              variant="ghost"
+                              size="icon-xs"
+                              className="text-[#c8c7b8]/60 hover:text-[#ffb77d] hover:bg-transparent"
                               title={
                                 revealedIds.includes(cred.id)
                                   ? "Mask secrecy"
@@ -3292,8 +3264,8 @@ export default function VaultView({
                               ) : (
                                 <Eye className="w-3.5 h-3.5" />
                               )}
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                               onClick={() =>
                                 copyToClipboard(
                                   cred.password,
@@ -3301,11 +3273,13 @@ export default function VaultView({
                                   "password",
                                 )
                               }
-                              className="text-[#c8c7b8]/60 hover:text-[#ffb77d] transition-colors p-1"
+                              variant="ghost"
+                              size="icon-xs"
+                              className="text-[#c8c7b8]/60 hover:text-[#ffb77d] hover:bg-transparent"
                               title="Copy passphrase key"
                             >
                               <Copy className="w-3.5 h-3.5" />
-                            </button>
+                            </Button>
                           </div>
                         </td>
                         <td className="p-4">
@@ -3335,7 +3309,6 @@ export default function VaultView({
                         </td>
                       </tr>
 
-                      {/* Detail Accordion Panel inside rows */}
                       <AnimatePresence>
                         {expandedId === cred.id && (
                           <tr className="bg-[#1c1b1b]/80 border-t border-b border-[#47483c]/50">
@@ -3403,7 +3376,7 @@ export default function VaultView({
                                 </div>
 
                                 <div className="flex justify-end gap-3 pt-2 border-t border-[#47483c]/30">
-                                  <button
+                                  <Button
                                     onClick={() =>
                                       copyToClipboard(
                                         cred.username,
@@ -3411,25 +3384,28 @@ export default function VaultView({
                                         "username",
                                       )
                                     }
-                                    className="px-3 py-1.5 bg-[#201f1f] border border-[#47483c] hover:border-[#ffb77d] text-[#c8c7b8] hover:text-[#ffb77d] text-[11px] uppercase tracking-wider transition-colors flex items-center gap-1"
+                                    variant="outline"
+                                    className="px-3 py-1.5 h-auto bg-[#201f1f] border-[#47483c] hover:border-[#ffb77d] text-[#c8c7b8] hover:text-[#ffb77d] text-[11px] uppercase tracking-wider transition-colors gap-1 rounded-none"
                                   >
                                     <Copy className="w-3 h-3" /> Copy username
-                                  </button>
-                                  <button
-                                    onClick={() => onEditPasswordClick(cred)}
-                                    className="px-3 py-1.5 bg-[#4b5320]/20 border border-[#c3cc8c]/40 hover:border-[#c3cc8c] text-[#c3cc8c] text-[11px] uppercase tracking-wider transition-all flex items-center gap-1"
+                                  </Button>
+                                  <Button
+                                    onClick={() => openPortalModal(cred)}
+                                    variant="outline"
+                                    className="px-3 py-1.5 h-auto bg-[#4b5320]/20 border-[#c3cc8c]/40 hover:border-[#c3cc8c] hover:bg-[#4b5320]/20 text-[#c3cc8c] text-[11px] uppercase tracking-wider transition-all gap-1 rounded-none"
                                   >
                                     <Edit className="w-3 h-3" /> Modify slab
-                                  </button>
-                                  <button
+                                  </Button>
+                                  <Button
                                     onClick={() =>
                                       onDeletePasswordClick(cred.id)
                                     }
-                                    className="px-3 py-1.5 bg-[#93000a]/20 border border-[#ffb4ab]/40 hover:border-[#ffb4ab] text-[#ffb4ab] text-[11px] uppercase tracking-wider transition-all flex items-center gap-1"
+                                    variant="outline"
+                                    className="px-3 py-1.5 h-auto bg-[#93000a]/20 border-[#ffb4ab]/40 hover:border-[#ffb4ab] hover:bg-[#93000a]/20 text-[#ffb4ab] text-[11px] uppercase tracking-wider transition-all gap-1 rounded-none"
                                   >
                                     <Trash2 className="w-3.5 h-3.5" /> Purge
                                     Crypt
-                                  </button>
+                                  </Button>
                                 </div>
                               </motion.div>
                             </td>
@@ -3443,29 +3419,30 @@ export default function VaultView({
             </table>
           </div>
 
-          {/* Load More Button matching exact style block bottom */}
           {sortedCredentials.length > visibleLimit && (
             <div className="p-4 border-t-2 border-[#47483c] bg-[#2a2a2a] text-center select-none">
-              <button
+              <Button
+                variant="ghost"
                 onClick={() =>
                   setVisibleLimit(
                     Math.min(visibleLimit + 5, sortedCredentials.length),
                   )
                 }
-                className="text-mono text-xs uppercase text-[#ffb77d] hover:text-[#c3cc8c] tracking-widest font-bold transition-colors cursor-pointer"
+                className="text-mono text-xs uppercase text-[#ffb77d] hover:text-[#c3cc8c] tracking-widest font-bold transition-colors hover:bg-transparent"
               >
                 Load More Secrets
-              </button>
+              </Button>
             </div>
           )}
           {visibleLimit > 5 && sortedCredentials.length > 5 && (
             <div className="p-4 border-t border-[#47483c]/30 bg-[#2a2a2a] text-center select-none">
-              <button
+              <Button
+                variant="ghost"
                 onClick={() => setVisibleLimit(5)}
-                className="text-mono text-[10px] uppercase text-[#c8c7b8]/60 hover:text-[#ffb77d] tracking-widest transition-colors cursor-pointer"
+                className="text-mono text-[10px] uppercase text-[#c8c7b8]/60 hover:text-[#ffb77d] tracking-widest transition-colors hover:bg-transparent"
               >
                 Show less secrets
-              </button>
+              </Button>
             </div>
           )}
         </div>
@@ -3476,8 +3453,8 @@ export default function VaultView({
 </file>
 
 <file path="src/features/dashboard/schemas/schema.ts">
-type Group = "Personal" | "Work" | "Social" | "Finance" | "None";
-type Strength = "Strong" | "Medium" | "Weak" | "InValid";
+export type Group = "Personal" | "Work" | "Social" | "Finance" | "None";
+export type Strength = "Strong" | "Medium" | "Weak" | "InValid";
 export interface Credential {
   id: string;
   name: string;
@@ -3509,14 +3486,14 @@ export type GroupType = "All" | Group;
 </file>
 
 <file path="src/features/dashboard/Dashboard.tsx">
-import { useState } from "react";
-import type { Credential, TabType, GroupType } from "./schemas/schema";
-import { useVault } from "@/hooks/useVault";
+import { useDashboardStore } from "@/store/useDashboardStore";
+import { useVaultStore } from "@/store/useVaultStore";
 
 // Layout & UI
 import { Sidebar } from "./components/layout/SideBar";
 import { Topbar } from "./components/layout/Topbar";
 import { Fab } from "./components/ui/Fab";
+import { BackgroundWatermark } from "./components/layout/BackGroundWatermark";
 
 // Views
 import VaultView from "./components/VaultView";
@@ -3530,39 +3507,13 @@ import { LockScreen } from "./components/modals/LockScreen";
 import { HelpScroll } from "./components/modals/HelpScroll";
 import { CustomPrompt } from "./components/modals/CustomPrompt";
 
-export type CustomPromptState = {
-  isOpen: boolean;
-  title: string;
-  message: string;
-  type: "info" | "confirm";
-  onConfirm?: () => void;
-};
-
 export function Dashboard() {
-  const vault = useVault();
-
-  // Local UI State
-  const [activeTab, setActiveTab] = useState<TabType>("vault");
-  const [selectedGroup, setSelectedGroup] = useState<GroupType>("All");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isLocked, setIsLocked] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingCredential, setEditingCredential] = useState<Credential | null>(
-    null,
-  );
-  const [showHelp, setShowHelp] = useState(false);
-  const [customPrompt, setCustomPrompt] = useState<CustomPromptState | null>(
-    null,
-  );
-
-  // Wrapper Handlers
-  const openCredentialModal = (cred: Credential | null = null) => {
-    setEditingCredential(cred);
-    setIsModalOpen(true);
-  };
+  // Consume Zustand Stores
+  const vault = useVaultStore();
+  const dashboard = useDashboardStore();
 
   const handleQuickVaultDeposit = (generatedPassword: string) => {
-    vault.handleSaveCredential({
+    vault.saveCredential({
       name: "Unassigned Forge",
       username: "user_handle",
       password: generatedPassword,
@@ -3570,13 +3521,13 @@ export function Dashboard() {
       websiteUrl: "",
       notes: "Slab key forged inside Primitive Key Generator.",
     });
-    setActiveTab("vault");
-    setSelectedGroup("All");
-    setSearchQuery("Forge");
+    dashboard.setActiveTab("vault");
+    dashboard.setSelectedGroup("All");
+    dashboard.setSearchQuery("Forge");
   };
 
   const handleDeleteRequest = (id: string) => {
-    setCustomPrompt({
+    dashboard.setCustomPrompt({
       isOpen: true,
       title: "TECTONIC PURGE COMMENCEMENT",
       message:
@@ -3588,102 +3539,36 @@ export function Dashboard() {
 
   return (
     <div className="bg-[#131313] text-[#e5e2e1] cave-bg min-h-screen flex selection:bg-[#ffb77d] selection:text-[#131313]">
-      <LockScreen isLocked={isLocked} onUnlock={() => setIsLocked(false)} />
+      <LockScreen />
 
-      <Sidebar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        selectedGroup={selectedGroup}
-        setSelectedGroup={setSelectedGroup}
-        onNewSecretClick={() => openCredentialModal()}
-        onHelpClick={() => setShowHelp(true)}
-        onLockClick={() => setIsLocked(true)}
-      />
+      <Sidebar />
 
       <div className="ml-64 flex-1 flex flex-col min-h-screen">
-        <Topbar
-          searchQuery={searchQuery}
-          onSearchChange={(val) => {
-            setSearchQuery(val);
-            if (activeTab !== "vault") setActiveTab("vault");
-          }}
-          onAddPasswordClick={() => openCredentialModal()}
-          onNotificationClick={() =>
-            setCustomPrompt({
-              isOpen: true,
-              title: "Sentinel System Update",
-              message: "Core Security Audit health score is active.",
-              type: "info",
-            })
-          }
-          onProfileClick={() =>
-            setCustomPrompt({
-              isOpen: true,
-              title: "Vault Operator Signet",
-              message: "Role: Primary Volcanic Vault Operator",
-              type: "info",
-            })
-          }
-        />
+        <Topbar />
 
         <main className="p-8 md:p-16 max-w-[1250px] mx-auto w-full relative flex-1">
-          {/* Background image component can go here */}
+          <BackgroundWatermark />
 
           <div className="relative z-10">
-            {activeTab === "vault" && (
-              <VaultView
-                credentials={vault.credentials}
-                searchQuery={searchQuery}
-                onSearchQueryChange={setSearchQuery}
-                selectedGroup={selectedGroup}
-                onSelectGroup={setSelectedGroup}
-                onAddPasswordClick={() => openCredentialModal()}
-                onEditPasswordClick={openCredentialModal}
-                onDeletePasswordClick={handleDeleteRequest}
-              />
+            {dashboard.activeTab === "vault" && (
+              <VaultView onDeletePasswordClick={handleDeleteRequest} />
             )}
-            {activeTab === "generator" && (
+            {dashboard.activeTab === "generator" && (
               <GeneratorView onAddSecurely={handleQuickVaultDeposit} />
             )}
-            {activeTab === "audit" && (
-              <SecurityAuditView
-                credentials={vault.credentials}
-                onUpgradePassword={vault.handleUpgradePassword}
-              />
-            )}
-            {activeTab === "settings" && (
-              <SettingsView
-                onClearVault={() => vault.handleClearVault()}
-                onResetToDefaults={() => vault.handleResetToDefaults()}
-                onImportBackup={vault.handleImportBackup}
-                exportCredentials={vault.getExportString}
-              />
-            )}
+            {dashboard.activeTab === "audit" && <SecurityAuditView />}
+            {dashboard.activeTab === "settings" && <SettingsView />}
           </div>
         </main>
       </div>
 
-      <Fab onClick={() => openCredentialModal()} />
+      <Fab />
 
-      <PortalModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setEditingCredential(null);
-        }}
-        onSave={(data) => {
-          vault.handleSaveCredential(data, editingCredential?.id);
-          setIsModalOpen(false);
-        }}
-        editingCredential={editingCredential}
-      />
+      <PortalModal />
 
-      <HelpScroll isOpen={showHelp} onClose={() => setShowHelp(false)} />
+      <HelpScroll />
 
-      <CustomPrompt
-        config={customPrompt}
-        onClose={() => setCustomPrompt(null)}
-      />
+      <CustomPrompt />
     </div>
   );
 }
@@ -4113,6 +3998,66 @@ export const useCredentialsStore = create<CredentialStoreInterface>((set) => ({
 }));
 </file>
 
+<file path="src/store/useDashboardStore.ts">
+import { create } from "zustand";
+import type {
+  TabType,
+  GroupType,
+  Credential,
+} from "@/features/dashboard/schemas/schema";
+import type { CustomPromptConfig } from "@/features/dashboard/components/modals/CustomPrompt";
+
+interface DashboardState {
+  // Navigation & Filtering
+  activeTab: TabType;
+  selectedGroup: GroupType;
+  searchQuery: string;
+
+  // Security & App State
+  isLocked: boolean;
+
+  // Modals & Overlays
+  isModalOpen: boolean;
+  editingCredential: Credential | null;
+  showHelp: boolean;
+  customPrompt: CustomPromptConfig | null;
+
+  // Actions
+  setActiveTab: (tab: TabType) => void;
+  setSelectedGroup: (group: GroupType) => void;
+  setSearchQuery: (query: string) => void;
+  setIsLocked: (locked: boolean) => void;
+  openPortalModal: (credential?: Credential | null) => void;
+  closePortalModal: () => void;
+  setShowHelp: (show: boolean) => void;
+  setCustomPrompt: (prompt: CustomPromptConfig | null) => void;
+}
+
+export const useDashboardStore = create<DashboardState>((set) => ({
+  activeTab: "vault",
+  selectedGroup: "All",
+  searchQuery: "",
+  isLocked: false,
+  isModalOpen: false,
+  editingCredential: null,
+  showHelp: false,
+  customPrompt: null,
+
+  setActiveTab: (tab) => set({ activeTab: tab }),
+  setSelectedGroup: (group) => set({ selectedGroup: group }),
+  setSearchQuery: (query) => set({ searchQuery: query }),
+  setIsLocked: (locked) => set({ isLocked: locked }),
+
+  openPortalModal: (credential = null) =>
+    set({ isModalOpen: true, editingCredential: credential }),
+
+  closePortalModal: () => set({ isModalOpen: false, editingCredential: null }),
+
+  setShowHelp: (show) => set({ showHelp: show }),
+  setCustomPrompt: (prompt) => set({ customPrompt: prompt }),
+}));
+</file>
+
 <file path="src/store/useUserStore.ts">
 import { create } from "zustand";
 
@@ -4140,6 +4085,116 @@ export const useUserStore = create<UseUserStoreInterface>((set) => ({
   setMasterHash: (masterHash) => set({ masterHash }),
   setEmail: (email) => set({ email }),
 }));
+</file>
+
+<file path="src/store/useVaultStore.ts">
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import type { Credential } from "@/features/dashboard/schemas/schema";
+import { INITIAL_CREDENTIALS } from "@/features/dashboard/initialData";
+
+interface VaultState {
+  credentials: Credential[];
+
+  // Actions
+  saveCredential: (
+    newData: Omit<Credential, "id" | "strength">,
+    editingId?: string,
+  ) => void;
+  upgradePassword: (id: string, newPassword: string) => void;
+  deleteCredential: (id: string) => void;
+  clearVault: () => void;
+  resetToDefaults: () => void;
+  importBackup: (imported: Credential[]) => void;
+  getExportString: () => string;
+}
+
+const analyzeStrength = (pass: string): "Strong" | "Medium" | "Weak" => {
+  if (pass.length < 6) return "Weak";
+  const count = [
+    /[A-Z]/.test(pass),
+    /[a-z]/.test(pass),
+    /\d/.test(pass),
+    /\W/.test(pass),
+  ].filter(Boolean).length;
+
+  if (pass.length >= 12 && count >= 3) return "Strong";
+  if (pass.length >= 8 && count >= 2) return "Medium";
+  return "Weak";
+};
+
+export const useVaultStore = create<VaultState>()(
+  persist(
+    (set, get) => ({
+      credentials: INITIAL_CREDENTIALS,
+
+      saveCredential: (newData, editingId) => {
+        const newStrength = analyzeStrength(newData.password);
+        const currentDate = new Date().toISOString().split("T")[0];
+
+        set((state) => {
+          if (editingId) {
+            return {
+              credentials: state.credentials.map((c) =>
+                c.id === editingId
+                  ? {
+                      ...c,
+                      ...newData,
+                      strength: newStrength,
+                      lastUpdated: currentDate,
+                    }
+                  : c,
+              ),
+            };
+          }
+
+          const newCred: Credential = {
+            ...newData,
+            id: Math.random().toString(36).substring(2, 9),
+            strength: newStrength,
+            lastUpdated: currentDate,
+            isFavorite: false,
+          };
+          return { credentials: [newCred, ...state.credentials] };
+        });
+      },
+
+      upgradePassword: (id, newPassword) => {
+        set((state) => ({
+          credentials: state.credentials.map((c) =>
+            c.id === id
+              ? {
+                  ...c,
+                  password: newPassword,
+                  strength: "Strong",
+                  lastUpdated: new Date().toISOString().split("T")[0],
+                }
+              : c,
+          ),
+        }));
+      },
+
+      deleteCredential: (id) => {
+        set((state) => ({
+          credentials: state.credentials.filter((c) => c.id !== id),
+        }));
+      },
+
+      clearVault: () => set({ credentials: [] }),
+
+      resetToDefaults: () => set({ credentials: INITIAL_CREDENTIALS }),
+
+      importBackup: (imported) => {
+        set((state) => ({ credentials: [...imported, ...state.credentials] }));
+      },
+
+      getExportString: () => JSON.stringify(get().credentials, null, 2),
+    }),
+    {
+      name: "chomp_vault_secrets", // Replaces your manual localStorage key
+    },
+  ),
+);
 </file>
 
 <file path="src/workers/hash.ts">

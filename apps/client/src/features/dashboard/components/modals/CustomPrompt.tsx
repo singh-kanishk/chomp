@@ -1,23 +1,13 @@
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
+import { useDashboardStore } from "@/store/useDashboardStore";
 
-export type CustomPromptConfig = {
-  isOpen: boolean;
-  title: string;
-  message: string;
-  type: "info" | "confirm";
-  onConfirm?: () => void;
-};
-
-interface CustomPromptProps {
-  config: CustomPromptConfig | null;
-  onClose: () => void;
-}
-
-export function CustomPrompt({ config, onClose }: CustomPromptProps) {
+export function CustomPrompt() {
+  const { customPrompt, setCustomPrompt } = useDashboardStore();
+  const onClose = () => setCustomPrompt(null);
   return (
     <AnimatePresence>
-      {config?.isOpen && (
+      {customPrompt?.isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <motion.div
             initial={{ opacity: 0 }}
@@ -36,15 +26,15 @@ export function CustomPrompt({ config, onClose }: CustomPromptProps) {
             <div className="absolute top-0 left-0 right-0 h-1 bg-[#ffb77d]" />
 
             <h3 className="font-headline text-sm text-[#ffb77d] uppercase tracking-wider mb-3">
-              🔱 {config.title}
+              🔱 {customPrompt.title}
             </h3>
 
             <div className="bg-[#0e0e0e] border border-[#47483c] p-3 text-xs text-[#c8c7b8] leading-relaxed rounded-xs whitespace-pre-line mb-5">
-              {config.message}
+              {customPrompt.message}
             </div>
 
             <div className="flex gap-3 justify-end">
-              {config.type === "confirm" ? (
+              {customPrompt.type === "confirm" ? (
                 <>
                   <Button
                     onClick={onClose}
@@ -54,7 +44,7 @@ export function CustomPrompt({ config, onClose }: CustomPromptProps) {
                   </Button>
                   <Button
                     onClick={() => {
-                      if (config.onConfirm) config.onConfirm();
+                      if (customPrompt.onConfirm) customPrompt.onConfirm();
                       onClose();
                     }}
                     className="px-5 py-2 bg-[#93000a]/20 border border-[#ffb4ab] text-[#ffb4ab] hover:bg-[#ffb4ab] hover:text-[#131313] uppercase text-[10px] tracking-wider transition-all font-bold cursor-pointer"

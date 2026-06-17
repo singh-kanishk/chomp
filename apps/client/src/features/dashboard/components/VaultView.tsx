@@ -16,29 +16,21 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import type { Credential, GroupType } from "../schemas/schema";
+import type { GroupType } from "../schemas/schema";
+import { useDashboardStore } from "@/store/useDashboardStore";
+import { useVaultStore } from "@/store/useVaultStore";
 
-interface VaultViewProps {
-  credentials: Credential[];
-  searchQuery: string;
-  onSearchQueryChange: (query: string) => void;
-  selectedGroup: GroupType;
-  onSelectGroup: (group: GroupType) => void;
-  onAddPasswordClick: () => void;
-  onEditPasswordClick: (cred: Credential) => void;
-  onDeletePasswordClick: (id: string) => void;
-}
-
-export default function VaultView({
-  credentials,
-  searchQuery,
-  onSearchQueryChange,
-  selectedGroup,
-  onSelectGroup,
-  onAddPasswordClick,
-  onEditPasswordClick,
-  onDeletePasswordClick,
-}: VaultViewProps) {
+export default function VaultView() {
+  const {
+    searchQuery,
+    setSearchQuery,
+    selectedGroup,
+    setSelectedGroup,
+    openPortalModal,
+    setCustomPrompt,
+  } = useDashboardStore();
+  const { credentials, deleteCredential } = useVaultStore();
+  const onAddPasswordClick = () => openPortalModal();
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [copiedType, setCopiedType] = useState<"username" | "password" | null>(
     null,
@@ -48,6 +40,17 @@ export default function VaultView({
   const [visibleLimit, setVisibleLimit] = useState(5);
   const [sortBy, setSortBy] = useState<"name" | "strength" | "group">("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+
+  const onDeletePasswordClick = (id: string) => {
+    setCustomPrompt({
+      isOpen: true,
+      title: "TECTONIC PURGE COMMENCEMENT",
+      message:
+        "Are you absolutely sure you want to purge this secure runestone key forever? This operation is completely irreversible.",
+      type: "confirm",
+      onConfirm: () => deleteCredential(id),
+    });
+  };
 
   const copyToClipboard = (
     text: string,
@@ -308,7 +311,7 @@ export default function VaultView({
                 type="text"
                 placeholder="Live search vault..."
                 value={searchQuery}
-                onChange={(e) => onSearchQueryChange(e.target.value)}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="bg-[#0e0e0e] border-[#47483c] pl-8 pr-3 py-1 text-xs text-[#e5e2e1] focus:outline-none focus:border-[#ffb77d] focus:ring-1 focus:ring-[#ffb77d] font-mono placeholder:text-[#c8c7b8]/40 h-8 transition-colors rounded-none"
               />
               <Search className="w-3.5 h-3.5 text-[#c8c7b8]/40 absolute left-2.5 top-1/2 -translate-y-1/2" />
@@ -332,7 +335,7 @@ export default function VaultView({
           {groups.map((group) => (
             <Button
               key={group}
-              onClick={() => onSelectGroup(group)}
+              onClick={() => setSelectedGroup(group)}
               variant="outline"
               className={`px-4 py-1.5 h-auto font-mono text-xs uppercase tracking-widest rounded-none ${
                 selectedGroup === group
@@ -543,7 +546,7 @@ export default function VaultView({
                                     <Copy className="w-3 h-3" /> Copy username
                                   </Button>
                                   <Button
-                                    onClick={() => onEditPasswordClick(cred)}
+                                    onClick={() => openPortalModal(cred)}
                                     variant="outline"
                                     className="px-3 py-1.5 h-auto bg-[#4b5320]/20 border-[#c3cc8c]/40 hover:border-[#c3cc8c] hover:bg-[#4b5320]/20 text-[#c3cc8c] text-[11px] uppercase tracking-wider transition-all gap-1 rounded-none"
                                   >

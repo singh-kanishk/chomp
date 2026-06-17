@@ -1,15 +1,13 @@
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
+import { useDashboardStore } from "@/store/useDashboardStore";
 
-interface HelpScrollProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export function HelpScroll({ isOpen, onClose }: HelpScrollProps) {
+export function HelpScroll() {
+  const { showHelp, setShowHelp } = useDashboardStore();
+  const onClose = () => setShowHelp(false);
   return (
     <AnimatePresence>
-      {isOpen && (
+      {showHelp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <motion.div
             initial={{ opacity: 0 }}

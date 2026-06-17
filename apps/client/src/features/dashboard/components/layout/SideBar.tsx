@@ -1,26 +1,23 @@
 import { Lock, HelpCircle, LogOut, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { TabType, GroupType } from "../../schemas/schema";
+import type { GroupType } from "../../schemas/schema";
+import { useDashboardStore } from "@/store/useDashboardStore";
 
-interface SidebarProps {
-  activeTab: TabType;
-  setActiveTab: (tab: TabType) => void;
-  selectedGroup: GroupType;
-  setSelectedGroup: (group: GroupType) => void;
-  onNewSecretClick: () => void;
-  onHelpClick: () => void;
-  onLockClick: () => void;
-}
+export function Sidebar() {
+  const {
+    activeTab,
+    setActiveTab,
+    selectedGroup,
+    setSelectedGroup,
+    openPortalModal,
+    setShowHelp,
+    setIsLocked,
+  } = useDashboardStore();
 
-export function Sidebar({
-  activeTab,
-  setActiveTab,
-  selectedGroup,
-  setSelectedGroup,
-  onNewSecretClick,
-  onHelpClick,
-  onLockClick,
-}: SidebarProps) {
+  const onNewSecretClick = () => openPortalModal();
+  const onHelpClick = () => setShowHelp(true);
+  const onLockClick = () => setIsLocked(true);
+
   return (
     <nav className="fixed left-0 top-0 h-screen w-64 bg-[#2a2a2a] border-r-4 border-[#353534] shadow-[5px_0_0_0_rgba(0,0,0,0.3)] flex flex-col z-40">
       <div className="p-6 border-b-2 border-[#47483c] select-none">
