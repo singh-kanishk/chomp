@@ -7,13 +7,12 @@ import { Fab } from "./components/ui/Fab";
 import { BackgroundWatermark } from "./components/layout/BackGroundWatermark";
 
 // Views
-import VaultView from "./components/VaultView";
-import GeneratorView from "./components/GeneratorView";
-import SecurityAuditView from "./components/SecurityAuditView";
-import SettingsView from "./components/SettingsView";
-
+import VaultView from "./components/views/VaultView";
+import GeneratorView from "./components/views/GeneratorView";
+import SecurityAuditView from "./components/views/SecurityAuditView";
+import SettingsView from "./components/views/SettingsView";
 // Modals
-import PortalModal from "./components/PortalModal";
+import PortalModal from "./components/views/PortalModal";
 import { LockScreen } from "./components/modals/LockScreen";
 import { HelpScroll } from "./components/modals/HelpScroll";
 import { CustomPrompt } from "./components/modals/CustomPrompt";

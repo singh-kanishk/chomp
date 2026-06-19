@@ -1,17 +1,5 @@
-export type Group = "Personal" | "Work" | "Social" | "Finance" | "None";
-export type Strength = "Strong" | "Medium" | "Weak" | "InValid";
-export interface Credential {
-  id: string;
-  name: string;
-  username: string;
-  password: string;
-  group: Group;
-  strength: Strength;
-  websiteUrl?: string;
-  notes?: string;
-  lastUpdated?: string;
-  isFavorite?: boolean;
-}
+import type { Credential, Group, Strength } from "@chomp/shared";
+
 export interface CredentialStoreInterface extends Credential {
   setId: (id: string) => void;
   setName: (name: string) => void;

@@ -1,4 +1,13 @@
-import { text, pgTable, timestamp, uuid, boolean } from "drizzle-orm/pg-core";
+import {
+  text,
+  pgTable,
+  timestamp,
+  uuid,
+  boolean,
+  pgEnum,
+} from "drizzle-orm/pg-core";
+import { Group, Strength } from "@chomp/shared";
+
 export const usersTable = pgTable("users", {
   userId: uuid("user_id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
@@ -25,4 +34,20 @@ export const sessionTable = pgTable("session", {
     onDelete: "cascade",
   }),
   refreshToken: text("refresh_token").primaryKey(),
+});
+
+export const credentialsTable = pgTable("credentials", {
+  userId: uuid("user_id")
+    .primaryKey()
+    .references(() => usersTable.userId, { onDelete: "cascade" }),
+  credentialId: text("credential_id").notNull(),
+  credentialName: text("credential_name").notNull(),
+  username: text("username").notNull(),
+  password: text("password").notNull(),
+  group: text("group").$type<Group>(),
+  strength: text("strength").$type<Strength>(),
+  websiteUrl: text("website_url"),
+  notes: text("notes"),
+  lastUpdated: text("last_updated"),
+  isFavorite: boolean("is_favorite"),
 });

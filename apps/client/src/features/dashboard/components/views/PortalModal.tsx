@@ -4,7 +4,7 @@ import { X, Lock, Eye, EyeOff, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
-import type { Credential, Group, Strength } from "../schemas/schema";
+import type { Credential, Group, Strength} from '@chomp/shared'
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { useVaultStore } from "@/store/useVaultStore";
 

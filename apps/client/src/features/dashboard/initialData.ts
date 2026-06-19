@@ -1,4 +1,4 @@
-import type { Credential } from "./schemas/schema";
+import type { Credential } from "@chomp/shared";
 
 export const INITIAL_CREDENTIALS: Credential[] = [
   {

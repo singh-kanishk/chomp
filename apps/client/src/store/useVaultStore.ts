@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { Credential } from "@/features/dashboard/schemas/schema";
+import type { Credential } from "@chomp/shared";
 import { INITIAL_CREDENTIALS } from "@/features/dashboard/initialData";
 
 interface VaultState {

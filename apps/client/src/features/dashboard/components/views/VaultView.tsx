@@ -16,9 +16,10 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import type { GroupType } from "../schemas/schema";
+import type { GroupType } from "@chomp/shared";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { useVaultStore } from "@/store/useVaultStore";
+import { useQuery } from "@tanstack/react-query";
 
 export default function VaultView() {
   const {
@@ -92,7 +93,7 @@ export default function VaultView() {
     if (sortBy === "name") {
       comparison = a.name.localeCompare(b.name);
     } else if (sortBy === "strength") {
-      const strengthVal = { Strong: 3, Medium: 2, Weak: 1 };
+      const strengthVal = { Strong: 3, Medium: 2, Weak: 1, InValid: -1 };
       comparison = strengthVal[a.strength] - strengthVal[b.strength];
     } else if (sortBy === "group") {
       comparison = a.group.localeCompare(b.group);

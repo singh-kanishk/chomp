@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import type { Credential } from "../schemas/schema";
 import { useVaultStore } from "@/store/useVaultStore";
 
 export default function SettingsView() {

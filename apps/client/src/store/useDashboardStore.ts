@@ -1,9 +1,9 @@
 import { create } from "zustand";
 import type {
   TabType,
-  GroupType,
-  Credential,
+  GroupType
 } from "@/features/dashboard/schemas/schema";
+import type { Credential } from "@chomp/shared";
 import type { CustomPromptConfig } from "@/features/dashboard/components/modals/CustomPrompt";
 
 interface DashboardState {
