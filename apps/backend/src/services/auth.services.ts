@@ -1,6 +1,10 @@
 import argon2 from "argon2";
 import { db } from "../index";
-import { usersTable, secretsTable, sessionTable } from "../db/schema";
+import {
+  usersTable,
+  secretsTable,
+  sessionTable,
+} from "../modals/SchemaDb/schema";
 import { SignUpRequest } from "@chomp/shared";
 import { eq, and } from "drizzle-orm";
 import jwt from "jsonwebtoken";

@@ -5,7 +5,7 @@ import cors from "cors";
 import { authRouter } from "./routes/auth/auth.routes.js";
 import postgres from "postgres";
 
-import * as schema from "./db/schema";
+import * as schema from "./modals/SchemaDb/schema.js";
 const queryClient = postgres(process.env.DATABASE_URL!);
 
 const app = express();
