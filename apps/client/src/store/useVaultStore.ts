@@ -1,21 +1,21 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { Credential } from "@chomp/shared";
+import type { CredentialFrontend } from "@chomp/shared";
 import { INITIAL_CREDENTIALS } from "@/features/dashboard/initialData";
 
 interface VaultState {
-  credentials: Credential[];
+  credentialFrontend: CredentialFrontend[];
 
   // Actions
   saveCredential: (
-    newData: Omit<Credential, "id" | "strength">,
+    newData: Omit<CredentialFrontend, "id" | "strength">,
     editingId?: string,
   ) => void;
   upgradePassword: (id: string, newPassword: string) => void;
   deleteCredential: (id: string) => void;
   clearVault: () => void;
   resetToDefaults: () => void;
-  importBackup: (imported: Credential[]) => void;
+  importBackup: (imported: CredentialFrontend[]) => void;
   getExportString: () => string;
 }
 
@@ -36,7 +36,7 @@ const analyzeStrength = (pass: string): "Strong" | "Medium" | "Weak" => {
 export const useVaultStore = create<VaultState>()(
   persist(
     (set, get) => ({
-      credentials: INITIAL_CREDENTIALS,
+      credentialFrontend: INITIAL_CREDENTIALS,
 
       saveCredential: (newData, editingId) => {
         const newStrength = analyzeStrength(newData.password);
@@ -45,7 +45,7 @@ export const useVaultStore = create<VaultState>()(
         set((state) => {
           if (editingId) {
             return {
-              credentials: state.credentials.map((c) =>
+              credentialFrontend: state.credentialFrontend.map((c) =>
                 c.id === editingId
                   ? {
                       ...c,
@@ -58,20 +58,20 @@ export const useVaultStore = create<VaultState>()(
             };
           }
 
-          const newCred: Credential = {
+          const newCred: CredentialFrontend = {
             ...newData,
             id: Math.random().toString(36).substring(2, 9),
             strength: newStrength,
             lastUpdated: currentDate,
             isFavorite: false,
           };
-          return { credentials: [newCred, ...state.credentials] };
+          return { credentialFrontends: [newCred, ...state.credentialFrontend] };
         });
       },
 
       upgradePassword: (id, newPassword) => {
         set((state) => ({
-          credentials: state.credentials.map((c) =>
+          credentialFrontend: state.credentialFrontend.map((c) =>
             c.id === id
               ? {
                   ...c,
@@ -86,19 +86,19 @@ export const useVaultStore = create<VaultState>()(
 
       deleteCredential: (id) => {
         set((state) => ({
-          credentials: state.credentials.filter((c) => c.id !== id),
+          credentialFrontend: state.credentialFrontend.filter((c) => c.id !== id),
         }));
       },
 
-      clearVault: () => set({ credentials: [] }),
+      clearVault: () => set({ credentialFrontend: [] }),
 
-      resetToDefaults: () => set({ credentials: INITIAL_CREDENTIALS }),
+      resetToDefaults: () => set({ credentialFrontend: INITIAL_CREDENTIALS }),
 
       importBackup: (imported) => {
-        set((state) => ({ credentials: [...imported, ...state.credentials] }));
+        set((state) => ({ credentialFrontend: [...imported, ...state.credentialFrontend] }));
       },
 
-      getExportString: () => JSON.stringify(get().credentials, null, 2),
+      getExportString: () => JSON.stringify(get().credentialFrontend, null, 2),
     }),
     {
       name: "chomp_vault_secrets", // Replaces your manual localStorage key

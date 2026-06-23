@@ -3,7 +3,7 @@ import type {
   TabType,
   GroupType
 } from "@/features/dashboard/schemas/schema";
-import type { Credential } from "@chomp/shared";
+import type { CredentialFrontend } from "@chomp/shared";
 import type { CustomPromptConfig } from "@/features/dashboard/components/modals/CustomPrompt";
 
 interface DashboardState {
@@ -17,7 +17,7 @@ interface DashboardState {
 
   // Modals & Overlays
   isModalOpen: boolean;
-  editingCredential: Credential | null;
+  editingCredentialFrontend: CredentialFrontend | null;
   showHelp: boolean;
   customPrompt: CustomPromptConfig | null;
 
@@ -26,7 +26,7 @@ interface DashboardState {
   setSelectedGroup: (group: GroupType) => void;
   setSearchQuery: (query: string) => void;
   setIsLocked: (locked: boolean) => void;
-  openPortalModal: (credential?: Credential | null) => void;
+  openPortalModal: (credentialFrontend?: CredentialFrontend | null) => void;
   closePortalModal: () => void;
   setShowHelp: (show: boolean) => void;
   setCustomPrompt: (prompt: CustomPromptConfig | null) => void;
@@ -38,7 +38,7 @@ export const useDashboardStore = create<DashboardState>((set) => ({
   searchQuery: "",
   isLocked: false,
   isModalOpen: false,
-  editingCredential: null,
+  editingCredentialFrontend: null,
   showHelp: false,
   customPrompt: null,
 
@@ -47,10 +47,10 @@ export const useDashboardStore = create<DashboardState>((set) => ({
   setSearchQuery: (query) => set({ searchQuery: query }),
   setIsLocked: (locked) => set({ isLocked: locked }),
 
-  openPortalModal: (credential = null) =>
-    set({ isModalOpen: true, editingCredential: credential }),
+  openPortalModal: (credentialFrontend = null) =>
+    set({ isModalOpen: true, editingCredentialFrontend: credentialFrontend }),
 
-  closePortalModal: () => set({ isModalOpen: false, editingCredential: null }),
+  closePortalModal: () => set({ isModalOpen: false, editingCredentialFrontend: null }),
 
   setShowHelp: (show) => set({ showHelp: show }),
   setCustomPrompt: (prompt) => set({ customPrompt: prompt }),

@@ -73,19 +73,18 @@ src/
           LockScreen.tsx
         ui/
           Fab.tsx
-        GeneratorView.tsx
-        PortalModal.tsx
-        SecurityAuditView.tsx
-        SettingsView.tsx
-        VaultView.tsx
+        views/
+          GeneratorView.tsx
+          PortalModal.tsx
+          SecurityAuditView.tsx
+          SettingsView.tsx
+          VaultView.tsx
       schemas/
         schema.ts
       Dashboard.tsx
       initialData.ts
     services/
-      getData.ts
-  hooks/
-    useVault.ts
+      vault.services.ts
   lib/
     api-call-wrapper.ts
     utils.ts
@@ -1196,7 +1195,15 @@ export function BackgroundWatermark() {
 </file>
 
 <file path="src/features/dashboard/components/layout/SideBar.tsx">
-import { Lock, HelpCircle, LogOut, Plus } from "lucide-react";
+import {
+  Lock,
+  HelpCircle,
+  LogOut,
+  Plus,
+  Key,
+  ShieldCheck,
+  Settings,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { GroupType } from "../../schemas/schema";
 import { useDashboardStore } from "@/store/useDashboardStore";
@@ -1244,7 +1251,50 @@ export function Sidebar() {
             Vault Dashboard
           </span>
         </Button>
-        {/* ... Include your other Navigation Buttons (Generator, Security, Settings) here ... */}
+        {/* Key Generator Tab */}
+        <Button
+          onClick={() => setActiveTab("generator")}
+          className={`flex items-center gap-4 px-4 py-3 text-left transition-all relative border-r-2 ${
+            activeTab === "generator"
+              ? "bg-[#4b5320] text-[#bdc787] border-[#c3cc8c] shadow-[0_0_15px_rgba(195,204,140,0.25)]"
+              : "text-[#c8c7b8] hover:text-[#ffb77d] hover:bg-[#353534] border-transparent"
+          }`}
+        >
+          <Key className="w-5 h-5 shrink-0" />
+          <span className="text-xs font-bold uppercase tracking-wider">
+            Generator Forge
+          </span>
+        </Button>
+
+        {/* Security Tab */}
+        <Button
+          onClick={() => setActiveTab("audit")}
+          className={`flex items-center gap-4 px-4 py-3 text-left transition-all relative border-r-2 ${
+            activeTab === "audit"
+              ? "bg-[#4b5320] text-[#bdc787] border-[#c3cc8c] shadow-[0_0_15px_rgba(195,204,140,0.25)]"
+              : "text-[#c8c7b8] hover:text-[#ffb77d] hover:bg-[#353534] border-transparent"
+          }`}
+        >
+          <ShieldCheck className="w-5 h-5 shrink-0" />
+          <span className="text-xs font-bold uppercase tracking-wider">
+            Security Sentinel
+          </span>
+        </Button>
+
+        {/* Settings Tab */}
+        <Button
+          onClick={() => setActiveTab("settings")}
+          className={`flex items-center gap-4 px-4 py-3 text-left transition-all relative border-r-2 ${
+            activeTab === "settings"
+              ? "bg-[#4b5320] text-[#bdc787] border-[#c3cc8c] shadow-[0_0_15px_rgba(195,204,140,0.25)]"
+              : "text-[#c8c7b8] hover:text-[#ffb77d] hover:bg-[#353534] border-transparent"
+          }`}
+        >
+          <Settings className="w-5 h-5 shrink-0" />
+          <span className="text-xs font-bold uppercase tracking-wider">
+            Slab Settings
+          </span>
+        </Button>
 
         <div className="mt-6 px-4">
           <p className="text-[10px] uppercase text-[#c8c7b8]/40 mb-2 font-mono tracking-widest">
@@ -1391,6 +1441,13 @@ import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { useDashboardStore } from "@/store/useDashboardStore";
 
+export interface CustomPromptConfig {
+  isOpen: boolean;
+  title: string;
+  message: string;
+  type: "info" | "confirm";
+  onConfirm?: () => void;
+}
 export function CustomPrompt() {
   const { customPrompt, setCustomPrompt } = useDashboardStore();
   const onClose = () => setCustomPrompt(null);
@@ -1677,8 +1734,8 @@ export function Fab() {
 }
 </file>
 
-<file path="src/features/dashboard/components/GeneratorView.tsx">
-import { useState } from "react";
+<file path="src/features/dashboard/components/views/GeneratorView.tsx">
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Copy,
@@ -1690,12 +1747,13 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useVaultStore } from "@/store/useVaultStore";
+import { useDashboardStore } from "@/store/useDashboardStore";
 
-interface GeneratorViewProps {
-  onAddSecurely: (pass: string) => void;
-}
-
-export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
+export default function GeneratorView() {
+  const { saveCredential } = useVaultStore();
+  const { setActiveTab, setSelectedGroup, setSearchQuery } =
+    useDashboardStore();
   const [password, setPassword] = useState("");
   const [length, setLength] = useState(16);
   const [includeUppercase, setIncludeUppercase] = useState(true);
@@ -1704,6 +1762,21 @@ export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
   const [includeSymbols, setIncludeSymbols] = useState(true);
   const [copied, setCopied] = useState(false);
 
+  useEffect(() => {
+    setSelectedGroup("All");
+    setSearchQuery("Forge");
+  }, [setSelectedGroup, setSearchQuery]);
+
+  const onAddSecurely = (generatedPassword: string) => {
+    saveCredential({
+      name: "Unassigned Forge",
+      username: "user_handle",
+      password: generatedPassword,
+      group: "Personal",
+      websiteUrl: "",
+      notes: "Slab key forged inside Primitive Key Generator.",
+    });
+  };
   const generatePassword = () => {
     let charset = "";
     if (includeUppercase) charset += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -1986,7 +2059,10 @@ export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
           {password && !password.startsWith("Please") && (
             <Button
               type="button"
-              onClick={() => onAddSecurely(password)}
+              onClick={() => {
+                onAddSecurely(password);
+                setActiveTab("vault");
+              }}
               variant="outline"
               className="sm:w-1/3 h-12 bg-transparent border-2 border-[#ffb77d] text-[#ffb77d] hover:bg-[#ffb77d] hover:text-[#131313] font-mono text-[12px] uppercase tracking-wider font-bold transition-all flex gap-1.5 rounded-none"
             >
@@ -2000,14 +2076,14 @@ export default function GeneratorView({ onAddSecurely }: GeneratorViewProps) {
 }
 </file>
 
-<file path="src/features/dashboard/components/PortalModal.tsx">
+<file path="src/features/dashboard/components/views/PortalModal.tsx">
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, Lock, Eye, EyeOff, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
-import type { Credential, Group, Strength } from "../schemas/schema";
+import type { Credential, Group, Strength} from '@chomp/shared'
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { useVaultStore } from "@/store/useVaultStore";
 
@@ -2274,7 +2350,7 @@ export default function PortalModal() {
 }
 </file>
 
-<file path="src/features/dashboard/components/SecurityAuditView.tsx">
+<file path="src/features/dashboard/components/views/SecurityAuditView.tsx">
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -2587,7 +2663,7 @@ export default function SecurityAuditView() {
 }
 </file>
 
-<file path="src/features/dashboard/components/SettingsView.tsx">
+<file path="src/features/dashboard/components/views/SettingsView.tsx">
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -2601,7 +2677,6 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import type { Credential } from "../schemas/schema";
 import { useVaultStore } from "@/store/useVaultStore";
 
 export default function SettingsView() {
@@ -2850,7 +2925,7 @@ export default function SettingsView() {
 }
 </file>
 
-<file path="src/features/dashboard/components/VaultView.tsx">
+<file path="src/features/dashboard/components/views/VaultView.tsx">
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -2869,22 +2944,20 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import type { GroupType } from "../schemas/schema";
+import type { GroupType } from "@chomp/shared";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { useVaultStore } from "@/store/useVaultStore";
-interface VaultViewProps {
-  onDeletePasswordClick: (id: string) => void;
-}
 
-export default function VaultView({ onDeletePasswordClick }: VaultViewProps) {
+export default function VaultView() {
   const {
     searchQuery,
     setSearchQuery,
     selectedGroup,
     setSelectedGroup,
     openPortalModal,
+    setCustomPrompt,
   } = useDashboardStore();
-  const { credentials } = useVaultStore();
+  const { credentials, deleteCredential } = useVaultStore();
   const onAddPasswordClick = () => openPortalModal();
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [copiedType, setCopiedType] = useState<"username" | "password" | null>(
@@ -2895,6 +2968,17 @@ export default function VaultView({ onDeletePasswordClick }: VaultViewProps) {
   const [visibleLimit, setVisibleLimit] = useState(5);
   const [sortBy, setSortBy] = useState<"name" | "strength" | "group">("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+
+  const onDeletePasswordClick = (id: string) => {
+    setCustomPrompt({
+      isOpen: true,
+      title: "TECTONIC PURGE COMMENCEMENT",
+      message:
+        "Are you absolutely sure you want to purge this secure runestone key forever? This operation is completely irreversible.",
+      type: "confirm",
+      onConfirm: () => deleteCredential(id),
+    });
+  };
 
   const copyToClipboard = (
     text: string,
@@ -2936,7 +3020,7 @@ export default function VaultView({ onDeletePasswordClick }: VaultViewProps) {
     if (sortBy === "name") {
       comparison = a.name.localeCompare(b.name);
     } else if (sortBy === "strength") {
-      const strengthVal = { Strong: 3, Medium: 2, Weak: 1 };
+      const strengthVal = { Strong: 3, Medium: 2, Weak: 1, InValid: -1 };
       comparison = strengthVal[a.strength] - strengthVal[b.strength];
     } else if (sortBy === "group") {
       comparison = a.group.localeCompare(b.group);
@@ -3453,20 +3537,8 @@ export default function VaultView({ onDeletePasswordClick }: VaultViewProps) {
 </file>
 
 <file path="src/features/dashboard/schemas/schema.ts">
-export type Group = "Personal" | "Work" | "Social" | "Finance" | "None";
-export type Strength = "Strong" | "Medium" | "Weak" | "InValid";
-export interface Credential {
-  id: string;
-  name: string;
-  username: string;
-  password: string;
-  group: Group;
-  strength: Strength;
-  websiteUrl?: string;
-  notes?: string;
-  lastUpdated?: string;
-  isFavorite?: boolean;
-}
+import type { Credential, Group, Strength } from "@chomp/shared";
+
 export interface CredentialStoreInterface extends Credential {
   setId: (id: string) => void;
   setName: (name: string) => void;
@@ -3487,7 +3559,6 @@ export type GroupType = "All" | Group;
 
 <file path="src/features/dashboard/Dashboard.tsx">
 import { useDashboardStore } from "@/store/useDashboardStore";
-import { useVaultStore } from "@/store/useVaultStore";
 
 // Layout & UI
 import { Sidebar } from "./components/layout/SideBar";
@@ -3496,46 +3567,18 @@ import { Fab } from "./components/ui/Fab";
 import { BackgroundWatermark } from "./components/layout/BackGroundWatermark";
 
 // Views
-import VaultView from "./components/VaultView";
-import GeneratorView from "./components/GeneratorView";
-import SecurityAuditView from "./components/SecurityAuditView";
-import SettingsView from "./components/SettingsView";
-
+import VaultView from "./components/views/VaultView";
+import GeneratorView from "./components/views/GeneratorView";
+import SecurityAuditView from "./components/views/SecurityAuditView";
+import SettingsView from "./components/views/SettingsView";
 // Modals
-import PortalModal from "./components/PortalModal";
+import PortalModal from "./components/views/PortalModal";
 import { LockScreen } from "./components/modals/LockScreen";
 import { HelpScroll } from "./components/modals/HelpScroll";
 import { CustomPrompt } from "./components/modals/CustomPrompt";
 
 export function Dashboard() {
-  // Consume Zustand Stores
-  const vault = useVaultStore();
   const dashboard = useDashboardStore();
-
-  const handleQuickVaultDeposit = (generatedPassword: string) => {
-    vault.saveCredential({
-      name: "Unassigned Forge",
-      username: "user_handle",
-      password: generatedPassword,
-      group: "Personal",
-      websiteUrl: "",
-      notes: "Slab key forged inside Primitive Key Generator.",
-    });
-    dashboard.setActiveTab("vault");
-    dashboard.setSelectedGroup("All");
-    dashboard.setSearchQuery("Forge");
-  };
-
-  const handleDeleteRequest = (id: string) => {
-    dashboard.setCustomPrompt({
-      isOpen: true,
-      title: "TECTONIC PURGE COMMENCEMENT",
-      message:
-        "Are you absolutely sure you want to purge this secure runestone key forever? This operation is completely irreversible.",
-      type: "confirm",
-      onConfirm: () => vault.deleteCredential(id),
-    });
-  };
 
   return (
     <div className="bg-[#131313] text-[#e5e2e1] cave-bg min-h-screen flex selection:bg-[#ffb77d] selection:text-[#131313]">
@@ -3550,12 +3593,8 @@ export function Dashboard() {
           <BackgroundWatermark />
 
           <div className="relative z-10">
-            {dashboard.activeTab === "vault" && (
-              <VaultView onDeletePasswordClick={handleDeleteRequest} />
-            )}
-            {dashboard.activeTab === "generator" && (
-              <GeneratorView onAddSecurely={handleQuickVaultDeposit} />
-            )}
+            {dashboard.activeTab === "vault" && <VaultView />}
+            {dashboard.activeTab === "generator" && <GeneratorView />}
             {dashboard.activeTab === "audit" && <SecurityAuditView />}
             {dashboard.activeTab === "settings" && <SettingsView />}
           </div>
@@ -3575,7 +3614,7 @@ export function Dashboard() {
 </file>
 
 <file path="src/features/dashboard/initialData.ts">
-import type { Credential } from "./schemas/schema";
+import type { Credential } from "@chomp/shared";
 
 export const INITIAL_CREDENTIALS: Credential[] = [
   {
@@ -3690,106 +3729,8 @@ export const GROUP_ICONS = {
 };
 </file>
 
-<file path="src/features/services/getData.ts">
+<file path="src/features/services/vault.services.ts">
 
-</file>
-
-<file path="src/hooks/useVault.ts">
-import { useState, useEffect } from "react";
-import type { Credential } from "@/features/dashboard/schemas/schema";
-import { INITIAL_CREDENTIALS } from "@/features/dashboard/initialData";
-
-export function useVault() {
-  const [credentials, setCredentials] = useState<Credential[]>(
-    () => INITIAL_CREDENTIALS,
-  );
-
-  useEffect(() => {
-    localStorage.setItem("chomp_vault_secrets", JSON.stringify(credentials));
-  }, [credentials]);
-
-  const handleSaveCredential = (
-    newData: Omit<Credential, "id" | "strength">,
-    editingId?: string,
-  ) => {
-    const analyzeStrength = (pass: string): "Strong" | "Medium" | "Weak" => {
-      if (pass.length < 6) return "Weak";
-      const count = [
-        /[A-Z]/.test(pass),
-        /[a-z]/.test(pass),
-        /\d/.test(pass),
-        /\W/.test(pass),
-      ].filter(Boolean).length;
-
-      if (pass.length >= 12 && count >= 3) return "Strong";
-      if (pass.length >= 8 && count >= 2) return "Medium";
-      return "Weak";
-    };
-
-    const newStrength = analyzeStrength(newData.password);
-    const currentDate = new Date().toISOString().split("T")[0];
-
-    if (editingId) {
-      setCredentials((prev) =>
-        prev.map((c) =>
-          c.id === editingId
-            ? {
-                ...c,
-                ...newData,
-                strength: newStrength,
-                lastUpdated: currentDate,
-              }
-            : c,
-        ),
-      );
-    } else {
-      const newCred: Credential = {
-        ...newData,
-        id: Math.random().toString(36).substring(2, 9),
-        strength: newStrength,
-        lastUpdated: currentDate,
-        isFavorite: false,
-      };
-      setCredentials((prev) => [newCred, ...prev]);
-    }
-  };
-
-  const handleUpgradePassword = (id: string, newPassword: string) => {
-    setCredentials((prev) =>
-      prev.map((c) =>
-        c.id === id
-          ? {
-              ...c,
-              password: newPassword,
-              strength: "Strong",
-              lastUpdated: new Date().toISOString().split("T")[0],
-            }
-          : c,
-      ),
-    );
-  };
-
-  const handleClearVault = () => setCredentials([]);
-  const handleResetToDefaults = () => setCredentials(INITIAL_CREDENTIALS);
-  const handleImportBackup = (imported: Credential[]) => {
-    setCredentials((prev) => [...imported, ...prev]);
-  };
-  const getExportString = () => JSON.stringify(credentials, null, 2);
-  const deleteCredential = (id: string) => {
-    setCredentials((prev) => prev.filter((c) => c.id !== id));
-  };
-
-  return {
-    credentials,
-    handleSaveCredential,
-    handleUpgradePassword,
-    handleClearVault,
-    handleResetToDefaults,
-    handleImportBackup,
-    getExportString,
-    deleteCredential,
-  };
-}
 </file>
 
 <file path="src/lib/api-call-wrapper.ts">
@@ -4002,9 +3943,9 @@ export const useCredentialsStore = create<CredentialStoreInterface>((set) => ({
 import { create } from "zustand";
 import type {
   TabType,
-  GroupType,
-  Credential,
+  GroupType
 } from "@/features/dashboard/schemas/schema";
+import type { Credential } from "@chomp/shared";
 import type { CustomPromptConfig } from "@/features/dashboard/components/modals/CustomPrompt";
 
 interface DashboardState {
@@ -4090,7 +4031,7 @@ export const useUserStore = create<UseUserStoreInterface>((set) => ({
 <file path="src/store/useVaultStore.ts">
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { Credential } from "@/features/dashboard/schemas/schema";
+import type { Credential } from "@chomp/shared";
 import { INITIAL_CREDENTIALS } from "@/features/dashboard/initialData";
 
 interface VaultState {

@@ -1,6 +1,6 @@
-import type { Credential, Group, Strength } from "@chomp/shared";
+import type { CredentialFrontend, Group, Strength } from "@chomp/shared";
 
-export interface CredentialStoreInterface extends Credential {
+export interface CredentialStoreInterface extends CredentialFrontend {
   setId: (id: string) => void;
   setName: (name: string) => void;
   setUserName: (username: string) => void;

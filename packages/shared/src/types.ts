@@ -5,13 +5,24 @@ export interface ApiResponse<T> {
   message?: string;
   statusCode: number;
 }
-export interface Credential {
+export interface CredentialFrontend {
   id: string;
   name: string;
   username: string;
   password: string;
   group: Group;
   strength: Strength;
+  websiteUrl?: string;
+  notes?: string;
+  lastUpdated?: string;
+  isFavorite?: boolean;
+}
+export interface CredentialBackend {
+  id: string;
+  name: string;
+  username: string;
+  password: string;
+  group: Group;
   websiteUrl?: string;
   notes?: string;
   lastUpdated?: string;

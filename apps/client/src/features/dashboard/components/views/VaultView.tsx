@@ -29,7 +29,7 @@ export default function VaultView() {
     openPortalModal,
     setCustomPrompt,
   } = useDashboardStore();
-  const { credentials, deleteCredential } = useVaultStore();
+  const { credentialFrontend, deleteCredential } = useVaultStore();
   const onAddPasswordClick = () => openPortalModal();
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [copiedType, setCopiedType] = useState<"username" | "password" | null>(
@@ -75,7 +75,7 @@ export default function VaultView() {
     }
   };
 
-  const filteredCredentials = credentials.filter((cred) => {
+  const filteredCredentials = credentialFrontend.filter((cred) => {
     const matchesGroup =
       selectedGroup === "All" || cred.group === selectedGroup;
     const matchesSearch =
@@ -110,14 +110,14 @@ export default function VaultView() {
   };
 
   const calculateSecurityScore = () => {
-    if (credentials.length === 0) return 100;
+    if (credentialFrontend.length === 0) return 100;
     let scoreTotal = 0;
-    credentials.forEach((c) => {
+    credentialFrontend.forEach((c) => {
       if (c.strength === "Strong") scoreTotal += 100;
       else if (c.strength === "Medium") scoreTotal += 55;
       else scoreTotal += 15;
     });
-    return Math.round(scoreTotal / credentials.length);
+    return Math.round(scoreTotal / credentialFrontend.length);
   };
 
   const securityScore = calculateSecurityScore();
@@ -180,13 +180,13 @@ export default function VaultView() {
               <div className="bg-[#1c1b1b] border border-[#47483c] px-3 py-1 text-[#c8c7b8]">
                 TOTAL CRYPTS:{" "}
                 <span className="text-[#ffb77d] font-bold">
-                  {credentials.length}
+                  {credentialFrontend.length}
                 </span>
               </div>
               <div className="bg-[#1c1b1b] border border-[#47483c] px-3 py-1 text-[#c8c7b8]">
                 STRONG SEALS:{" "}
                 <span className="text-[#c3cc8c] font-bold">
-                  {credentials.filter((c) => c.strength === "Strong").length}
+                  {credentialFrontend.filter((c) => c.strength === "Strong").length}
                 </span>
               </div>
             </div>
@@ -224,7 +224,7 @@ export default function VaultView() {
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {credentials.slice(0, 3).map((cred) => {
+          {credentialFrontend.slice(0, 3).map((cred) => {
             const firstChar = cred.name.charAt(0).toUpperCase();
             return (
               <div

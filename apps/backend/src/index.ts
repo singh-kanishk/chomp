@@ -6,6 +6,7 @@ import { authRouter } from "./routes/auth/auth.routes.js";
 import postgres from "postgres";
 import pinoHttp from "pino-http";
 import { logger } from "./logger/logger.js";
+import cookieParser from "cookie-parser";
 
 import * as schema from "./modals/SchemaDb/schema.js";
 const queryClient = postgres(process.env.DATABASE_URL!);
@@ -20,6 +21,7 @@ app.use(
   }),
 );
 
+app.use(cookieParser())
 app.use(express.json());
 
 app.use(
