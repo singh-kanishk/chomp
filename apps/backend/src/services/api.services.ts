@@ -1,5 +1,6 @@
 import { db } from "../index";
 import { eq } from "drizzle-orm";
+import { logger } from "../logger/logger";
 import {
   usersTable,
   secretsTable,
@@ -13,6 +14,7 @@ export class ApiServices {
   public async getCredential(email: string) {
     const isUserPresent = await authService.isUserPresent(email);
     if (!isUserPresent) {
+      logger.warn("User isnt Present");
       throw new Error("Invalid User");
     }
     const { userId, ...credential } = credentialsTable;

@@ -19,7 +19,6 @@ import { Button } from "@/components/ui/button";
 import type { GroupType } from "@chomp/shared";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { useVaultStore } from "@/store/useVaultStore";
-import { useQuery } from "@tanstack/react-query";
 
 export default function VaultView() {
   const {

@@ -9,6 +9,7 @@ import { SignUpRequest } from "@chomp/shared";
 import { eq, and } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 import { type JwtPayloadInterface } from "@chomp/shared";
+import { logger } from "../logger/logger";
 
 export class AuthServices {
   private async getUserIdFromEmail(email: string) {
@@ -17,18 +18,24 @@ export class AuthServices {
       .from(usersTable)
       .where(eq(usersTable.email, email));
     if (query.length === 0) {
+      logger.warn("User Not Present In Database");
       throw new Error("User Not Found");
     }
     const { userId } = query[0];
+    logger.info(`User Id :${userId}`);
     return userId;
   }
   public async hashService(data: string) {
+    logger.info("hashing data");
     return await argon2.hash(data);
   }
   public async isUserPresent(email: string): Promise<boolean> {
     const user = await db.query.usersTable.findFirst({
       where: (users, { eq }) => eq(users.email, email),
     });
+    logger.info(
+      user && user.isActive ? "User Is Present" : "User Is Not Present",
+    );
     return user && user.isActive ? true : false;
   }
   public async createUser(body: SignUpRequest) {
@@ -43,16 +50,20 @@ export class AuthServices {
           .insert(secretsTable)
           .values({ userId: id, authHash: body.authHash, saltUuid: body.salt });
       });
+      logger.info(`user created `);
     } catch (error) {
+      logger.warn("Unsuccesful Account Creation")
       throw error;
     }
   }
   public async getSalt(email: string) {
+    try{
     const userIdObj = await db
       .select({ userId: usersTable.userId })
       .from(usersTable)
       .where(eq(usersTable.email, email));
     if (userIdObj.length === 0) {
+      logger.warn("User Might Not exist error during salt fetch re login or  create account")
       return;
     }
     const { userId } = userIdObj[0];
@@ -60,7 +71,15 @@ export class AuthServices {
       .select({ salt: secretsTable.saltUuid })
       .from(secretsTable)
       .where(eq(secretsTable.userId, userId));
-    if (salt.length > 0) return salt[0].salt;
+      
+    if (salt.length > 0) {
+      logger.info("Sent Salt")
+      return salt[0].salt;}}
+      catch(error){
+        logger.warn("Error in Salt Fetch")
+        throw error;
+      }
+      
   }
   public async getUserData(email: string) {
     const result = await db
