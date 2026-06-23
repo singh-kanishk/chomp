@@ -25,7 +25,7 @@ export class ApiServices {
         credentialsTable,
         eq(usersTable.userId, credentialsTable.userId),
       );
-
+      logger.info("Credentials Provided")
     return query.length != 0 ? query : null;
   }
 }

@@ -36,6 +36,7 @@ export class AuthServices {
     logger.info(
       user && user.isActive ? "User Is Present" : "User Is Not Present",
     );
+    logger.info("User Is Not Present")
     return user && user.isActive ? true : false;
   }
   public async createUser(body: SignUpRequest) {
@@ -52,34 +53,36 @@ export class AuthServices {
       });
       logger.info(`user created `);
     } catch (error) {
-      logger.warn("Unsuccesful Account Creation")
+      logger.warn("Unsuccesful Account Creation");
       throw error;
     }
   }
   public async getSalt(email: string) {
-    try{
-    const userIdObj = await db
-      .select({ userId: usersTable.userId })
-      .from(usersTable)
-      .where(eq(usersTable.email, email));
-    if (userIdObj.length === 0) {
-      logger.warn("User Might Not exist error during salt fetch re login or  create account")
-      return;
-    }
-    const { userId } = userIdObj[0];
-    const salt = await db
-      .select({ salt: secretsTable.saltUuid })
-      .from(secretsTable)
-      .where(eq(secretsTable.userId, userId));
-      
-    if (salt.length > 0) {
-      logger.info("Sent Salt")
-      return salt[0].salt;}}
-      catch(error){
-        logger.warn("Error in Salt Fetch")
-        throw error;
+    try {
+      const userIdObj = await db
+        .select({ userId: usersTable.userId })
+        .from(usersTable)
+        .where(eq(usersTable.email, email));
+      if (userIdObj.length === 0) {
+        logger.warn(
+          "User Might Not exist error during salt fetch re login or  create account",
+        );
+        return;
       }
-      
+      const { userId } = userIdObj[0];
+      const salt = await db
+        .select({ salt: secretsTable.saltUuid })
+        .from(secretsTable)
+        .where(eq(secretsTable.userId, userId));
+
+      if (salt.length > 0) {
+        logger.info("Sent Salt");
+        return salt[0].salt;
+      }
+    } catch (error) {
+      logger.warn("Error in Salt Fetch");
+      throw error;
+    }
   }
   public async getUserData(email: string) {
     const result = await db
@@ -108,8 +111,13 @@ export class AuthServices {
   public checkRefreshToken(token: string) {
     try {
       const refreshTokenKey = process.env.JWT_SECRET_KEY_REFRESH_TOKEN || "";
-      return jwt.verify(token, refreshTokenKey);
+      const jwtToken= jwt.verify(token, refreshTokenKey);
+      if(jwtToken){
+        logger.info("Valid Refresh Token")
+        return jwtToken
+      }
     } catch (error) {
+      logger.warn("Invalid Refresh Token")
       throw error;
     }
   }
@@ -124,15 +132,26 @@ export class AuthServices {
           eq(sessionTable.userId, userId),
         ),
       );
-    return checkRefreshToken.length > 0;
+      
+    const isValid= checkRefreshToken.length > 0;
+    if(!isValid){
+      logger.warn("InValid Refresh Token")
+      return false;
+    }
+    logger.info("Valid Refresh Token")
+    return true;
   }
   public generateAccessToken(payload: JwtPayloadInterface) {
     const accessKey = process.env.JWT_SECRET_KEY_ACCESS_TOKEN || "";
-    return jwt.sign(payload, accessKey, { expiresIn: 15 * 60 });
+    const token= jwt.sign(payload, accessKey, { expiresIn: 15 * 60 });
+    logger.info("Generated Access Token")
+    return token;
   }
   public generateRefreshToken(payload: JwtPayloadInterface) {
     const refreshKey = process.env.JWT_SECRET_KEY_REFRESH_TOKEN || "";
-    return jwt.sign(payload, refreshKey, { expiresIn: 15 * 24 * 60 * 60 });
+    const token= jwt.sign(payload, refreshKey, { expiresIn: 15 * 24 * 60 * 60 });
+    logger.info("Generated Refresh Token")
+    return token;
   }
   public async storeRefreshToken(refreshToken: string, email: string) {
     try {
@@ -141,7 +160,9 @@ export class AuthServices {
       const query = await db
         .insert(sessionTable)
         .values({ userId, refreshToken });
+        logger.info("Stored Refresh Token")
     } catch (error) {
+      logger.info("Error Storing Refresh Token")
       throw error;
     }
   }
