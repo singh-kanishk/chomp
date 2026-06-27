@@ -12,7 +12,7 @@ import { type JwtPayloadInterface } from "@chomp/shared";
 import { logger } from "../logger/logger";
 
 export class AuthServices {
-  private async getUserIdFromEmail(email: string) {
+  public async getUserIdFromEmail(email: string) {
     const query = await db
       .select({ userId: usersTable.userId })
       .from(usersTable)

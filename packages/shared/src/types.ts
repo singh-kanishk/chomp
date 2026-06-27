@@ -17,7 +17,7 @@ export interface CredentialFrontend {
   lastUpdated?: string;
   isFavorite?: boolean;
 }
-export interface CredentialBackend {
+export interface CredentialPayload {
   id: string;
   name: string;
   username: string;

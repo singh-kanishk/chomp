@@ -8,24 +8,27 @@ import {
   credentialsTable,
 } from "../modals/SchemaDb/schema";
 import { AuthServices } from "./auth.services";
+import { ApiResponse, GetCredentialRequest } from "@chomp/shared";
 const authService = new AuthServices();
 
 export class ApiServices {
-  public async getCredential(email: string) {
-    const isUserPresent = await authService.isUserPresent(email);
+  public async getCredential(email: string, credentials: GetCredentialRequest) {
+    const isUserPresent = authService.isUserPresent(email);
     if (!isUserPresent) {
-      logger.warn("User isnt Present");
-      throw new Error("Invalid User");
+      logger.warn("User Is Not Present")
+      throw new Error("User Is Not Present")      
     }
-    const { userId, ...credential } = credentialsTable;
-    const query = await db
-      .select({ credential })
-      .from(usersTable)
-      .leftJoin(
-        credentialsTable,
-        eq(usersTable.userId, credentialsTable.userId),
-      );
-      logger.info("Credentials Provided")
-    return query.length != 0 ? query : null;
+    const userId = await authService.getUserIdFromEmail(email);
+    const query = await db.query.credentialsTable.findMany({
+      where:eq(credentialsTable.userId,userId),
+      columns:{
+        credentialId:true,
+        credentialPayload:true
+      },
+      limit:credentials.limit,
+      offset:credentials.offset           
+    })
+    logger.info(`Total ${query.length} Credentials Provided `)
+    return query
   }
 }

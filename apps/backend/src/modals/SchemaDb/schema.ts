@@ -38,16 +38,7 @@ export const sessionTable = pgTable("session", {
 
 export const credentialsTable = pgTable("credentials", {
   userId: uuid("user_id")
-    .primaryKey()
     .references(() => usersTable.userId, { onDelete: "cascade" }),
-  credentialId: text("credential_id").notNull(),
-  credentialName: text("credential_name").notNull(),
-  username: text("username").notNull(),
-  password: text("password").notNull(),
-  group: text("group").$type<Group>(),
-  strength: text("strength").$type<Strength>(),
-  websiteUrl: text("website_url"),
-  notes: text("notes"),
-  lastUpdated: text("last_updated"),
-  isFavorite: boolean("is_favorite"),
+  credentialId: text("credential_id").notNull().primaryKey(),
+  credentialPayload:text("credential_payload").notNull()
 });

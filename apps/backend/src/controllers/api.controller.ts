@@ -4,6 +4,7 @@ import { AuthLocal } from "../modals/middlewareSchema/authSchema";
 import { ApiResponse } from "@chomp/shared";
 import { JwtPayloadZod } from "@chomp/shared";
 import { ApiServices } from "../services/api.services";
+import { GetCredentialRequestZod } from "@chomp/shared";
 
 const apiService = new ApiServices();
 export class ApiController {
@@ -19,8 +20,10 @@ export class ApiController {
         res.status(401).json(payload);
         return;
       }
+
+      const credentialQuery = GetCredentialRequestZod.parse(req.query);
       const { email } = JwtPayloadZod.parse(userDetails.user);
-      const credential = await apiService.getCredential(email);
+      const credential = await apiService.getCredential(email, credentialQuery);
 
       const payload: ApiResponse<typeof credential> = {
         success: true,
@@ -29,14 +32,16 @@ export class ApiController {
         message: "Successfull",
       };
       res.status(200).json(payload);
+      return;
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Internal Server Error";
-      const payload: ApiResponse<null>={
-        statusCode:500,
-        success:false,
-        message:errorMessage
-      }
+      const payload: ApiResponse<null> = {
+        statusCode: 500,
+        success: false,
+        message: errorMessage,
+      };
+      res.status(500).json(payload)
     }
   }
 }
