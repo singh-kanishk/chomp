@@ -17,7 +17,7 @@ interface DashboardState {
 
   // Modals & Overlays
   isModalOpen: boolean;
-  editingCredentialFrontend: CredentialFrontend | null;
+  editingCredential: CredentialFrontend | null;
   showHelp: boolean;
   customPrompt: CustomPromptConfig | null;
 
@@ -38,7 +38,7 @@ export const useDashboardStore = create<DashboardState>((set) => ({
   searchQuery: "",
   isLocked: false,
   isModalOpen: false,
-  editingCredentialFrontend: null,
+  editingCredential: null,
   showHelp: false,
   customPrompt: null,
 
@@ -48,9 +48,9 @@ export const useDashboardStore = create<DashboardState>((set) => ({
   setIsLocked: (locked) => set({ isLocked: locked }),
 
   openPortalModal: (credentialFrontend = null) =>
-    set({ isModalOpen: true, editingCredentialFrontend: credentialFrontend }),
+    set({ isModalOpen: true, editingCredential: credentialFrontend }),
 
-  closePortalModal: () => set({ isModalOpen: false, editingCredentialFrontend: null }),
+  closePortalModal: () => set({ isModalOpen: false, editingCredential: null }),
 
   setShowHelp: (show) => set({ showHelp: show }),
   setCustomPrompt: (prompt) => set({ customPrompt: prompt }),

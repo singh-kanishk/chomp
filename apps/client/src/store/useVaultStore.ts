@@ -4,7 +4,7 @@ import type { CredentialFrontend } from "@chomp/shared";
 import { INITIAL_CREDENTIALS } from "@/features/dashboard/initialData";
 
 interface VaultState {
-  credentialFrontend: CredentialFrontend[];
+  credentials: CredentialFrontend[];
 
   // Actions
   saveCredential: (
@@ -36,7 +36,7 @@ const analyzeStrength = (pass: string): "Strong" | "Medium" | "Weak" => {
 export const useVaultStore = create<VaultState>()(
   persist(
     (set, get) => ({
-      credentialFrontend: INITIAL_CREDENTIALS,
+      credentials: INITIAL_CREDENTIALS,
 
       saveCredential: (newData, editingId) => {
         const newStrength = analyzeStrength(newData.password);
@@ -45,7 +45,7 @@ export const useVaultStore = create<VaultState>()(
         set((state) => {
           if (editingId) {
             return {
-              credentialFrontend: state.credentialFrontend.map((c) =>
+              credentials: state.credentials.map((c) =>
                 c.id === editingId
                   ? {
                       ...c,
@@ -65,13 +65,13 @@ export const useVaultStore = create<VaultState>()(
             lastUpdated: currentDate,
             isFavorite: false,
           };
-          return { credentialFrontends: [newCred, ...state.credentialFrontend] };
+          return { credentialFrontends: [newCred, ...state.credentials] };
         });
       },
 
       upgradePassword: (id, newPassword) => {
         set((state) => ({
-          credentialFrontend: state.credentialFrontend.map((c) =>
+          credentials: state.credentials.map((c) =>
             c.id === id
               ? {
                   ...c,
@@ -86,19 +86,19 @@ export const useVaultStore = create<VaultState>()(
 
       deleteCredential: (id) => {
         set((state) => ({
-          credentialFrontend: state.credentialFrontend.filter((c) => c.id !== id),
+          credentials: state.credentials.filter((c) => c.id !== id),
         }));
       },
 
-      clearVault: () => set({ credentialFrontend: [] }),
+      clearVault: () => set({ credentials: [] }),
 
-      resetToDefaults: () => set({ credentialFrontend: INITIAL_CREDENTIALS }),
+      resetToDefaults: () => set({ credentials: INITIAL_CREDENTIALS }),
 
       importBackup: (imported) => {
-        set((state) => ({ credentialFrontend: [...imported, ...state.credentialFrontend] }));
+        set((state) => ({ credentials: [...imported, ...state.credentials] }));
       },
 
-      getExportString: () => JSON.stringify(get().credentialFrontend, null, 2),
+      getExportString: () => JSON.stringify(get().credentials, null, 2),
     }),
     {
       name: "chomp_vault_secrets", // Replaces your manual localStorage key

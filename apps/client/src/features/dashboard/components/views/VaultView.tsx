@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import type { GroupType } from "@chomp/shared";
+import { type GroupType } from "@chomp/shared";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { useVaultStore } from "@/store/useVaultStore";
 
@@ -29,7 +29,7 @@ export default function VaultView() {
     openPortalModal,
     setCustomPrompt,
   } = useDashboardStore();
-  const { credentialFrontend, deleteCredential } = useVaultStore();
+  const { credentials, deleteCredential } = useVaultStore();
   const onAddPasswordClick = () => openPortalModal();
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [copiedType, setCopiedType] = useState<"username" | "password" | null>(
@@ -75,7 +75,7 @@ export default function VaultView() {
     }
   };
 
-  const filteredCredentials = credentialFrontend.filter((cred) => {
+  const filteredCredentials = credentials.filter((cred) => {
     const matchesGroup =
       selectedGroup === "All" || cred.group === selectedGroup;
     const matchesSearch =
@@ -110,14 +110,14 @@ export default function VaultView() {
   };
 
   const calculateSecurityScore = () => {
-    if (credentialFrontend.length === 0) return 100;
+    if (credentials.length === 0) return 100;
     let scoreTotal = 0;
-    credentialFrontend.forEach((c) => {
+    credentials.forEach((c) => {
       if (c.strength === "Strong") scoreTotal += 100;
       else if (c.strength === "Medium") scoreTotal += 55;
       else scoreTotal += 15;
     });
-    return Math.round(scoreTotal / credentialFrontend.length);
+    return Math.round(scoreTotal / credentials.length);
   };
 
   const securityScore = calculateSecurityScore();
@@ -132,7 +132,13 @@ export default function VaultView() {
     return "text-[#ffb4ab] bg-[#93000a]/20 border-[#ffb4ab] animate-pulse";
   };
   const needleRotation = -90 + (securityScore / 100) * 180;
-  const groups: GroupType[] = ["All", "Personal", "Work", "Social", "Finance"];
+  const groups: GroupType[] = [
+    "All",
+    "Personal",
+    "Work",
+    "Social",
+    "Finance",
+  ];
 
   return (
     <div className="space-y-10 select-none">
@@ -180,13 +186,16 @@ export default function VaultView() {
               <div className="bg-[#1c1b1b] border border-[#47483c] px-3 py-1 text-[#c8c7b8]">
                 TOTAL CRYPTS:{" "}
                 <span className="text-[#ffb77d] font-bold">
-                  {credentialFrontend.length}
+                  {credentials.length}
                 </span>
               </div>
               <div className="bg-[#1c1b1b] border border-[#47483c] px-3 py-1 text-[#c8c7b8]">
                 STRONG SEALS:{" "}
                 <span className="text-[#c3cc8c] font-bold">
-                  {credentialFrontend.filter((c) => c.strength === "Strong").length}
+                  {
+                    credentials.filter((c) => c.strength === "Strong")
+                      .length
+                  }
                 </span>
               </div>
             </div>
@@ -224,7 +233,7 @@ export default function VaultView() {
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {credentialFrontend.slice(0, 3).map((cred) => {
+          {credentials.slice(0, 3).map((cred) => {
             const firstChar = cred.name.charAt(0).toUpperCase();
             return (
               <div

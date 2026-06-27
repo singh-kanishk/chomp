@@ -14,3 +14,4 @@ export * from "./types";
 export * from "./apis/auth/auth.payload";
 export * from "./apis/apis/api.request"
 export * from "./apis/apis/api.response"
+export * from './apis/vaultSchema/credential.schema'

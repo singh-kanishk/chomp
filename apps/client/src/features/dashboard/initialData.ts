@@ -1,4 +1,4 @@
-import type { CredentialFrontend } from "@chomp/shared";
+import type{ CredentialFrontend } from "@chomp/shared";
 
 export const INITIAL_CREDENTIALS: CredentialFrontend[] = [
   {

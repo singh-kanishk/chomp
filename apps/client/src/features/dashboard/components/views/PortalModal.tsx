@@ -4,7 +4,7 @@ import { X, Lock, Eye, EyeOff, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
-import type { Credential, Group, Strength} from '@chomp/shared'
+import type{ Group,  CredentialFrontend, Strength} from '@chomp/shared'
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { useVaultStore } from "@/store/useVaultStore";
 
@@ -12,7 +12,7 @@ export default function PortalModal() {
   const { isModalOpen, closePortalModal, editingCredential } =
     useDashboardStore();
   const { saveCredential } = useVaultStore();
-  const onSave = (data: Omit<Credential, "id" | "strength">) => {
+  const onSave = (data: Omit<CredentialFrontend, "id" | "strength">) => {
     saveCredential(data, editingCredential?.id);
     closePortalModal();
   };
