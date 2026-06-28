@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 import type { CredentialFrontend } from "@chomp/shared";
 import { INITIAL_CREDENTIALS } from "@/features/dashboard/initialData";
 
@@ -33,75 +32,69 @@ const analyzeStrength = (pass: string): "Strong" | "Medium" | "Weak" => {
   return "Weak";
 };
 
-export const useVaultStore = create<VaultState>()(
-  persist(
-    (set, get) => ({
-      credentials: INITIAL_CREDENTIALS,
+export const useVaultStore = create<VaultState>()((set, get) => ({
+  credentials: INITIAL_CREDENTIALS,
 
-      saveCredential: (newData, editingId) => {
-        const newStrength = analyzeStrength(newData.password);
-        const currentDate = new Date().toISOString().split("T")[0];
+  saveCredential: (newData, editingId) => {
+    const newStrength = analyzeStrength(newData.password);
+    const currentDate = new Date().toISOString().split("T")[0];
 
-        set((state) => {
-          if (editingId) {
-            return {
-              credentials: state.credentials.map((c) =>
-                c.id === editingId
-                  ? {
-                      ...c,
-                      ...newData,
-                      strength: newStrength,
-                      lastUpdated: currentDate,
-                    }
-                  : c,
-              ),
-            };
-          }
-
-          const newCred: CredentialFrontend = {
-            ...newData,
-            id: Math.random().toString(36).substring(2, 9),
-            strength: newStrength,
-            lastUpdated: currentDate,
-            isFavorite: false,
-          };
-          return { credentialFrontends: [newCred, ...state.credentials] };
-        });
-      },
-
-      upgradePassword: (id, newPassword) => {
-        set((state) => ({
+    set((state) => {
+      if (editingId) {
+        return {
           credentials: state.credentials.map((c) =>
-            c.id === id
+            c.id === editingId
               ? {
                   ...c,
-                  password: newPassword,
-                  strength: "Strong",
-                  lastUpdated: new Date().toISOString().split("T")[0],
+                  ...newData,
+                  strength: newStrength,
+                  lastUpdated: currentDate,
                 }
               : c,
           ),
-        }));
-      },
+        };
+      }
 
-      deleteCredential: (id) => {
-        set((state) => ({
-          credentials: state.credentials.filter((c) => c.id !== id),
-        }));
-      },
+      const newCred: CredentialFrontend = {
+        ...newData,
+        id: Math.random().toString(36).substring(2, 9),
+        strength: newStrength,
+        lastUpdated: currentDate,
+        isFavorite: false,
+      };
+      
+      return { credentials: [newCred, ...state.credentials] };
+    });
+  },
 
-      clearVault: () => set({ credentials: [] }),
+  upgradePassword: (id, newPassword) => {
+    set((state) => ({
+      credentials: state.credentials.map((c) =>
+        c.id === id
+          ? {
+              ...c,
+              password: newPassword,
+              strength: "Strong",
+              lastUpdated: new Date().toISOString().split("T")[0],
+            }
+          : c,
+      ),
+    }));
+  },
 
-      resetToDefaults: () => set({ credentials: INITIAL_CREDENTIALS }),
+  deleteCredential: (id) => {
+    set((state) => ({
+      credentials: state.credentials.filter((c) => c.id !== id),
+    }));
+  },
 
-      importBackup: (imported) => {
-        set((state) => ({ credentials: [...imported, ...state.credentials] }));
-      },
+  clearVault: () => set({ credentials: [] }),
 
-      getExportString: () => JSON.stringify(get().credentials, null, 2),
-    }),
-    {
-      name: "chomp_vault_secrets", // Replaces your manual localStorage key
-    },
-  ),
-);
+  resetToDefaults: () => set({ credentials: INITIAL_CREDENTIALS }),
+
+  importBackup: (imported) => {
+    set((state) => ({ credentials: [...imported, ...state.credentials] }));
+  },
+
+  getExportString: () => JSON.stringify(get().credentials, null, 2),
+}));

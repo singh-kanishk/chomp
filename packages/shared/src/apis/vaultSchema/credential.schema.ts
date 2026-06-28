@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { number } from "zod/v4";
 
 const GROUP_VALUES = ["Personal", "Work", "Social", "Finance", "None"] as const;
 
@@ -21,16 +22,23 @@ export interface CredentialFrontend {
 export type Strength = "Strong" | "Medium" | "Weak" | "InValid";
 export type GroupType = "All" | Group;
 
-export const CredentialPayloadZod = z.object({
+export const CredentialBodyZod = z.object({
   id: z.string(),
   name: z.string(),
   username: z.string(),
   password: z.string(),
-  group: GroupZod, 
+  group: GroupZod,
   websiteUrl: z.string().optional(),
   notes: z.string().optional(),
   lastUpdated: z.string().optional(),
   isFavorite: z.boolean().optional(),
+});
+
+export type CredentialBody = z.infer<typeof CredentialBodyZod>;
+
+export const CredentialPayloadZod = z.object({
+  body: z.array(CredentialBodyZod),
+  nextOffset: z.number(),
 });
 
 export type CredentialPayload = z.infer<typeof CredentialPayloadZod>;

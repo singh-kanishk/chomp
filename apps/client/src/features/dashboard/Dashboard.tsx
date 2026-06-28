@@ -7,7 +7,7 @@ import { Fab } from "./components/ui/Fab";
 import { BackgroundWatermark } from "./components/layout/BackGroundWatermark";
 
 // Views
-import VaultView from "./components/views/VaultView";
+import VaultView from "./components/views/VaultView/VaultView";
 import GeneratorView from "./components/views/GeneratorView";
 import SecurityAuditView from "./components/views/SecurityAuditView";
 import SettingsView from "./components/views/SettingsView";
