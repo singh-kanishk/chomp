@@ -4,4 +4,7 @@ export const apiRouter = express.Router();
 
 const apiController = new ApiController();
 
-apiRouter.get("/credential",apiController.getCredentials);
+apiRouter.get("/credential", apiController.getCredentials);
+apiRouter.post("/credential", apiController.postCredential);
+apiRouter.put("/credential", apiController.putCredential);
+apiRouter.delete("/credential", apiController.deleteCredential);

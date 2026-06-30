@@ -2,7 +2,7 @@ import * as Comlink from "comlink";
 import { apiCall } from "@/lib/api-call-wrapper";
 import { type HashingService } from "@/workers/hash";
 import HashWorker from "@/workers/hash?worker";
-import type { CredentialBody,  GetCredentialRequest } from "@chomp/shared";
+import type { CredentialBody,  GetCredentialRequest, VaultMutationRequest, DeleteCredentialRequest } from "@chomp/shared";
 import type { GetCredentialResponse } from "@chomp/shared";
 import { CredentialBodyZod } from "@chomp/shared";
 import { useUserStore } from "@/store/useUserStore";
@@ -44,6 +44,93 @@ export class VaultServices {
         await Promise.all(decryptionPromises);
         return {decryptedCredential,nextOffset:query.body.nextOffset}
       }
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  public addCredential = async (payload: CredentialBody) => {
+    try {
+      const { encryptionKey } = useUserStore.getState();
+      if (!encryptionKey) {
+        throw new Error("No Encryption Key Available Try Again Or Re Login");
+      }
+
+      const stringifiedPayload = JSON.stringify(payload);
+      const encryptedData = await cryptoWorker.encrypt(
+        stringifiedPayload,
+        encryptionKey
+      );
+
+      const requestBody: VaultMutationRequest = {
+        credentialId: payload.id,
+        credentialData: encryptedData,
+      };
+
+      const response = await apiCall<null>({
+        url: "/api/credential",
+        method: "POST",
+        body: requestBody,
+      });
+
+      if (!response.success) {
+        throw new Error(response.message);
+      }
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  public updateCredential = async (payload: CredentialBody) => {
+    try {
+      const { encryptionKey } = useUserStore.getState();
+      if (!encryptionKey) {
+        throw new Error("No Encryption Key Available Try Again Or Re Login");
+      }
+
+      const stringifiedPayload = JSON.stringify(payload);
+      const encryptedData = await cryptoWorker.encrypt(
+        stringifiedPayload,
+        encryptionKey
+      );
+
+      const requestBody: VaultMutationRequest = {
+        credentialId: payload.id,
+        credentialData: encryptedData,
+      };
+
+      const response = await apiCall<null>({
+        url: "/api/credential",
+        method: "PUT",
+        body: requestBody,
+      });
+
+      if (!response.success) {
+        throw new Error(response.message);
+      }
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  public deleteCredential = async (credentialId: string) => {
+    try {
+      const requestBody: DeleteCredentialRequest = {
+        credentialId,
+      };
+
+      const response = await apiCall<null>({
+        url: "/api/credential",
+        method: "DELETE",
+        body: requestBody,
+      });
+
+      if (!response.success) {
+        throw new Error(response.message);
+      }
+      return response;
     } catch (error) {
       throw error;
     }

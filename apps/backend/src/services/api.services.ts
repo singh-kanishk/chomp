@@ -1,5 +1,5 @@
 import { db } from "../index";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { logger } from "../logger/logger";
 import {
   usersTable,
@@ -16,7 +16,7 @@ export class ApiServices {
     email: string,
     { offset, limit }: GetCredentialRequest,
   ) {
-    const isUserPresent = authService.isUserPresent(email);
+    const isUserPresent = await authService.isUserPresent(email);
     if (!isUserPresent) {
       logger.warn("User Is Not Present");
       throw new Error("User Is Not Present");
@@ -33,5 +33,71 @@ export class ApiServices {
     });
     logger.info(`Total ${query.length} Credentials Provided `);
     return { query, nextOffset: offset + limit };
+  }
+
+  public async addCredential(
+    email: string,
+    credentialId: string,
+    credentialPayload: string
+  ) {
+    try {
+      const isUserPresent = await authService.isUserPresent(email);
+      if (!isUserPresent) throw new Error("User Is Not Present");
+      const userId = await authService.getUserIdFromEmail(email);
+      await db.insert(credentialsTable).values({
+        userId,
+        credentialId,
+        credentialPayload,
+      });
+      logger.info(`Credential added for user ${userId}`);
+    } catch (error) {
+      logger.warn("Unsuccessful Credential Addition");
+      throw error;
+    }
+  }
+
+  public async updateCredential(
+    email: string,
+    credentialId: string,
+    credentialPayload: string
+  ) {
+    try {
+      const isUserPresent = await authService.isUserPresent(email);
+      if (!isUserPresent) throw new Error("User Is Not Present");
+      const userId = await authService.getUserIdFromEmail(email);
+      await db
+        .update(credentialsTable)
+        .set({ credentialPayload })
+        .where(
+          and(
+            eq(credentialsTable.credentialId, credentialId),
+            eq(credentialsTable.userId, userId)
+          )
+        );
+      logger.info(`Credential updated for user ${userId}`);
+    } catch (error) {
+      logger.warn("Unsuccessful Credential Update");
+      throw error;
+    }
+  }
+
+  public async deleteCredential(email: string, credentialId: string) {
+    try {
+      const isUserPresent = await authService.isUserPresent(email);
+      if (!isUserPresent) throw new Error("User Is Not Present");
+      const userId = await authService.getUserIdFromEmail(email);
+      await db
+        .delete(credentialsTable)
+        .where(
+          and(
+            eq(credentialsTable.credentialId, credentialId),
+            eq(credentialsTable.userId, userId)
+          )
+        );
+      logger.info(`Credential deleted for user ${userId}`);
+    } catch (error) {
+      logger.warn("Unsuccessful Credential Deletion");
+      throw error;
+    }
   }
 }
