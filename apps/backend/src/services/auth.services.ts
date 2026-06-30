@@ -36,7 +36,6 @@ export class AuthServices {
     logger.info(
       user && user.isActive ? "User Is Present" : "User Is Not Present",
     );
-    logger.info("User Is Not Present")
     return user && user.isActive ? true : false;
   }
   public async createUser(body: SignUpRequest) {

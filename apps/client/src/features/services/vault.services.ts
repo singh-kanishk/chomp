@@ -15,7 +15,7 @@ export class VaultServices {
     offset,
   }: GetCredentialRequest) => {
     try {
-      const { encryptionKey } = useUserStore();
+      const { encryptionKey } = useUserStore.getState();
       const query = await apiCall<GetCredentialResponse>({
         url: `/api/credential?limit=${limit}&offset=${offset}`,
         method: "GET",
@@ -41,7 +41,7 @@ export class VaultServices {
         });
 
         // 2. Properly block until all items are decrypted and saved
-        Promise.all(decryptionPromises);
+        await Promise.all(decryptionPromises);
         return {decryptedCredential,nextOffset:query.body.nextOffset}
       }
     } catch (error) {

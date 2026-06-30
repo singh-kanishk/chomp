@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
 import { AuthLocal } from "../modals/middlewareSchema/authSchema";
-import { ApiResponse } from "@chomp/shared";
+import { ApiResponse, GetCredentialResponse } from "@chomp/shared";
 import { JwtPayloadZod } from "@chomp/shared";
 import { ApiServices } from "../services/api.services";
 import { GetCredentialRequestZod } from "@chomp/shared";
@@ -22,13 +22,18 @@ export class ApiController {
       }
 
       const credentialQuery = GetCredentialRequestZod.parse(req.query);
-      const { email } = JwtPayloadZod.parse(userDetails.user);
+      const { email } = JwtPayloadZod.parse(userDetails);
       const credential = await apiService.getCredential(email, credentialQuery);
 
-      const payload: ApiResponse<typeof credential> = {
+      const mappedCredentials = credential.query.map((item) => ({
+        credentialName: item.credentialId,
+        credentialData: item.credentialPayload,
+      }));
+
+      const payload: ApiResponse<GetCredentialResponse> = {
         success: true,
         statusCode: 200,
-        body: credential || [],
+        body: { credentials: mappedCredentials, nextOffset: credential.nextOffset },
         message: "Successfull",
       };
       res.status(200).json(payload);

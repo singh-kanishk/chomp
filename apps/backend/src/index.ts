@@ -3,6 +3,8 @@ import "dotenv/config";
 import { drizzle } from "drizzle-orm/postgres-js";
 import cors from "cors";
 import { authRouter } from "./routes/auth/auth.routes.js";
+import { apiRouter } from "./routes/api/api.routes.js";
+import { requireAuth } from "./middleware/authWare.js";
 import postgres from "postgres";
 import pinoHttp from "pino-http";
 import { logger } from "./logger/logger.js";
@@ -30,6 +32,7 @@ app.use(
   }),
 );
 app.use("/auth", authRouter);
+app.use("/api", requireAuth, apiRouter);
 
 app.listen(PORT, () => {
   console.log(`Backend running on http://localhost:${PORT}`);
