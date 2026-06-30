@@ -6,9 +6,13 @@ import { VaultOverview } from "./components/VaultOverview";
 import { QuickAccess } from "./components/QuickAccess";
 import { VaultControls } from "./components/VaultControls";
 import { VaultTable } from "./components/VaultTable";
+import { useQuery } from "@tanstack/react-query";
+import { VaultServices } from "@/features/services/vault.services";
 
 export default function VaultView() {
+  const vaultServices = new VaultServices();
   const { credentials, securityScore } = useVaultData();
+  const { visibleLimit } = useVaultUIStore();
   const copiedState = useVaultUIStore((state) => state.copiedState);
 
   return (
@@ -25,14 +29,18 @@ export default function VaultView() {
               <Check className="w-3.5 h-3.5" />
             </div>
             <div>
-              <p className="font-mono text-xs text-[#e5e2e1] uppercase tracking-wider">Hieroglyph Transcribed!</p>
-              <p className="font-mono text-[10px] text-[#c8c7b8] mt-0.5">Copied {copiedState.type} to local scroll board.</p>
+              <p className="font-mono text-xs text-[#e5e2e1] uppercase tracking-wider">
+                Hieroglyph Transcribed!
+              </p>
+              <p className="font-mono text-[10px] text-[#c8c7b8] mt-0.5">
+                Copied {copiedState.type} to local scroll board.
+              </p>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <VaultOverview 
+      <VaultOverview
         totalCrypts={credentials.length}
         strongSeals={credentials.filter((c) => c.strength === "Strong").length}
         securityScore={securityScore}

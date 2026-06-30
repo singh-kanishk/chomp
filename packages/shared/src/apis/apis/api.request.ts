@@ -1,6 +1,6 @@
-import { number, z } from "zod";
+import z from "zod";
 export const GetCredentialRequestZod = z.object({
-  offset:number(),
-  limit:number()
+  offset:z.number(),
+  limit:z.number()
 })
 export type GetCredentialRequest = z.infer<typeof GetCredentialRequestZod> 

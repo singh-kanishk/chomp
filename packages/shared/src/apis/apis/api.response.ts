@@ -1,8 +1,13 @@
-import z, { string } from "zod";
+import { z } from "zod";
 
-export const GetCredentialResponseZod = z.object({
-  credentialName: string(),
-  credentialData: string(),
+const GetCredentialResponseBodyZod = z.object({
+  credentialName: z.string(),
+  credentialData: z.string(),
 });
-export type GetCredentialResponse = z.infer<typeof GetCredentialResponseZod> 
 
+const GetCredentialResponseZod = z.object({
+  nextOffset: z.number(),
+  credentials: z.array(GetCredentialResponseBodyZod),
+});
+
+export type GetCredentialResponse = z.infer<typeof GetCredentialResponseZod>;

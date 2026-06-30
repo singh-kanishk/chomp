@@ -5,22 +5,22 @@ export interface LoginPayload {
 }
 
 export const SignUpRequestZod = z.object({
-  encryptedName: string(),
-  email: string(),
-  authHash: string(),
-  salt: string(),
+  encryptedName: z.string(),
+  email: z.string(),
+  authHash: z.string(),
+  salt: z.string(),
 });
 
 export type SignUpRequest = z.infer<typeof SignUpRequestZod>;
 
 export const LogInRequestZod = z.object({
-  email: string(),
-  authHash: string(),
+  email: z.string(),
+  authHash: z.string(),
 });
 
 export type LogInRequest = z.infer<typeof LogInRequestZod>;
 
 export const JwtPayloadZod = z.object({
-  email: string(),
+  email: z.string(),
 });
 export type JwtPayloadInterface = z.infer<typeof JwtPayloadZod>;
