@@ -99,7 +99,7 @@ const hashingService = {
       combined.set(encryptedBytes, iv.length);
 
       return bytesToBase64(combined);
-    } catch (error) {
+    } catch {
       throw new Error("Encryption Failed");
     }
   },
@@ -126,7 +126,7 @@ const hashingService = {
       );
 
       return decoder.decode(decryptedBuffer);
-    } catch (error) {
+    } catch {
       throw new Error("Decryption failed. Invalid key or corrupted data.");
     }
   },

@@ -50,13 +50,6 @@ Thumbs.db
 .settings/
 *.sublime-workspace
 
-# Logs
-logs/
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
 # OS
 .DS_Store?
 ._*
@@ -75,3 +68,10 @@ dist-ssr/
 *.rest
 
 routeTree.gen.ts
+
+# Docker
+docker-compose.override.yml
+pgdata/
+
+# Reference Documentation
+DOCKER_GUIDE.md

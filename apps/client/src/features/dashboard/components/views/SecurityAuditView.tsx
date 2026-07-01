@@ -11,6 +11,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { useVaultStore } from "@/store/useVaultStore";
 
+function generateRandomPassword() {
+  const chars =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+{}[]";
+  let result = "";
+  for (let i = 0; i < 16; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
 export default function SecurityAuditView() {
   const { credentials, upgradePassword } = useVaultStore();
   const [upgradingId, setUpgradingId] = useState<string | null>(null);
@@ -45,12 +55,7 @@ export default function SecurityAuditView() {
 
   const handleAutoUpgrade = (id: string, appName: string) => {
     setUpgradingId(id);
-    const chars =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+{}[]";
-    let result = "";
-    for (let i = 0; i < 16; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
+    const result = generateRandomPassword();
 
     setTimeout(() => {
       upgradePassword(id, result);

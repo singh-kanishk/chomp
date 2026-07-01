@@ -12,18 +12,36 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useVaultData } from "../hooks/useVaultData";
 import { useVaultStore } from "@/store/useVaultStore";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { useVaultUIStore } from "@/store/useVaultUiStore";
 import { VaultServices } from "@/features/services/vault.services";
+import { useDeleteCredential } from "../hooks/useVaultMutations";
+import type { CredentialFrontend } from "@chomp/shared";
+import { Loader2 } from "lucide-react";
 
 const vaultServices = new VaultServices();
+
+const analyzeStrength = (pass: string): "Strong" | "Medium" | "Weak" => {
+  if (pass.length < 6) return "Weak";
+  const count = [
+    /[A-Z]/.test(pass),
+    /[a-z]/.test(pass),
+    /\d/.test(pass),
+    /\W/.test(pass),
+  ].filter(Boolean).length;
+  if (pass.length >= 12 && count >= 3) return "Strong";
+  if (pass.length >= 8 && count >= 2) return "Medium";
+  return "Weak";
+};
+
 export function VaultTable() {
   const { sortedCredentials } = useVaultData();
-  const { deleteCredential } = useVaultStore();
+  const { setCredentials } = useVaultStore();
   const { openPortalModal, setCustomPrompt } = useDashboardStore();
+  const deleteMutation = useDeleteCredential();
 
   const {
     expandedId,
@@ -36,13 +54,25 @@ export function VaultTable() {
     showLess,
   } = useVaultUIStore();
 
-  const { data, error, isLoading } = useInfiniteQuery({
-    queryKey: ["credentials", visibleLimit],
+  const { data, isLoading } = useQuery({
+    queryKey: ["credentials"],
     queryFn: () =>
-      vaultServices.getCredential({ offset: visibleLimit, limit: 5 }),
-    initialPageParam: 0,
-    getNextPageParam: (lastPage) => lastPage?.nextOffset,
+      vaultServices.getCredential({ offset: 0, limit: 50 }),
   });
+
+  // Sync fetched & decrypted data into Zustand store
+  useEffect(() => {
+    if (data?.decryptedCredential) {
+      const withStrength: CredentialFrontend[] = data.decryptedCredential.map(
+        (cred) => ({
+          ...cred,
+          strength: analyzeStrength(cred.password),
+        })
+      );
+      setCredentials(withStrength);
+    }
+  }, [data, setCredentials]);
+
   const handlePurge = (id: string) => {
     setCustomPrompt({
       isOpen: true,
@@ -50,12 +80,18 @@ export function VaultTable() {
       message:
         "Are you absolutely sure you want to purge this secure runestone key forever? This operation is completely irreversible.",
       type: "confirm",
-      onConfirm: () => deleteCredential(id),
+      onConfirm: () => deleteMutation.mutate(id),
     });
   };
-  useEffect(()=>{
-    
-  },[])
+  if (isLoading) {
+    return (
+      <div className="stone-slab border-2 border-[#47483c] p-12 flex flex-col items-center justify-center gap-3">
+        <Loader2 className="w-6 h-6 text-[#ffb77d] animate-spin" />
+        <p className="font-mono text-xs text-[#c8c7b8]/60 uppercase tracking-widest">Decrypting vault secrets...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="stone-slab border-2 border-[#47483c] p-0 overflow-hidden">
       <div className="overflow-x-auto">

@@ -1,11 +1,11 @@
 import { create } from "zustand";
 import type { CredentialFrontend } from "@chomp/shared";
-import { INITIAL_CREDENTIALS } from "@/features/dashboard/initialData";
 
 interface VaultState {
   credentials: CredentialFrontend[];
 
   // Actions
+  setCredentials: (credentials: CredentialFrontend[]) => void;
   saveCredential: (
     newData: Omit<CredentialFrontend, "id" | "strength">,
     editingId?: string,
@@ -13,7 +13,6 @@ interface VaultState {
   upgradePassword: (id: string, newPassword: string) => void;
   deleteCredential: (id: string) => void;
   clearVault: () => void;
-  resetToDefaults: () => void;
   importBackup: (imported: CredentialFrontend[]) => void;
   getExportString: () => string;
 }
@@ -33,7 +32,9 @@ const analyzeStrength = (pass: string): "Strong" | "Medium" | "Weak" => {
 };
 
 export const useVaultStore = create<VaultState>()((set, get) => ({
-  credentials: INITIAL_CREDENTIALS,
+  credentials: [],
+
+  setCredentials: (credentials) => set({ credentials }),
 
   saveCredential: (newData, editingId) => {
     const newStrength = analyzeStrength(newData.password);
@@ -89,8 +90,6 @@ export const useVaultStore = create<VaultState>()((set, get) => ({
   },
 
   clearVault: () => set({ credentials: [] }),
-
-  resetToDefaults: () => set({ credentials: INITIAL_CREDENTIALS }),
 
   importBackup: (imported) => {
     set((state) => ({ credentials: [...imported, ...state.credentials] }));

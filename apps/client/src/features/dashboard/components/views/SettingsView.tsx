@@ -6,20 +6,19 @@ import {
   Trash2,
   ShieldAlert,
   Check,
-  RefreshCw,
   Download,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useVaultStore } from "@/store/useVaultStore";
+import type { CredentialFrontend } from "@chomp/shared";
 
 export default function SettingsView() {
-  const { clearVault, resetToDefaults, importBackup, getExportString } =
+  const { clearVault, importBackup, getExportString } =
     useVaultStore();
 
   const onClearVault = () => clearVault();
-  const onResetToDefaults = () => resetToDefaults();
-  const onImportBackup = () => importBackup;
+  const onImportBackup = (imported: CredentialFrontend[]) => importBackup(imported);
   const exportCredentials = () => getExportString();
 
   const [masterKey, setMasterKey] = useState("CHOMP_MASTER_GUARD_2026!");
@@ -62,8 +61,9 @@ export default function SettingsView() {
       setImportDone(true);
       setImportText("");
       setTimeout(() => setImportDone(false), 2000);
-    } catch (err: any) {
-      setImportError(err.message || "JSON Parsing failed!");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "JSON Parsing failed!";
+      setImportError(message);
     }
   };
 
@@ -235,15 +235,6 @@ export default function SettingsView() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 pt-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onResetToDefaults}
-            className="flex-1 h-10 bg-transparent border-[#ffb77d] text-[#ffb77d] hover:bg-[#ffb77d] hover:text-[#131313] font-mono text-xs uppercase tracking-wider font-bold transition-all gap-1.5 rounded-none"
-          >
-            <RefreshCw className="w-4 h-4" /> Reset database to initial mock
-          </Button>
-
           <Button
             type="button"
             variant="destructive"

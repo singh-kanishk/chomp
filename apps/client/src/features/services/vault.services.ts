@@ -14,125 +14,109 @@ export class VaultServices {
     limit,
     offset,
   }: GetCredentialRequest) => {
-    try {
-      const { encryptionKey } = useUserStore.getState();
-      const query = await apiCall<GetCredentialResponse>({
-        url: `/api/credential?limit=${limit}&offset=${offset}`,
-        method: "GET",
+    const { encryptionKey } = useUserStore.getState();
+    const query = await apiCall<GetCredentialResponse>({
+      url: `/api/credential?limit=${limit}&offset=${offset}`,
+      method: "GET",
+    });
+    if (!query.success) {
+      throw new Error(query.message);
+    }
+
+    if (!encryptionKey) {
+      throw new Error("No Encryption Key Available Try Again Or Re Login");
+    }
+
+    if (query.body) {
+      const decryptedCredential: CredentialBody[]=[]
+      // 1. Map to an array of pending promises (they start working in parallel)
+      const decryptionPromises = query.body.credentials.map(async (item) => {
+        const credential = await cryptoWorker.decrypt(
+          item.credentialData,
+          encryptionKey,
+        );
+        const obj = CredentialBodyZod.parse(JSON.parse(credential));
+        decryptedCredential.push(obj);
       });
-      if (!query.success) {
-        throw new Error(query.message);
-      }
 
-      if (!encryptionKey) {
-        throw new Error("No Encryption Key Available Try Again Or Re Login");
-      }
-
-      if (query.body) {
-        const decryptedCredential: CredentialBody[]=[]
-        // 1. Map to an array of pending promises (they start working in parallel)
-        const decryptionPromises = query.body.credentials.map(async (item) => {
-          const credential = await cryptoWorker.decrypt(
-            item.credentialData,
-            encryptionKey,
-          );
-          const obj = CredentialBodyZod.parse(JSON.parse(credential));
-          decryptedCredential.push(obj);
-        });
-
-        // 2. Properly block until all items are decrypted and saved
-        await Promise.all(decryptionPromises);
-        return {decryptedCredential,nextOffset:query.body.nextOffset}
-      }
-    } catch (error) {
-      throw error;
+      // 2. Properly block until all items are decrypted and saved
+      await Promise.all(decryptionPromises);
+      return {decryptedCredential,nextOffset:query.body.nextOffset}
     }
   };
 
   public addCredential = async (payload: CredentialBody) => {
-    try {
-      const { encryptionKey } = useUserStore.getState();
-      if (!encryptionKey) {
-        throw new Error("No Encryption Key Available Try Again Or Re Login");
-      }
-
-      const stringifiedPayload = JSON.stringify(payload);
-      const encryptedData = await cryptoWorker.encrypt(
-        stringifiedPayload,
-        encryptionKey
-      );
-
-      const requestBody: VaultMutationRequest = {
-        credentialId: payload.id,
-        credentialData: encryptedData,
-      };
-
-      const response = await apiCall<null>({
-        url: "/api/credential",
-        method: "POST",
-        body: requestBody,
-      });
-
-      if (!response.success) {
-        throw new Error(response.message);
-      }
-      return response;
-    } catch (error) {
-      throw error;
+    const { encryptionKey } = useUserStore.getState();
+    if (!encryptionKey) {
+      throw new Error("No Encryption Key Available Try Again Or Re Login");
     }
+
+    const stringifiedPayload = JSON.stringify(payload);
+    const encryptedData = await cryptoWorker.encrypt(
+      stringifiedPayload,
+      encryptionKey
+    );
+
+    const requestBody: VaultMutationRequest = {
+      credentialId: payload.id,
+      credentialData: encryptedData,
+    };
+
+    const response = await apiCall<null>({
+      url: "/api/credential",
+      method: "POST",
+      body: requestBody,
+    });
+
+    if (!response.success) {
+      throw new Error(response.message);
+    }
+    return response;
   };
 
   public updateCredential = async (payload: CredentialBody) => {
-    try {
-      const { encryptionKey } = useUserStore.getState();
-      if (!encryptionKey) {
-        throw new Error("No Encryption Key Available Try Again Or Re Login");
-      }
-
-      const stringifiedPayload = JSON.stringify(payload);
-      const encryptedData = await cryptoWorker.encrypt(
-        stringifiedPayload,
-        encryptionKey
-      );
-
-      const requestBody: VaultMutationRequest = {
-        credentialId: payload.id,
-        credentialData: encryptedData,
-      };
-
-      const response = await apiCall<null>({
-        url: "/api/credential",
-        method: "PUT",
-        body: requestBody,
-      });
-
-      if (!response.success) {
-        throw new Error(response.message);
-      }
-      return response;
-    } catch (error) {
-      throw error;
+    const { encryptionKey } = useUserStore.getState();
+    if (!encryptionKey) {
+      throw new Error("No Encryption Key Available Try Again Or Re Login");
     }
+
+    const stringifiedPayload = JSON.stringify(payload);
+    const encryptedData = await cryptoWorker.encrypt(
+      stringifiedPayload,
+      encryptionKey
+    );
+
+    const requestBody: VaultMutationRequest = {
+      credentialId: payload.id,
+      credentialData: encryptedData,
+    };
+
+    const response = await apiCall<null>({
+      url: "/api/credential",
+      method: "PUT",
+      body: requestBody,
+    });
+
+    if (!response.success) {
+      throw new Error(response.message);
+    }
+    return response;
   };
 
   public deleteCredential = async (credentialId: string) => {
-    try {
-      const requestBody: DeleteCredentialRequest = {
-        credentialId,
-      };
+    const requestBody: DeleteCredentialRequest = {
+      credentialId,
+    };
 
-      const response = await apiCall<null>({
-        url: "/api/credential",
-        method: "DELETE",
-        body: requestBody,
-      });
+    const response = await apiCall<null>({
+      url: "/api/credential",
+      method: "DELETE",
+      body: requestBody,
+    });
 
-      if (!response.success) {
-        throw new Error(response.message);
-      }
-      return response;
-    } catch (error) {
-      throw error;
+    if (!response.success) {
+      throw new Error(response.message);
     }
+    return response;
   };
 }

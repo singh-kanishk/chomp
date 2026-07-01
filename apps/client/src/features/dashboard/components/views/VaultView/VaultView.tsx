@@ -6,13 +6,9 @@ import { VaultOverview } from "./components/VaultOverview";
 import { QuickAccess } from "./components/QuickAccess";
 import { VaultControls } from "./components/VaultControls";
 import { VaultTable } from "./components/VaultTable";
-import { useQuery } from "@tanstack/react-query";
-import { VaultServices } from "@/features/services/vault.services";
 
 export default function VaultView() {
-  const vaultServices = new VaultServices();
   const { credentials, securityScore } = useVaultData();
-  const { visibleLimit } = useVaultUIStore();
   const copiedState = useVaultUIStore((state) => state.copiedState);
 
   return (

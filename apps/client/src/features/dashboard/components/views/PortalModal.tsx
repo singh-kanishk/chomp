@@ -1,21 +1,19 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, Lock, Eye, EyeOff, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
-import type{ Group,  CredentialFrontend, Strength} from '@chomp/shared'
+import type{ Group, CredentialBody, Strength} from '@chomp/shared'
 import { useDashboardStore } from "@/store/useDashboardStore";
-import { useVaultStore } from "@/store/useVaultStore";
+import { useAddCredential, useUpdateCredential } from "./VaultView/hooks/useVaultMutations";
 
 export default function PortalModal() {
   const { isModalOpen, closePortalModal, editingCredential } =
     useDashboardStore();
-  const { saveCredential } = useVaultStore();
-  const onSave = (data: Omit<CredentialFrontend, "id" | "strength">) => {
-    saveCredential(data, editingCredential?.id);
-    closePortalModal();
-  };
+  const addMutation = useAddCredential();
+  const updateMutation = useUpdateCredential();
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -72,8 +70,42 @@ export default function PortalModal() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !username || !password) return;
-    onSave({ name, username, password, group, websiteUrl, notes });
-    closePortalModal();
+
+    const currentDate = new Date().toISOString().split("T")[0];
+
+    if (editingCredential) {
+      // Update existing credential
+      const payload: CredentialBody = {
+        id: editingCredential.id,
+        name,
+        username,
+        password,
+        group,
+        websiteUrl,
+        notes,
+        lastUpdated: currentDate,
+        isFavorite: editingCredential.isFavorite,
+      };
+      updateMutation.mutate(payload, {
+        onSuccess: () => closePortalModal(),
+      });
+    } else {
+      // Create new credential
+      const payload: CredentialBody = {
+        id: crypto.randomUUID(),
+        name,
+        username,
+        password,
+        group,
+        websiteUrl,
+        notes,
+        lastUpdated: currentDate,
+        isFavorite: false,
+      };
+      addMutation.mutate(payload, {
+        onSuccess: () => closePortalModal(),
+      });
+    }
   };
 
   return (
@@ -160,7 +192,7 @@ export default function PortalModal() {
                   </FieldLabel>
                   <select
                     value={group}
-                    onChange={(e) => setGroup(e.target.value as any)}
+                    onChange={(e) => setGroup(e.target.value as Group)}
                     className="w-full bg-[#0e0e0e] border border-input h-10 px-3 py-2 text-xs focus:outline-none focus:border-ring focus:ring-1 focus:ring-ring font-mono transition-all"
                   >
                     <option value="Personal">Personal</option>
@@ -257,9 +289,12 @@ export default function PortalModal() {
                 </Button>
                 <Button
                   type="submit"
+                  disabled={addMutation.isPending || updateMutation.isPending}
                   className="w-2/3 h-10 font-mono text-[12px] uppercase bg-[#4b5320] hover:bg-[#c3cc8c] text-[#bdc787] hover:text-[#2d3404] border border-[#c3cc8c]"
                 >
-                  {editingCredential ? "Update Chomp Seal" : "Secure In Cave"}
+                  {addMutation.isPending || updateMutation.isPending
+                    ? "Encrypting..."
+                    : editingCredential ? "Update Chomp Seal" : "Secure In Cave"}
                 </Button>
               </div>
             </form>

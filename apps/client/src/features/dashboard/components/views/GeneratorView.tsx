@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useVaultStore } from "@/store/useVaultStore";
 import { useDashboardStore } from "@/store/useDashboardStore";
-import type{ Group } from "@chomp/shared";
 
 export default function GeneratorView() {
   const { saveCredential } = useVaultStore();
