@@ -5,6 +5,7 @@ import { ApiResponse, GetCredentialResponse } from "@chomp/shared";
 import { JwtPayloadZod } from "@chomp/shared";
 import { ApiServices } from "../services/api.services";
 import { GetCredentialRequestZod, VaultMutationRequestZod, DeleteCredentialRequestZod } from "@chomp/shared";
+import { logger } from "../logger/logger";
 
 const apiService = new ApiServices();
 export class ApiController {
@@ -17,6 +18,7 @@ export class ApiController {
           success: false,
           message: "Incorrect token Re - Login",
         };
+        logger.warn("Incorrect token Re - Login")
         res.status(401).json(payload);
         return;
       }
@@ -36,6 +38,7 @@ export class ApiController {
         body: { credentials: mappedCredentials, nextOffset: credential.nextOffset },
         message: "Successfull",
       };
+      logger.info("Successfully Credentials Provided")
       res.status(200).json(payload);
       return;
     } catch (error) {
@@ -46,6 +49,7 @@ export class ApiController {
         success: false,
         message: errorMessage,
       };
+      logger.warn(`Error while fetching credentials: ${errorMessage}`)
       res.status(500).json(payload)
     }
   }
@@ -54,6 +58,7 @@ export class ApiController {
     try {
       const userDetails = res.locals.user;
       if (typeof userDetails != "object") {
+        logger.warn("Incorrect token")
         return res.status(401).json({ statusCode: 401, success: false, message: "Incorrect token" });
       }
 

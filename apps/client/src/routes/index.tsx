@@ -1,5 +1,9 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { RootComponent } from '../components/ui/RootComponent'
+import { createFileRoute, redirect } from '@tanstack/react-router'
+
 export const Route = createFileRoute('/')({
-  component: RootComponent,
+  beforeLoad: () => {
+    throw redirect({
+      to: '/dashboard',
+    })
+  },
 })
