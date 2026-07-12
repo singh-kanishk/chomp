@@ -4,7 +4,7 @@ import { useDashboardStore } from "@/store/useDashboardStore";
 
 export function Fab() {
   const { openPortalModal } = useDashboardStore();
-  const onClick = () => openPortalModal;
+  const onClick = () => openPortalModal();
   return (
     <Button
       onClick={onClick}

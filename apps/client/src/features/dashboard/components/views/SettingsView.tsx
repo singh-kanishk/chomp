@@ -11,14 +11,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useVaultStore } from "@/store/useVaultStore";
-import type { CredentialFrontend } from "@chomp/shared";
+import { useDashboardStore } from "@/store/useDashboardStore";
+import { useAddCredential, useDeleteCredential } from "./VaultView/hooks/useVaultMutations";
+import type { CredentialBody } from "@chomp/shared";
 
 export default function SettingsView() {
-  const { clearVault, importBackup, getExportString } =
-    useVaultStore();
+  const { credentials, getExportString } = useVaultStore();
+  const { setCustomPrompt } = useDashboardStore();
+  const addMutation = useAddCredential();
+  const deleteMutation = useDeleteCredential();
 
-  const onClearVault = () => clearVault();
-  const onImportBackup = (imported: CredentialFrontend[]) => importBackup(imported);
   const exportCredentials = () => getExportString();
 
   const [masterKey, setMasterKey] = useState("CHOMP_MASTER_GUARD_2026!");
@@ -28,6 +30,8 @@ export default function SettingsView() {
   const [importText, setImportText] = useState("");
   const [importError, setImportError] = useState<string | null>(null);
   const [importDone, setImportDone] = useState(false);
+  const [isPurging, setIsPurging] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
 
   const handleSaveMasterKey = (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +50,7 @@ export default function SettingsView() {
     linkElement.click();
   };
 
-  const handleImportJSON = () => {
+  const handleImportJSON = async () => {
     try {
       setImportError(null);
       const parsed = JSON.parse(importText);
@@ -57,14 +61,46 @@ export default function SettingsView() {
       );
       if (!isValid) throw new Error("Invalid secret format inside the arrays!");
 
-      onImportBackup(parsed);
+      setIsImporting(true);
+      for (const item of parsed) {
+        const payload: CredentialBody = {
+          id: item.id || crypto.randomUUID(),
+          name: item.name,
+          username: item.username,
+          password: item.password,
+          group: item.group,
+          websiteUrl: item.websiteUrl || "",
+          notes: item.notes || "",
+          lastUpdated: item.lastUpdated || new Date().toISOString().split("T")[0],
+          isFavorite: item.isFavorite || false,
+        };
+        await addMutation.mutateAsync(payload);
+      }
+      setIsImporting(false);
       setImportDone(true);
       setImportText("");
       setTimeout(() => setImportDone(false), 2000);
     } catch (err: unknown) {
+      setIsImporting(false);
       const message = err instanceof Error ? err.message : "JSON Parsing failed!";
       setImportError(message);
     }
+  };
+
+  const handlePurgeAll = () => {
+    setCustomPrompt({
+      isOpen: true,
+      title: "⚠️ TOTAL VAULT PURGE",
+      message: `This will permanently destroy ALL ${credentials.length} credentials from the server. This action is IRREVERSIBLE.`,
+      type: "confirm",
+      onConfirm: async () => {
+        setIsPurging(true);
+        for (const cred of credentials) {
+          await deleteMutation.mutateAsync(cred.id);
+        }
+        setIsPurging(false);
+      },
+    });
   };
 
   return (
@@ -210,10 +246,10 @@ export default function SettingsView() {
               <Button
                 type="button"
                 onClick={handleImportJSON}
-                disabled={!importText}
+                disabled={!importText || isImporting}
                 className="w-full h-8 bg-[#4b5320] text-[#bdc787] hover:bg-[#c3cc8c] hover:text-[#2d3404] disabled:bg-[#1c1b1b] disabled:text-[#47483c] uppercase font-mono text-[10px] tracking-wider border border-[#c3cc8c]/40 rounded-none"
               >
-                Assemble JSON Secrets
+                {isImporting ? "Encrypting & Importing..." : "Assemble JSON Secrets"}
               </Button>
             </div>
           </div>
@@ -229,7 +265,7 @@ export default function SettingsView() {
         </div>
 
         <p className="font-body text-xs text-[#c8c7b8] max-w-3xl leading-relaxed">
-          These operations immediately modify local vault storage matrices. They
+          These operations permanently destroy credentials from the server. They
           are completely irreversible. Be absolutely sure before triggering
           hammer of destruction.
         </p>
@@ -238,10 +274,12 @@ export default function SettingsView() {
           <Button
             type="button"
             variant="destructive"
-            onClick={onClearVault}
-            className="flex-1 h-10 bg-[#93000a]/20 border border-[#ffb4ab] text-[#ffb4ab] hover:bg-[#ffb4ab] hover:text-[#131313] font-mono text-xs uppercase tracking-wider font-bold transition-all gap-1.5 shadow-sm hover:shadow-[0_0_10px_rgba(255,180,171,0.25)] rounded-none"
+            onClick={handlePurgeAll}
+            disabled={isPurging || credentials.length === 0}
+            className="flex-1 h-10 bg-[#93000a]/20 border border-[#ffb4ab] text-[#ffb4ab] hover:bg-[#ffb4ab] hover:text-[#131313] font-mono text-xs uppercase tracking-wider font-bold transition-all gap-1.5 shadow-sm hover:shadow-[0_0_10px_rgba(255,180,171,0.25)] rounded-none disabled:opacity-50"
           >
-            <Trash2 className="w-4 h-4" /> PURGE ALL VAULT SECRETS
+            <Trash2 className="w-4 h-4" />
+            {isPurging ? "Purging..." : "PURGE ALL VAULT SECRETS"}
           </Button>
         </div>
       </section>

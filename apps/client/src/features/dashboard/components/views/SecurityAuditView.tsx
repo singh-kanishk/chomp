@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useVaultStore } from "@/store/useVaultStore";
+import { useUpdateCredential } from "./VaultView/hooks/useVaultMutations";
+import type { CredentialBody } from "@chomp/shared";
 
 function generateRandomPassword() {
   const chars =
@@ -22,7 +24,8 @@ function generateRandomPassword() {
 }
 
 export default function SecurityAuditView() {
-  const { credentials, upgradePassword } = useVaultStore();
+  const { credentials } = useVaultStore();
+  const updateMutation = useUpdateCredential();
   const [upgradingId, setUpgradingId] = useState<string | null>(null);
   const [upgradeSuccess, setUpgradeSuccess] = useState<string | null>(null);
 
@@ -54,15 +57,34 @@ export default function SecurityAuditView() {
       : 100;
 
   const handleAutoUpgrade = (id: string, appName: string) => {
-    setUpgradingId(id);
-    const result = generateRandomPassword();
+    const cred = credentials.find((c) => c.id === id);
+    if (!cred) return;
 
-    setTimeout(() => {
-      upgradePassword(id, result);
-      setUpgradingId(null);
-      setUpgradeSuccess(appName);
-      setTimeout(() => setUpgradeSuccess(null), 3000);
-    }, 1200);
+    setUpgradingId(id);
+    const newPassword = generateRandomPassword();
+
+    const payload: CredentialBody = {
+      id: cred.id,
+      name: cred.name,
+      username: cred.username,
+      password: newPassword,
+      group: cred.group,
+      websiteUrl: cred.websiteUrl,
+      notes: cred.notes,
+      lastUpdated: new Date().toISOString().split("T")[0],
+      isFavorite: cred.isFavorite,
+    };
+
+    updateMutation.mutate(payload, {
+      onSuccess: () => {
+        setUpgradingId(null);
+        setUpgradeSuccess(appName);
+        setTimeout(() => setUpgradeSuccess(null), 3000);
+      },
+      onError: () => {
+        setUpgradingId(null);
+      },
+    });
   };
 
   return (

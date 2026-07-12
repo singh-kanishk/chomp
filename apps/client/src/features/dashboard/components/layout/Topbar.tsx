@@ -15,7 +15,7 @@ export function Topbar() {
     setSearchQuery(val);
     if (activeTab !== "vault") setActiveTab("vault");
   };
-  const onAddPasswordClick = () => openPortalModal;
+  const onAddPasswordClick = () => openPortalModal();
   const onProfileClick = () =>
     setCustomPrompt({
       isOpen: true,

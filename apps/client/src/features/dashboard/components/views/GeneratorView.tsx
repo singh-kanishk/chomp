@@ -10,11 +10,12 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useVaultStore } from "@/store/useVaultStore";
 import { useDashboardStore } from "@/store/useDashboardStore";
+import { useAddCredential } from "./VaultView/hooks/useVaultMutations";
+import type { CredentialBody } from "@chomp/shared";
 
 export default function GeneratorView() {
-  const { saveCredential } = useVaultStore();
+  const addMutation = useAddCredential();
   const { setActiveTab, setSelectedGroup, setSearchQuery } =
     useDashboardStore();
   const [password, setPassword] = useState("");
@@ -31,13 +32,19 @@ export default function GeneratorView() {
   }, [setSelectedGroup, setSearchQuery]);
 
   const onAddSecurely = (generatedPassword: string) => {
-    saveCredential({
+    const payload: CredentialBody = {
+      id: crypto.randomUUID(),
       name: "Unassigned Forge",
       username: "user_handle",
       password: generatedPassword,
       group: "Personal",
       websiteUrl: "",
       notes: "Slab key forged inside Primitive Key Generator.",
+      lastUpdated: new Date().toISOString().split("T")[0],
+      isFavorite: false,
+    };
+    addMutation.mutate(payload, {
+      onSuccess: () => setActiveTab("vault"),
     });
   };
   const generatePassword = () => {
@@ -322,14 +329,13 @@ export default function GeneratorView() {
           {password && !password.startsWith("Please") && (
             <Button
               type="button"
-              onClick={() => {
-                onAddSecurely(password);
-                setActiveTab("vault");
-              }}
+              onClick={() => onAddSecurely(password)}
+              disabled={addMutation.isPending}
               variant="outline"
               className="sm:w-1/3 h-12 bg-transparent border-2 border-[#ffb77d] text-[#ffb77d] hover:bg-[#ffb77d] hover:text-[#131313] font-mono text-[12px] uppercase tracking-wider font-bold transition-all flex gap-1.5 rounded-none"
             >
-              <Lock className="w-4 h-4" /> Deposit In Vault
+              <Lock className="w-4 h-4" />
+              {addMutation.isPending ? "Encrypting..." : "Deposit In Vault"}
             </Button>
           )}
         </div>
