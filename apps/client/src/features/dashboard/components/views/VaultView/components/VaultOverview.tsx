@@ -20,11 +20,11 @@ export function VaultOverview({ totalCrypts, strongSeals, securityScore }: Vault
   const needleRotation = -90 + (securityScore / 100) * 180;
 
   return (
-    <section className="stone-slab p-6 sm:p-8 border-4 border-[#47483c] relative">
-      <div className="absolute top-2 left-2 text-[9px] font-mono text-[#c8c7b8]/20 tracking-tighter">
+    <section className="stone-slab p-6 sm:p-8 border-4 border-border relative">
+      <div className="absolute top-2 left-2 text-[9px] font-mono text-muted-foreground/20 tracking-tighter">
         ⊞ S_SLAB_00
       </div>
-      <div className="absolute bottom-2 right-2 text-[9px] font-mono text-[#c8c7b8]/20 tracking-tighter">
+      <div className="absolute bottom-2 right-2 text-[9px] font-mono text-muted-foreground/20 tracking-tighter">
         🔒 MONSTER_ACTIVE
       </div>
 
@@ -33,15 +33,15 @@ export function VaultOverview({ totalCrypts, strongSeals, securityScore }: Vault
           <h2 className="font-headline text-2xl sm:text-3xl text-[#ffb77d] uppercase tracking-wider mb-2">
             Monster Vault Overview
           </h2>
-          <p className="font-body text-sm text-[#c8c7b8] max-w-lg leading-relaxed">
+          <p className="font-body text-sm text-muted-foreground max-w-lg leading-relaxed">
             Your secrets are currently heavily guarded. The monster's hunger is
             satisfied by strong cryptography. Keep key entropy maximum.
           </p>
           <div className="mt-4 flex flex-wrap gap-4 text-xs font-mono">
-            <div className="bg-[#1c1b1b] border border-[#47483c] px-3 py-1 text-[#c8c7b8]">
+            <div className="bg-popover border border-border px-3 py-1 text-muted-foreground">
               TOTAL CRYPTS: <span className="text-[#ffb77d] font-bold">{totalCrypts}</span>
             </div>
-            <div className="bg-[#1c1b1b] border border-[#47483c] px-3 py-1 text-[#c8c7b8]">
+            <div className="bg-popover border border-border px-3 py-1 text-muted-foreground">
               STRONG SEALS: <span className="text-[#c3cc8c] font-bold">{strongSeals}</span>
             </div>
           </div>

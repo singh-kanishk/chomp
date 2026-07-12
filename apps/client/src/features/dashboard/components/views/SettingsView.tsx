@@ -117,10 +117,10 @@ export default function SettingsView() {
               <Check className="w-3.5 h-3.5" />
             </div>
             <div>
-              <p className="font-mono text-xs text-[#e5e2e1] uppercase tracking-wider font-bold">
+              <p className="font-mono text-xs text-muted-foreground uppercase tracking-wider font-bold">
                 MASTER SEAL CONFIGURED!
               </p>
-              <p className="font-mono text-[10px] text-[#c8c7b8] mt-0.5">
+              <p className="font-mono text-[10px] text-muted-foreground mt-0.5">
                 New master sentinel gate passcode is securely set.
               </p>
             </div>
@@ -128,13 +128,13 @@ export default function SettingsView() {
         )}
       </AnimatePresence>
 
-      <div className="flex items-center gap-3 border-b-2 border-[#47483c] pb-4">
+      <div className="flex items-center gap-3 border-b-2 border-border pb-4">
         <Settings className="w-7 h-7 text-[#ffb77d]" />
         <div>
           <h2 className="font-headline text-2xl text-[#ffb77d] uppercase tracking-wider">
             Sentinel Vault Settings
           </h2>
-          <p className="font-mono text-xs text-[#c8c7b8]/60 uppercase tracking-widest mt-1">
+          <p className="font-mono text-xs text-muted-foreground/60 uppercase tracking-widest mt-1">
             Reconfigure slab master parameters, export stones backup, or purge
             cells
           </p>
@@ -142,12 +142,12 @@ export default function SettingsView() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="stone-slab p-6 border-2 border-[#47483c] flex flex-col justify-between space-y-4">
+        <div className="stone-slab p-6 border-2 border-border flex flex-col justify-between space-y-4">
           <div>
-            <h3 className="font-headline text-base text-[#e5e2e1] uppercase tracking-wider mb-2">
+            <h3 className="font-headline text-base text-muted-foreground uppercase tracking-wider mb-2">
               Master Fortress Seal
             </h3>
-            <p className="font-mono text-[11px] text-[#c8c7b8]/60 leading-relaxed uppercase">
+            <p className="font-mono text-[11px] text-muted-foreground/60 leading-relaxed uppercase">
               The primary key that protects the password vault on start. Do not
               lose this.
             </p>
@@ -158,14 +158,14 @@ export default function SettingsView() {
             className="space-y-4 font-mono text-xs flex-1 flex flex-col justify-end"
           >
             <div>
-              <label className="block text-[10px] uppercase text-[#c8c7b8] mb-1 tracking-wider">
+              <label className="block text-[10px] uppercase text-muted-foreground mb-1 tracking-wider">
                 Fortress Access Passphrase
               </label>
               <Input
                 type={showKey ? "text" : "password"}
                 value={masterKey}
                 onChange={(e) => setMasterKey(e.target.value)}
-                className="bg-[#0e0e0e] border-[#47483c] text-[#ffb77d] focus:border-[#ffb77d] h-10 select-all rounded-none"
+                className="bg-input border-border text-[#ffb77d] focus:border-[#ffb77d] h-10 select-all rounded-none"
               />
             </div>
 
@@ -174,7 +174,7 @@ export default function SettingsView() {
                 type="button"
                 variant="outline"
                 onClick={() => setShowKey(!showKey)}
-                className="h-8 text-[10px] uppercase bg-transparent border-[#47483c] hover:border-[#ffb77d] text-[#c8c7b8] hover:text-[#ffb77d] hover:bg-transparent rounded-none"
+                className="h-8 text-[10px] uppercase bg-transparent border-border hover:border-[#ffb77d] text-muted-foreground hover:text-[#ffb77d] hover:bg-transparent rounded-none"
               >
                 {showKey ? "Hide Secrecy" : "Reveal Secrecy"}
               </Button>
@@ -184,9 +184,9 @@ export default function SettingsView() {
                   type="checkbox"
                   checked={bioluminescent}
                   onChange={() => setBioluminescent(!bioluminescent)}
-                  className="rounded-none bg-[#0e0e0e] border-[#47483c] accent-[#ffb77d]"
+                  className="rounded-none bg-input border-border accent-[#ffb77d]"
                 />
-                <span className="text-[10px] uppercase text-[#c8c7b8]">
+                <span className="text-[10px] uppercase text-muted-foreground">
                   Glow Hover Effects
                 </span>
               </label>
@@ -201,12 +201,12 @@ export default function SettingsView() {
           </form>
         </div>
 
-        <div className="stone-slab p-6 border-2 border-[#47483c] flex flex-col justify-between space-y-4">
+        <div className="stone-slab p-6 border-2 border-border flex flex-col justify-between space-y-4">
           <div>
-            <h3 className="font-headline text-base text-[#e5e2e1] uppercase tracking-wider mb-2">
+            <h3 className="font-headline text-base text-muted-foreground uppercase tracking-wider mb-2">
               Runestone Exports & Backups
             </h3>
-            <p className="font-mono text-[11px] text-[#c8c7b8]/60 leading-relaxed uppercase">
+            <p className="font-mono text-[11px] text-muted-foreground/60 leading-relaxed uppercase">
               Retrieve full copies of your local database secrets or import
               runic blueprints directly.
             </p>
@@ -217,13 +217,13 @@ export default function SettingsView() {
               type="button"
               variant="outline"
               onClick={handleDownloadBackup}
-              className="w-full h-10 bg-[#201f1f] border-[#47483c] hover:border-[#ffb77d] text-[#e5e2e1] hover:text-[#ffb77d] hover:bg-[#201f1f] font-bold uppercase tracking-wider transition-all gap-1.5 rounded-none"
+              className="w-full h-10 bg-card border-border hover:border-[#ffb77d] text-muted-foreground hover:text-[#ffb77d] hover:bg-card font-bold uppercase tracking-wider transition-all gap-1.5 rounded-none"
             >
               <Download className="w-4 h-4" /> Export Backup file
             </Button>
 
-            <div className="bg-[#131313] border border-[#47483c] p-3 space-y-2">
-              <span className="text-[10px] uppercase text-[#c8c7b8] tracking-wider block">
+            <div className="bg-background border border-border p-3 space-y-2">
+              <span className="text-[10px] uppercase text-muted-foreground tracking-wider block">
                 Import JSON Runes
               </span>
               <textarea
@@ -231,7 +231,7 @@ export default function SettingsView() {
                 onChange={(e) => setImportText(e.target.value)}
                 placeholder="Paste JSON array backup string..."
                 rows={2}
-                className="w-full bg-[#0e0e0e] border border-[#47483c] px-2 py-1.5 text-[11px] font-mono text-[#ffb77d] focus:outline-none focus:border-[#ffb77d] resize-none outline-none"
+                className="w-full bg-input border border-border px-2 py-1.5 text-[11px] font-mono text-[#ffb77d] focus:outline-none focus:border-[#ffb77d] resize-none outline-none"
               />
               {importError && (
                 <p className="text-[#ffb4ab] text-[10px] font-mono uppercase tracking-wide">
@@ -247,7 +247,7 @@ export default function SettingsView() {
                 type="button"
                 onClick={handleImportJSON}
                 disabled={!importText || isImporting}
-                className="w-full h-8 bg-[#4b5320] text-[#bdc787] hover:bg-[#c3cc8c] hover:text-[#2d3404] disabled:bg-[#1c1b1b] disabled:text-[#47483c] uppercase font-mono text-[10px] tracking-wider border border-[#c3cc8c]/40 rounded-none"
+                className="w-full h-8 bg-[#4b5320] text-[#bdc787] hover:bg-[#c3cc8c] hover:text-[#2d3404] disabled:bg-popover disabled:text-[#47483c] uppercase font-mono text-[10px] tracking-wider border border-[#c3cc8c]/40 rounded-none"
               >
                 {isImporting ? "Encrypting & Importing..." : "Assemble JSON Secrets"}
               </Button>
@@ -264,7 +264,7 @@ export default function SettingsView() {
           </h3>
         </div>
 
-        <p className="font-body text-xs text-[#c8c7b8] max-w-3xl leading-relaxed">
+        <p className="font-body text-xs text-muted-foreground max-w-3xl leading-relaxed">
           These operations permanently destroy credentials from the server. They
           are completely irreversible. Be absolutely sure before triggering
           hammer of destruction.

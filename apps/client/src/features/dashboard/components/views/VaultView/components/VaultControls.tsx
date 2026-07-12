@@ -14,7 +14,7 @@ export function VaultControls() {
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3 pb-2">
-        <h3 className="font-headline text-xl text-[#e5e2e1] uppercase tracking-wider flex items-center gap-2">
+        <h3 className="font-headline text-xl text-muted-foreground uppercase tracking-wider flex items-center gap-2">
           <span className="text-[#ffb77d]">✦</span> Credential Vault
         </h3>
 
@@ -25,15 +25,15 @@ export function VaultControls() {
               placeholder="Live search vault..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-[#0e0e0e] border-[#47483c] pl-8 pr-3 py-1 text-xs text-[#e5e2e1] focus:outline-none focus:border-[#ffb77d] font-mono placeholder:text-[#c8c7b8]/40 h-8 rounded-none"
+              className="bg-input border-border pl-8 pr-3 py-1 text-xs text-muted-foreground focus:outline-none focus:border-[#ffb77d] font-mono placeholder:text-muted-foreground/40 h-8 rounded-none"
             />
-            <Search className="w-3.5 h-3.5 text-[#c8c7b8]/40 absolute left-2.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-muted-foreground/40 absolute left-2.5 top-1/2 -translate-y-1/2" />
           </div>
 
           <Button
             onClick={() => toggleSort("name")}
             variant="outline"
-            className={`h-8 flex items-center gap-1 bg-[#201f1f] border-[#47483c] text-xs font-mono uppercase tracking-wider text-[#c8c7b8] hover:border-[#ffb77d] hover:text-[#ffb77d] rounded-none ${
+            className={`h-8 flex items-center gap-1 bg-card border-border text-xs font-mono uppercase tracking-wider text-muted-foreground hover:border-[#ffb77d] hover:text-[#ffb77d] rounded-none ${
               sortBy === "name" ? "border-[#ffb77d] text-[#ffb77d]" : ""
             }`}
           >
@@ -52,7 +52,7 @@ export function VaultControls() {
             className={`px-4 py-1.5 h-auto font-mono text-xs uppercase tracking-widest rounded-none ${
               selectedGroup === group
                 ? "bg-[#4b5320] border-[#c3cc8c] text-[#bdc787] shadow-[0_0_10px_rgba(195,204,140,0.15)]"
-                : "bg-[#201f1f] border-[#47483c] text-[#c8c7b8] hover:border-[#ffb77d] hover:text-[#ffb77d]"
+                : "bg-card border-border text-muted-foreground hover:border-[#ffb77d] hover:text-[#ffb77d]"
             }`}
           >
             {group}

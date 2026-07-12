@@ -32,33 +32,33 @@ export function Topbar() {
     });
 
   return (
-    <header className="flex justify-between items-center px-8 md:px-16 h-20 border-b-2 border-[#47483c] bg-[#131313] sticky top-0 z-30 select-none">
-      <div className="flex items-center gap-3 text-[#c8c7b8]">
-        <Search className="w-5 h-5 text-[#c8c7b8]/60" />
+    <header className="flex justify-between items-center px-8 md:px-16 h-20 border-b-2 border-border bg-background sticky top-0 z-30 select-none">
+      <div className="flex items-center gap-3 text-muted-foreground">
+        <Search className="w-5 h-5 text-muted-foreground/60" />
         <input
           type="text"
           placeholder="Search through secure slabs..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="bg-transparent border-none text-sm font-mono focus:ring-0 focus:outline-none placeholder-on-surface-variant w-64 text-[#e5e2e1]"
+          className="bg-transparent border-none text-sm font-mono focus:ring-0 focus:outline-none placeholder-on-surface-variant w-64 text-muted-foreground"
         />
       </div>
 
       <div className="flex items-center gap-5">
-        <div className="hidden lg:flex items-center gap-1 bg-[#1c1b1b] border border-[#47483c] px-3 py-1 text-[11px] font-mono text-[#c8c7b8]">
+        <div className="hidden lg:flex items-center gap-1 bg-popover border border-border px-3 py-1 text-[11px] font-mono text-muted-foreground">
           🛡️ GATEWAY:{" "}
           <span className="text-[#c3cc8c] font-bold">PORT 3000 ACTIVE</span>
         </div>
         <Button
           onClick={onNotificationClick}
-          className="p-1 border border-[#47483c] bg-[#1c1b1b] text-[#c8c7b8] hover:text-[#ffb77d] hover:border-[#ffb77d] transition-colors relative"
+          className="p-1 border border-border bg-popover text-muted-foreground hover:text-[#ffb77d] hover:border-[#ffb77d] transition-colors relative"
         >
           <Bell className="w-4 h-4" />
           <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#ffb77d] rounded-full shadow-[0_0_5px_#ffb77d]" />
         </Button>
         <Button
           onClick={onProfileClick}
-          className="flex items-center gap-2 border border-[#47483c] bg-[#1c1b1b] pl-2 pr-3 py-1 text-xs font-mono text-[#c8c7b8] hover:border-[#ffb77d]"
+          className="flex items-center gap-2 border border-border bg-popover pl-2 pr-3 py-1 text-xs font-mono text-muted-foreground hover:border-[#ffb77d]"
         >
           <User className="w-3.5 h-3.5" />
           <span>Operator</span>

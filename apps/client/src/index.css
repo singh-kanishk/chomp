@@ -42,40 +42,17 @@
     --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* LIGHT MODE: Standard Shadcn setup */
+/* GLOBAL THEME: Custom Stitch Cave Theme */
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --radius: 0.625rem;
-}
-
-/* DARK MODE: Your Custom Stitch Theme */
-.dark {
     /* Base Cave Colors */
     --background: #131313;
-    --foreground: #e5e2e1;
+    --foreground: #e3e3dc;
     
     /* Stone Slab Elements */
     --card: #201f1f;
-    --card-foreground: #e5e2e1;
+    --card-foreground: #e3e3dc;
     --popover: #1c1b1b;
-    --popover-foreground: #e5e2e1;
+    --popover-foreground: #e3e3dc;
     
     /* Primary (Lizard Green) */
     --primary: #c3cc8c;
@@ -87,9 +64,9 @@
     
     /* Muted & Outlines */
     --muted: #2a2a2a;
-    --muted-foreground: #919283;
+    --muted-foreground: #c8c7b8;
     --accent: #2a2a2a;
-    --accent-foreground: #e5e2e1;
+    --accent-foreground: #c8c7b8;
     
     /* Error / Monster Red */
     --destructive: #ffb4ab;
@@ -97,8 +74,11 @@
     
     /* Borders & Interaction */
     --border: #47483c;
-    --input: #201f1f;
+    --input: #0e0e0e;
     --ring: #ffb77d;
+
+    /* Radius */
+    --radius: 0.625rem;
 }
 
 @layer base {

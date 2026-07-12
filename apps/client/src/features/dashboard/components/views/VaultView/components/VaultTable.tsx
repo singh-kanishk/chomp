@@ -85,19 +85,19 @@ export function VaultTable() {
   };
   if (isLoading) {
     return (
-      <div className="stone-slab border-2 border-[#47483c] p-12 flex flex-col items-center justify-center gap-3">
+      <div className="stone-slab border-2 border-border p-12 flex flex-col items-center justify-center gap-3">
         <Loader2 className="w-6 h-6 text-[#ffb77d] animate-spin" />
-        <p className="font-mono text-xs text-[#c8c7b8]/60 uppercase tracking-widest">Decrypting vault secrets...</p>
+        <p className="font-mono text-xs text-muted-foreground/60 uppercase tracking-widest">Decrypting vault secrets...</p>
       </div>
     );
   }
 
   return (
-    <div className="stone-slab border-2 border-[#47483c] p-0 overflow-hidden">
+    <div className="stone-slab border-2 border-border p-0 overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse select-none">
           <thead>
-            <tr className="bg-[#2a2a2a] border-b-2 border-[#47483c] font-mono text-[11px] uppercase tracking-wider text-[#c8c7b8]">
+            <tr className="bg-[#2a2a2a] border-b-2 border-border font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
               <th className="p-4 w-[28%]">Website / App</th>
               <th className="p-4 w-[22%]">Username</th>
               <th className="p-4 w-[25%]">Password</th>
@@ -110,7 +110,7 @@ export function VaultTable() {
               <tr>
                 <td
                   colSpan={5}
-                  className="p-8 text-center text-[#c8c7b8]/60 uppercase tracking-widest font-mono"
+                  className="p-8 text-center text-muted-foreground/60 uppercase tracking-widest font-mono"
                 >
                   No matching secrets secured in database.
                 </td>
@@ -126,23 +126,23 @@ export function VaultTable() {
                         : ""
                     }`}
                   >
-                    <td className="p-4 font-bold text-[#e5e2e1] flex items-center gap-3">
-                      <div className="w-8 h-8 bg-[#131313] border border-[#47483c] flex items-center justify-center text-[#ffb77d] font-headline select-none">
+                    <td className="p-4 font-bold text-muted-foreground flex items-center gap-3">
+                      <div className="w-8 h-8 bg-background border border-border flex items-center justify-center text-[#ffb77d] font-headline select-none">
                         {cred.name.charAt(0).toUpperCase()}
                       </div>
                       <span className="group-hover:text-[#ffb77d] transition-colors truncate max-w-[150px]">
                         {cred.name}
                       </span>
                     </td>
-                    <td className="p-4 text-[#c8c7b8] truncate max-w-[150px]">
+                    <td className="p-4 text-muted-foreground truncate max-w-[150px]">
                       {cred.username}
                     </td>
                     <td
-                      className="p-4 text-[#c8c7b8]"
+                      className="p-4 text-muted-foreground"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <div className="flex items-center gap-2">
-                        <span className="tracking-widest font-bold text-[#e5e2e1] select-none text-[13px]">
+                        <span className="tracking-widest font-bold text-muted-foreground select-none text-[13px]">
                           {revealedIds.includes(cred.id)
                             ? cred.password
                             : "••••••••••••"}
@@ -151,7 +151,7 @@ export function VaultTable() {
                           onClick={(e) => toggleReveal(cred.id, e)}
                           variant="ghost"
                           size="icon-xs"
-                          className="text-[#c8c7b8]/60 hover:text-[#ffb77d] hover:bg-transparent"
+                          className="text-muted-foreground/60 hover:text-[#ffb77d] hover:bg-transparent"
                         >
                           {revealedIds.includes(cred.id) ? (
                             <EyeOff className="w-3.5 h-3.5" />
@@ -165,14 +165,14 @@ export function VaultTable() {
                           }
                           variant="ghost"
                           size="icon-xs"
-                          className="text-[#c8c7b8]/60 hover:text-[#ffb77d] hover:bg-transparent"
+                          className="text-muted-foreground/60 hover:text-[#ffb77d] hover:bg-transparent"
                         >
                           <Copy className="w-3.5 h-3.5" />
                         </Button>
                       </div>
                     </td>
                     <td className="p-4">
-                      <span className="px-2 py-0.5 bg-[#47483c]/20 text-[#c8c7b8] border border-[#47483c]/50 text-[10px]">
+                      <span className="px-2 py-0.5 bg-[#47483c]/20 text-muted-foreground border border-border/50 text-[10px]">
                         {cred.group}
                       </span>
                     </td>
@@ -200,7 +200,7 @@ export function VaultTable() {
 
                   <AnimatePresence>
                     {expandedId === cred.id && (
-                      <tr className="bg-[#1c1b1b]/80 border-t border-b border-[#47483c]/50">
+                      <tr className="bg-popover/80 border-t border-b border-border/50">
                         <td colSpan={5} className="p-4 font-mono select-none">
                           <motion.div
                             initial={{ opacity: 0, height: 0 }}
@@ -210,19 +210,19 @@ export function VaultTable() {
                           >
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-1">
                               <div>
-                                <h5 className="text-[10px] uppercase text-[#c8c7b8]/50 tracking-wider">
+                                <h5 className="text-[10px] uppercase text-muted-foreground/50 tracking-wider">
                                   Secure Note Carvings
                                 </h5>
-                                <p className="text-xs text-[#c8c7b8] bg-[#0e0e0e] border border-[#47483c]/50 p-2.5 mt-1 whitespace-pre-wrap">
+                                <p className="text-xs text-muted-foreground bg-input border border-border/50 p-2.5 mt-1 whitespace-pre-wrap">
                                   {cred.notes || "No secure notes inscribed."}
                                 </p>
                               </div>
                               <div className="space-y-2 text-xs">
-                                <div className="flex justify-between py-1 border-b border-[#47483c]/30">
-                                  <span className="text-[#c8c7b8]/60">
+                                <div className="flex justify-between py-1 border-b border-border/30">
+                                  <span className="text-muted-foreground/60">
                                     Portal:
                                   </span>
-                                  <span className="text-[#e5e2e1] truncate max-w-[200px]">
+                                  <span className="text-muted-foreground truncate max-w-[200px]">
                                     {cred.websiteUrl ? (
                                       <a
                                         href={cred.websiteUrl}
@@ -238,8 +238,8 @@ export function VaultTable() {
                                     )}
                                   </span>
                                 </div>
-                                <div className="flex justify-between py-1 border-b border-[#47483c]/30">
-                                  <span className="text-[#c8c7b8]/60">
+                                <div className="flex justify-between py-1 border-b border-border/30">
+                                  <span className="text-muted-foreground/60">
                                     Updated:
                                   </span>
                                   <span>
@@ -248,7 +248,7 @@ export function VaultTable() {
                                 </div>
                               </div>
                             </div>
-                            <div className="flex justify-end gap-3 pt-2 border-t border-[#47483c]/30">
+                            <div className="flex justify-end gap-3 pt-2 border-t border-border/30">
                               <Button
                                 onClick={() =>
                                   triggerCopy(
@@ -258,7 +258,7 @@ export function VaultTable() {
                                   )
                                 }
                                 variant="outline"
-                                className="h-7 bg-[#201f1f] border-[#47483c] text-xs font-mono rounded-none"
+                                className="h-7 bg-card border-border text-xs font-mono rounded-none"
                               >
                                 <Copy className="w-3 h-3 mr-1" /> Copy User
                               </Button>
@@ -290,7 +290,7 @@ export function VaultTable() {
       </div>
 
       {sortedCredentials.length > visibleLimit && (
-        <div className="p-4 border-t-2 border-[#47483c] bg-[#2a2a2a] text-center">
+        <div className="p-4 border-t-2 border-border bg-[#2a2a2a] text-center">
           <Button
             variant="ghost"
             onClick={() => loadMore(sortedCredentials.length)}
@@ -301,11 +301,11 @@ export function VaultTable() {
         </div>
       )}
       {visibleLimit > 5 && sortedCredentials.length > 5 && (
-        <div className="p-4 border-t border-[#47483c]/30 bg-[#2a2a2a] text-center">
+        <div className="p-4 border-t border-border/30 bg-[#2a2a2a] text-center">
           <Button
             variant="ghost"
             onClick={showLess}
-            className="text-[10px] font-mono uppercase text-[#c8c7b8]/60 hover:text-[#ffb77d]"
+            className="text-[10px] font-mono uppercase text-muted-foreground/60 hover:text-[#ffb77d]"
           >
             Show less secrets
           </Button>

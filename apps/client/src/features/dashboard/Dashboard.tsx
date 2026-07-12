@@ -21,7 +21,7 @@ export function Dashboard() {
   const dashboard = useDashboardStore();
 
   return (
-    <div className="bg-[#131313] text-[#e5e2e1] cave-bg min-h-screen flex selection:bg-[#ffb77d] selection:text-[#131313]">
+    <div className="bg-background text-muted-foreground cave-bg min-h-screen flex selection:bg-[#ffb77d] selection:text-[#131313]">
       <LockScreen />
 
       <Sidebar />

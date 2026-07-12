@@ -25,10 +25,10 @@ export default function VaultView() {
               <Check className="w-3.5 h-3.5" />
             </div>
             <div>
-              <p className="font-mono text-xs text-[#e5e2e1] uppercase tracking-wider">
+              <p className="font-mono text-xs text-muted-foreground uppercase tracking-wider">
                 Hieroglyph Transcribed!
               </p>
-              <p className="font-mono text-[10px] text-[#c8c7b8] mt-0.5">
+              <p className="font-mono text-[10px] text-muted-foreground mt-0.5">
                 Copied {copiedState.type} to local scroll board.
               </p>
             </div>

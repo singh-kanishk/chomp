@@ -101,10 +101,10 @@ export default function SecurityAuditView() {
               <Check className="w-3.5 h-3.5" />
             </div>
             <div>
-              <p className="font-mono text-xs text-[#e5e2e1] uppercase tracking-wider font-bold">
+              <p className="font-mono text-xs text-muted-foreground uppercase tracking-wider font-bold">
                 CRAVE OVERWRITE SUCCESS!
               </p>
-              <p className="font-mono text-[10px] text-[#c8c7b8] mt-0.5">
+              <p className="font-mono text-[10px] text-muted-foreground mt-0.5">
                 {upgradeSuccess} is now sealed with strong encryption runes!
               </p>
             </div>
@@ -112,13 +112,13 @@ export default function SecurityAuditView() {
         )}
       </AnimatePresence>
 
-      <div className="flex items-center gap-3 border-b-2 border-[#47483c] pb-4">
+      <div className="flex items-center gap-3 border-b-2 border-border pb-4">
         <ShieldCheck className="w-7 h-7 text-[#ffb77d]" />
         <div>
           <h2 className="font-headline text-2xl text-[#ffb77d] uppercase tracking-wider">
             Sentinel Security Audit
           </h2>
-          <p className="font-mono text-xs text-[#c8c7b8]/60 uppercase tracking-widest mt-1">
+          <p className="font-mono text-xs text-muted-foreground/60 uppercase tracking-widest mt-1">
             Dynamic real-time scanner testing encryption walls and keys
             integrity
           </p>
@@ -127,7 +127,7 @@ export default function SecurityAuditView() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div className="stone-slab p-6 border-4 flex flex-col justify-between">
-          <span className="font-mono text-[10px] uppercase text-[#c8c7b8]/60 tracking-wider block">
+          <span className="font-mono text-[10px] uppercase text-muted-foreground/60 tracking-wider block">
             INTEGRITY INDEX
           </span>
           <div className="py-4 text-center">
@@ -136,11 +136,11 @@ export default function SecurityAuditView() {
             >
               {score}%
             </span>
-            <p className="font-mono text-[10px] text-[#c8c7b8] mt-1 uppercase tracking-widest">
+            <p className="font-mono text-[10px] text-muted-foreground mt-1 uppercase tracking-widest">
               Total Sentinel Rating
             </p>
           </div>
-          <div className="h-2 bg-[#131313] border border-[#47483c] p-0.5 mt-2">
+          <div className="h-2 bg-background border border-border p-0.5 mt-2">
             {/* Fixed the typo 'class' here */}
             <div
               className={`h-full transition-all duration-1000 ${score >= 80 ? "bg-[#c3cc8c] w-full" : score >= 50 ? "bg-[#ffb77d] w-2/3" : "bg-[#ffb4ab] w-1/3"}`}
@@ -150,30 +150,30 @@ export default function SecurityAuditView() {
         </div>
 
         <div className="stone-slab p-5 border-2 flex flex-col justify-between space-y-4">
-          <span className="font-mono text-[10px] uppercase text-[#c8c7b8]/60 tracking-wider">
+          <span className="font-mono text-[10px] uppercase text-muted-foreground/60 tracking-wider">
             Key Strength Tally
           </span>
           <div className="space-y-2 font-mono text-xs">
-            <div className="flex justify-between py-1 border-b border-[#47483c]/30">
+            <div className="flex justify-between py-1 border-b border-border/30">
               <span className="text-[#c3cc8c] font-bold">● Strong Seals</span>
-              <span className="text-[#e5e2e1]">{strong.length} apps</span>
+              <span className="text-muted-foreground">{strong.length} apps</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-[#47483c]/30">
+            <div className="flex justify-between py-1 border-b border-border/30">
               <span className="text-[#ffb77d] font-bold">● Medium Seals</span>
-              <span className="text-[#e5e2e1]">{medium.length} apps</span>
+              <span className="text-muted-foreground">{medium.length} apps</span>
             </div>
             <div className="flex justify-between py-1">
               <span className="text-[#ffb4ab] font-bold">● Weak Seals</span>
-              <span className="text-[#e5e2e1]">{weak.length} apps</span>
+              <span className="text-muted-foreground">{weak.length} apps</span>
             </div>
           </div>
-          <div className="text-[10px] font-mono text-[#c8c7b8]/40">
+          <div className="text-[10px] font-mono text-muted-foreground/40">
             Total scan volume: {total} elements.
           </div>
         </div>
 
         <div className="stone-slab p-5 border-2 flex flex-col justify-between space-y-4">
-          <span className="font-mono text-[10px] uppercase text-[#c8c7b8]/60 tracking-wider">
+          <span className="font-mono text-[10px] uppercase text-muted-foreground/60 tracking-wider">
             Severe Threat Tracker
           </span>
           <div className="space-y-4 pt-2">
@@ -184,7 +184,7 @@ export default function SecurityAuditView() {
                   <h4 className="font-bold text-[#ffb4ab] font-mono uppercase text-[11px]">
                     Weak Crypts Detected!
                   </h4>
-                  <p className="text-[10px] text-[#c8c7b8] mt-0.5 leading-normal">
+                  <p className="text-[10px] text-muted-foreground mt-0.5 leading-normal">
                     {weak.length} entries fail standard security filters.
                   </p>
                 </div>
@@ -196,7 +196,7 @@ export default function SecurityAuditView() {
                   <h4 className="font-bold text-[#c3cc8c] font-mono uppercase text-[11px]">
                     No Weak Crypts
                   </h4>
-                  <p className="text-[10px] text-[#c8c7b8] mt-0.5 leading-normal">
+                  <p className="text-[10px] text-muted-foreground mt-0.5 leading-normal">
                     All password cells meet minimum strength.
                   </p>
                 </div>
@@ -204,25 +204,25 @@ export default function SecurityAuditView() {
             )}
 
             {duplicates.length > 0 ? (
-              <div className="flex items-start gap-2 text-xs border-t border-[#47483c]/30 pt-3">
+              <div className="flex items-start gap-2 text-xs border-t border-border/30 pt-3">
                 <AlertTriangle className="w-5 h-5 text-[#ffb77d] mt-0.5 shrink-0 animate-pulse" />
                 <div>
                   <h4 className="font-bold text-[#ffb77d] font-mono uppercase text-[11px]">
                     Duplicated Key Reuse!
                   </h4>
-                  <p className="text-[10px] text-[#c8c7b8] mt-0.5 leading-normal">
+                  <p className="text-[10px] text-muted-foreground mt-0.5 leading-normal">
                     {duplicates.length} keys are reused across multiple items.
                   </p>
                 </div>
               </div>
             ) : (
-              <div className="flex items-start gap-2 text-xs border-t border-[#47483c]/30 pt-3">
+              <div className="flex items-start gap-2 text-xs border-t border-border/30 pt-3">
                 <ShieldCheck className="w-5 h-5 text-[#c3cc8c] shrink-0" />
                 <div>
                   <h4 className="font-bold text-[#c3cc8c] font-mono uppercase text-[11px]">
                     Perfect Uniqueness
                   </h4>
-                  <p className="text-[10px] text-[#c8c7b8] mt-0.5 leading-normal">
+                  <p className="text-[10px] text-muted-foreground mt-0.5 leading-normal">
                     Every app holds distinct passwords.
                   </p>
                 </div>
@@ -244,10 +244,10 @@ export default function SecurityAuditView() {
                 className="stone-slab p-4 border border-[#ffb4ab]/30 bg-[#2a2a2a]/40 shadow-inner flex justify-between items-center"
               >
                 <div>
-                  <h4 className="font-headline text-sm text-[#e5e2e1] uppercase tracking-wide group-hover:text-[#ffb77d] transition-colors">
+                  <h4 className="font-headline text-sm text-muted-foreground uppercase tracking-wide group-hover:text-[#ffb77d] transition-colors">
                     {cred.name}
                   </h4>
-                  <p className="font-mono text-[10px] text-[#c8c7b8] mt-0.5">
+                  <p className="font-mono text-[10px] text-muted-foreground mt-0.5">
                     User: {cred.username}
                   </p>
                 </div>
@@ -255,7 +255,7 @@ export default function SecurityAuditView() {
                 <Button
                   onClick={() => handleAutoUpgrade(cred.id, cred.name)}
                   disabled={upgradingId === cred.id}
-                  className="px-3.5 py-2.5 h-auto bg-[#93000a]/30 border border-[#ffb4ab] text-[#ffb4ab] hover:bg-[#ffb4ab] hover:text-[#131313] disabled:bg-[#1c1b1b] disabled:text-[#c8c7b8]/40 disabled:border-[#47483c] transition-all font-mono text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-sm hover:shadow-[0_0_10px_rgba(255,180,171,0.3)]"
+                  className="px-3.5 py-2.5 h-auto bg-[#93000a]/30 border border-[#ffb4ab] text-[#ffb4ab] hover:bg-[#ffb4ab] hover:text-[#131313] disabled:bg-popover disabled:text-muted-foreground/40 disabled:border-border transition-all font-mono text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-sm hover:shadow-[0_0_10px_rgba(255,180,171,0.3)]"
                 >
                   {upgradingId === cred.id ? (
                     <>
@@ -284,23 +284,23 @@ export default function SecurityAuditView() {
             {duplicates.map((dup, index) => (
               <div
                 key={`dup-${index}`}
-                className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#47483c]/30 last:border-b-0 last:pb-0"
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border/30 last:border-b-0 last:pb-0"
               >
                 <div>
                   <div className="flex items-center gap-2 font-mono text-xs">
                     <span className="text-[#ffb77d]/80 uppercase tracking-widest font-bold">
                       Identical Seal Crypt:
                     </span>
-                    <span className="text-[#e5e2e1] bg-[#0e0e0e] border border-[#47483c] px-2 py-0.5">
+                    <span className="text-muted-foreground bg-input border border-border px-2 py-0.5">
                       ••••••••••••
                     </span>
                   </div>
-                  <div className="mt-2 text-[11px] font-mono text-[#c8c7b8] flex flex-wrap gap-1.5 items-center">
+                  <div className="mt-2 text-[11px] font-mono text-muted-foreground flex flex-wrap gap-1.5 items-center">
                     <span>Reused across:</span>
                     {dup.apps.map((app, appIdx) => (
                       <span
                         key={appIdx}
-                        className="px-2 py-0.5 bg-[#353534] border border-[#47483c] text-[#ffb77d] uppercase text-[9px] tracking-wide"
+                        className="px-2 py-0.5 bg-[#353534] border border-border text-[#ffb77d] uppercase text-[9px] tracking-wide"
                       >
                         {app}
                       </span>
@@ -325,7 +325,7 @@ export default function SecurityAuditView() {
           <h3 className="font-headline text-lg text-[#c3cc8c] uppercase tracking-wider">
             Sentinel Status: Maximum Guard
           </h3>
-          <p className="font-body text-xs text-[#c8c7b8] max-w-sm leading-relaxed">
+          <p className="font-body text-xs text-muted-foreground max-w-sm leading-relaxed">
             All database keys hold sufficient uniqueness and high cryptographic
             complexity scores. The monster is completely satisfied. Keep it
             secure!

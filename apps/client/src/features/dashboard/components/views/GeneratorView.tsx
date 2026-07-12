@@ -86,7 +86,7 @@ export default function GeneratorView() {
       return {
         text: "None",
         score: 0,
-        color: "text-[#c8c7b8]",
+        color: "text-muted-foreground",
         style: "bg-[#47483c]",
       };
 
@@ -142,10 +142,10 @@ export default function GeneratorView() {
               <Check className="w-3.5 h-3.5" />
             </div>
             <div>
-              <p className="font-mono text-xs text-[#e5e2e1] uppercase tracking-wider">
+              <p className="font-mono text-xs text-muted-foreground uppercase tracking-wider">
                 Key Transcribed!
               </p>
-              <p className="font-mono text-[10px] text-[#c8c7b8] mt-0.5">
+              <p className="font-mono text-[10px] text-muted-foreground mt-0.5">
                 Saved safely to your clipboard buffer page.
               </p>
             </div>
@@ -153,21 +153,21 @@ export default function GeneratorView() {
         )}
       </AnimatePresence>
 
-      <div className="flex items-center gap-3 border-b-2 border-[#47483c] pb-4">
+      <div className="flex items-center gap-3 border-b-2 border-border pb-4">
         <Sparkles className="w-7 h-7 text-[#ffb77d]" />
         <div>
           <h2 className="font-headline text-2xl text-[#ffb77d] uppercase tracking-wider">
             Primitive Key Forge
           </h2>
-          <p className="font-mono text-xs text-[#c8c7b8]/60 uppercase tracking-widest mt-1">
+          <p className="font-mono text-xs text-muted-foreground/60 uppercase tracking-widest mt-1">
             Chomp through random entropy to shape high-encryption seals
           </p>
         </div>
       </div>
 
-      <div className="stone-slab p-6 md:p-8 border-4 border-[#47483c] space-y-6">
+      <div className="stone-slab p-6 md:p-8 border-4 border-border space-y-6">
         <div>
-          <label className="block text-[11px] font-mono uppercase tracking-wider text-[#c8c7b8]/60 mb-2">
+          <label className="block text-[11px] font-mono uppercase tracking-wider text-muted-foreground/60 mb-2">
             Generated Runes Key
           </label>
           <div className="relative">
@@ -176,7 +176,7 @@ export default function GeneratorView() {
               readOnly
               value={password}
               placeholder="Click Chomp & Generate below..."
-              className="w-full bg-[#0e0e0e] border-2 border-[#47483c] px-4 py-3.5 pr-24 text-base font-mono text-[#ffb77d] tracking-wider focus:outline-none placeholder:text-[#c8c7b8]/20 select-all leading-none focus:border-[#ffb77d] transition-all h-14 rounded-none"
+              className="w-full bg-input border-2 border-border px-4 py-3.5 pr-24 text-base font-mono text-[#ffb77d] tracking-wider focus:outline-none placeholder:text-muted-foreground/20 select-all leading-none focus:border-[#ffb77d] transition-all h-14 rounded-none"
             />
             {password && !password.startsWith("Please") && (
               <div className="absolute right-2 top-2 flex gap-1.5">
@@ -184,7 +184,7 @@ export default function GeneratorView() {
                   type="button"
                   onClick={copyToClipboard}
                   variant="outline"
-                  className="px-3 h-10 bg-[#201f1f] border-[#47483c] text-[#c8c7b8] hover:text-[#ffb77d] hover:bg-[#201f1f] hover:border-[#ffb77d] font-mono text-xs uppercase tracking-wider transition-colors rounded-none"
+                  className="px-3 h-10 bg-card border-border text-muted-foreground hover:text-[#ffb77d] hover:bg-card hover:border-[#ffb77d] font-mono text-xs uppercase tracking-wider transition-colors rounded-none"
                   title="Copy secret key"
                 >
                   <Copy className="w-3.5 h-3.5" />
@@ -198,7 +198,7 @@ export default function GeneratorView() {
           <motion.div
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-4 bg-[#131313] border border-[#47483c] flex flex-col md:flex-row md:items-center justify-between gap-4 font-mono text-xs"
+            className="p-4 bg-background border border-border flex flex-col md:flex-row md:items-center justify-between gap-4 font-mono text-xs"
           >
             <div className="flex items-center gap-2.5">
               {strength.score >= 50 ? (
@@ -207,7 +207,7 @@ export default function GeneratorView() {
                 <ShieldAlert className="w-5 h-5 text-[#ffb4ab] animate-pulse" />
               )}
               <div>
-                <span className="text-[#c8c7b8]/60">Cryptic Density: </span>
+                <span className="text-muted-foreground/60">Cryptic Density: </span>
                 <span
                   className={`font-bold uppercase tracking-widest ${strength.color}`}
                 >
@@ -220,7 +220,7 @@ export default function GeneratorView() {
               <span className="text-stone-400 text-[10px]">
                 Tectonic Strength:
               </span>
-              <div className="h-2 w-32 bg-[#201f1f] border border-[#47483c] p-0.5">
+              <div className="h-2 w-32 bg-card border border-border p-0.5">
                 <div
                   className={`h-full transition-all duration-700 ${strength.style}`}
                 />
@@ -232,10 +232,10 @@ export default function GeneratorView() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <span className="font-mono text-xs text-[#c8c7b8] uppercase tracking-wider">
+              <span className="font-mono text-xs text-muted-foreground uppercase tracking-wider">
                 Rune Character Length
               </span>
-              <span className="bg-[#0e0e0e] border border-[#47483c] px-3 py-1 font-mono text-[#ffb77d] font-bold text-sm">
+              <span className="bg-input border border-border px-3 py-1 font-mono text-[#ffb77d] font-bold text-sm">
                 {length} runes
               </span>
             </div>
@@ -246,9 +246,9 @@ export default function GeneratorView() {
                 max={32}
                 value={length}
                 onChange={(e) => setLength(parseInt(e.target.value, 10))}
-                className="w-full accent-[#ffb77d] bg-[#0e0e0e] rounded-none border border-[#47483c] h-3 py-1.5 cursor-pointer"
+                className="w-full accent-[#ffb77d] bg-input rounded-none border border-border h-3 py-1.5 cursor-pointer"
               />
-              <div className="flex justify-between font-mono text-[9px] text-[#c8c7b8]/40">
+              <div className="flex justify-between font-mono text-[9px] text-muted-foreground/40">
                 <span>Min: 6 (Weak)</span>
                 <span>Normal: 16 (Recommended)</span>
                 <span>Max: 32 (Impenetrable)</span>
@@ -257,63 +257,63 @@ export default function GeneratorView() {
           </div>
 
           <div className="space-y-3 font-mono text-xs">
-            <span className="block text-[#c8c7b8]/60 uppercase text-[10px] tracking-wider mb-2">
+            <span className="block text-muted-foreground/60 uppercase text-[10px] tracking-wider mb-2">
               Allowed Cryptic Blocks
             </span>
 
             <div className="grid grid-cols-2 gap-3">
               <label
                 onClick={() => setIncludeUppercase(!includeUppercase)}
-                className="flex items-center gap-2.5 p-2 bg-[#131313] border border-[#47483c] hover:border-[#ffb77d] transition-colors cursor-pointer"
+                className="flex items-center gap-2.5 p-2 bg-background border border-border hover:border-[#ffb77d] transition-colors cursor-pointer"
               >
                 <div
-                  className={`w-4 h-4 border flex items-center justify-center transition-colors ${includeUppercase ? "bg-[#4b5320] border-[#c3cc8c] text-[#c3cc8c]" : "bg-[#0e0e0e] border-[#47483c]"}`}
+                  className={`w-4 h-4 border flex items-center justify-center transition-colors ${includeUppercase ? "bg-[#4b5320] border-[#c3cc8c] text-[#c3cc8c]" : "bg-input border-border"}`}
                 >
                   {includeUppercase && <Check className="w-3 h-3" />}
                 </div>
-                <span className="text-[#e5e2e1]">A-Z Upper</span>
+                <span className="text-muted-foreground">A-Z Upper</span>
               </label>
 
               <label
                 onClick={() => setIncludeLowercase(!includeLowercase)}
-                className="flex items-center gap-2.5 p-2 bg-[#131313] border border-[#47483c] hover:border-[#ffb77d] transition-colors cursor-pointer"
+                className="flex items-center gap-2.5 p-2 bg-background border border-border hover:border-[#ffb77d] transition-colors cursor-pointer"
               >
                 <div
-                  className={`w-4 h-4 border flex items-center justify-center transition-colors ${includeLowercase ? "bg-[#4b5320] border-[#c3cc8c] text-[#c3cc8c]" : "bg-[#0e0e0e] border-[#47483c]"}`}
+                  className={`w-4 h-4 border flex items-center justify-center transition-colors ${includeLowercase ? "bg-[#4b5320] border-[#c3cc8c] text-[#c3cc8c]" : "bg-input border-border"}`}
                 >
                   {includeLowercase && <Check className="w-3 h-3" />}
                 </div>
-                <span className="text-[#e5e2e1]">a-z Lower</span>
+                <span className="text-muted-foreground">a-z Lower</span>
               </label>
 
               <label
                 onClick={() => setIncludeNumbers(!includeNumbers)}
-                className="flex items-center gap-2.5 p-2 bg-[#131313] border border-[#47483c] hover:border-[#ffb77d] transition-colors cursor-pointer"
+                className="flex items-center gap-2.5 p-2 bg-background border border-border hover:border-[#ffb77d] transition-colors cursor-pointer"
               >
                 <div
-                  className={`w-4 h-4 border flex items-center justify-center transition-colors ${includeNumbers ? "bg-[#4b5320] border-[#c3cc8c] text-[#c3cc8c]" : "bg-[#0e0e0e] border-[#47483c]"}`}
+                  className={`w-4 h-4 border flex items-center justify-center transition-colors ${includeNumbers ? "bg-[#4b5320] border-[#c3cc8c] text-[#c3cc8c]" : "bg-input border-border"}`}
                 >
                   {includeNumbers && <Check className="w-3 h-3" />}
                 </div>
-                <span className="text-[#e5e2e1]">0-9 Numbers</span>
+                <span className="text-muted-foreground">0-9 Numbers</span>
               </label>
 
               <label
                 onClick={() => setIncludeSymbols(!includeSymbols)}
-                className="flex items-center gap-2.5 p-2 bg-[#131313] border border-[#47483c] hover:border-[#ffb77d] transition-colors cursor-pointer"
+                className="flex items-center gap-2.5 p-2 bg-background border border-border hover:border-[#ffb77d] transition-colors cursor-pointer"
               >
                 <div
-                  className={`w-4 h-4 border flex items-center justify-center transition-colors ${includeSymbols ? "bg-[#4b5320] border-[#c3cc8c] text-[#c3cc8c]" : "bg-[#0e0e0e] border-[#47483c]"}`}
+                  className={`w-4 h-4 border flex items-center justify-center transition-colors ${includeSymbols ? "bg-[#4b5320] border-[#c3cc8c] text-[#c3cc8c]" : "bg-input border-border"}`}
                 >
                   {includeSymbols && <Check className="w-3 h-3" />}
                 </div>
-                <span className="text-[#e5e2e1]">@%# Symbols</span>
+                <span className="text-muted-foreground">@%# Symbols</span>
               </label>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-[#47483c]/30">
+        <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border/30">
           <Button
             type="button"
             onClick={generatePassword}

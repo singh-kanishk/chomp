@@ -125,13 +125,13 @@ export default function PortalModal() {
             animate={{ scale: 1, y: 0, opacity: 1 }}
             exit={{ scale: 0.95, y: 15, opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 350 }}
-            className="stone-slab border-4 border-[#47483c] w-full max-w-lg p-6 overflow-hidden relative text-[#e5e2e1]"
+            className="stone-slab border-4 border-border w-full max-w-lg p-6 overflow-hidden relative text-muted-foreground"
           >
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#ffb77d]/60 to-transparent" />
 
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 border border-[#919283]/30 bg-[#1c1b1b]">
+                <div className="p-2 border border-[#919283]/30 bg-popover">
                   <Lock className="w-5 h-5 text-[#ffb77d]" />
                 </div>
                 <div>
@@ -140,14 +140,14 @@ export default function PortalModal() {
                       ? "Modify Encryption Crypt"
                       : "Secure New Secret"}
                   </h3>
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-[#c8c7b8]/60">
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/60">
                     Slab Portal v2.0
                   </span>
                 </div>
               </div>
               <button
                 onClick={closePortalModal}
-                className="p-1 border border-[#47483c] bg-[#1c1b1b] text-[#c8c7b8] hover:text-[#ffb77d] hover:border-[#ffb77d] transition-colors"
+                className="p-1 border border-border bg-popover text-muted-foreground hover:text-[#ffb77d] hover:border-[#ffb77d] transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -158,7 +158,7 @@ export default function PortalModal() {
               className="space-y-4 font-body text-sm select-none"
             >
               <Field>
-                <FieldLabel className="text-[11px] font-mono uppercase text-[#c8c7b8]">
+                <FieldLabel className="text-[11px] font-mono uppercase text-muted-foreground">
                   Website / App Name *
                 </FieldLabel>
                 <Input
@@ -173,7 +173,7 @@ export default function PortalModal() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Field>
-                  <FieldLabel className="text-[11px] font-mono uppercase text-[#c8c7b8]">
+                  <FieldLabel className="text-[11px] font-mono uppercase text-muted-foreground">
                     Username *
                   </FieldLabel>
                   <Input
@@ -187,13 +187,13 @@ export default function PortalModal() {
                 </Field>
 
                 <Field>
-                  <FieldLabel className="text-[11px] font-mono uppercase text-[#c8c7b8]">
+                  <FieldLabel className="text-[11px] font-mono uppercase text-muted-foreground">
                     Vault Category
                   </FieldLabel>
                   <select
                     value={group}
                     onChange={(e) => setGroup(e.target.value as Group)}
-                    className="w-full bg-[#0e0e0e] border border-input h-10 px-3 py-2 text-xs focus:outline-none focus:border-ring focus:ring-1 focus:ring-ring font-mono transition-all"
+                    className="w-full bg-input border border-input h-10 px-3 py-2 text-xs focus:outline-none focus:border-ring focus:ring-1 focus:ring-ring font-mono transition-all"
                   >
                     <option value="Personal">Personal</option>
                     <option value="Work">Work</option>
@@ -205,7 +205,7 @@ export default function PortalModal() {
 
               <Field>
                 <div className="flex justify-between items-center w-full">
-                  <FieldLabel className="text-[11px] font-mono uppercase text-[#c8c7b8]">
+                  <FieldLabel className="text-[11px] font-mono uppercase text-muted-foreground">
                     Secret Password *
                   </FieldLabel>
                   <button
@@ -228,7 +228,7 @@ export default function PortalModal() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#c8c7b8] hover:text-[#ffb77d]"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-[#ffb77d]"
                   >
                     {showPassword ? (
                       <EyeOff className="w-4 h-4" />
@@ -241,7 +241,7 @@ export default function PortalModal() {
                 {password && (
                   <div className="mt-1 flex items-center justify-between text-[11px] font-mono w-full">
                     <div className="flex items-center gap-2">
-                      <span className="text-[#c8c7b8]/60">Cryptic Weight:</span>
+                      <span className="text-muted-foreground/60">Cryptic Weight:</span>
                       <span
                         className={`font-bold uppercase tracking-wider ${strength === "Strong" ? "text-[#c3cc8c]" : strength === "Medium" ? "text-[#ffb77d]" : "text-[#ffb4ab]"}`}
                       >
@@ -253,7 +253,7 @@ export default function PortalModal() {
               </Field>
 
               <Field>
-                <FieldLabel className="text-[11px] font-mono uppercase text-[#c8c7b8]">
+                <FieldLabel className="text-[11px] font-mono uppercase text-muted-foreground">
                   Website URL (Optional)
                 </FieldLabel>
                 <Input
@@ -266,7 +266,7 @@ export default function PortalModal() {
               </Field>
 
               <Field>
-                <FieldLabel className="text-[11px] font-mono uppercase text-[#c8c7b8]">
+                <FieldLabel className="text-[11px] font-mono uppercase text-muted-foreground">
                   Secure Notes (Optional)
                 </FieldLabel>
                 <textarea
@@ -274,7 +274,7 @@ export default function PortalModal() {
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Write relevant cave instructions..."
                   rows={2}
-                  className="w-full bg-[#0e0e0e] border border-input px-3 py-2 text-xs text-foreground focus:outline-none focus:border-ring focus:ring-1 focus:ring-ring font-mono placeholder:text-muted-foreground transition-all resize-none"
+                  className="w-full bg-input border border-input px-3 py-2 text-xs text-foreground focus:outline-none focus:border-ring focus:ring-1 focus:ring-ring font-mono placeholder:text-muted-foreground transition-all resize-none"
                 />
               </Field>
 

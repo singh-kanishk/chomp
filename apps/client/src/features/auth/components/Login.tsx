@@ -72,25 +72,28 @@ export function LogIn() {
       className={`h-screen w-screen bg-cover bg-center`}
       style={{ backgroundImage: `url(${authBg})` }}
     >
-      <Card className="fixed top-1/4 left-1/2 -translate-x-1/2 w-full max-w-md bg-wood shadow-[inset_0_2px_4px_rgba(255,255,255,0.1)]">
+      <Card className="stone-slab fixed top-1/4 left-1/2 -translate-x-1/2 w-full max-w-md p-6 border-4 border-border bg-popover text-muted-foreground shadow-2xl relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#ffb77d]/60 to-transparent" />
+        
         <CardHeader>
           <div className="flex justify-center">
-            <CardTitle>LOG IN</CardTitle>
+            <CardTitle className="font-headline text-2xl text-[#ffb77d] uppercase tracking-widest">
+              LOG IN
+            </CardTitle>
           </div>
         </CardHeader>
         <CardContent>
-          <form id="logIn-form" onSubmit={handleSubmit(onSubmit)}>
+          <form id="logIn-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4 font-body">
             <FieldGroup>
               <Controller
                 name="email"
                 control={control}
                 render={({ field, fieldState }) => (
                   <Field>
-                    <FieldLabel>E-mail</FieldLabel>
-                    {/* Spread the field props here to connect to RHF */}
-                    <Input type="email" {...field} />
+                    <FieldLabel className="text-[11px] font-mono uppercase text-muted-foreground">E-mail</FieldLabel>
+                    <Input type="email" {...field} className="font-mono h-10 bg-input border-border text-muted-foreground focus-visible:ring-[#ffb77d]" />
                     {fieldState.error && (
-                      <span className="text-sm text-red-800">
+                      <span className="text-xs font-mono text-[#ffb4ab]">
                         {fieldState.error.message}
                       </span>
                     )}
@@ -101,10 +104,12 @@ export function LogIn() {
               {!isSaltReceived && (
                 <Button
                   type="button"
+                  variant="outline"
                   onClick={(e) => {
                     e.preventDefault();
                     preLogin();
                   }}
+                  className="w-full h-10 bg-transparent border-2 border-[#ffb77d] text-[#ffb77d] hover:bg-[#ffb77d] hover:text-[#131313] font-mono text-[12px] uppercase tracking-wider font-bold transition-all rounded-none mt-4"
                 >
                   Check Email
                 </Button>
@@ -114,12 +119,11 @@ export function LogIn() {
                   name="password"
                   control={control}
                   render={({ field, fieldState }) => (
-                    <Field>
-                      <FieldLabel>Password</FieldLabel>
-                      {/* Spread the field props here to connect to RHF */}
-                      <Input type="password" {...field} />
+                    <Field className="mt-4">
+                      <FieldLabel className="text-[11px] font-mono uppercase text-muted-foreground">Password</FieldLabel>
+                      <Input type="password" {...field} className="font-mono h-10 bg-input border-border text-muted-foreground focus-visible:ring-[#ffb77d]" />
                       {fieldState.error && (
-                        <span className="text-sm text-red-800">
+                        <span className="text-xs font-mono text-[#ffb4ab]">
                           {fieldState.error.message}
                         </span>
                       )}
@@ -130,8 +134,8 @@ export function LogIn() {
             </FieldGroup>
           </form>
         </CardContent>
-        <CardFooter className="flex flex-col">
-          <Field orientation="horizontal">
+        <CardFooter className="flex flex-col mt-4">
+          <Field orientation="horizontal" className="w-full flex gap-3 mb-4">
             <Button
               type="button"
               variant="outline"
@@ -140,6 +144,7 @@ export function LogIn() {
                 reset();
               }}
               disabled={isPending}
+              className="flex-1 h-10 font-mono text-[12px] uppercase bg-transparent border-border text-muted-foreground hover:text-[#ffb77d] hover:border-[#ffb77d] rounded-none"
             >
               Reset
             </Button>
@@ -147,11 +152,12 @@ export function LogIn() {
               type="submit"
               form="logIn-form"
               disabled={isPending || !isSaltReceived}
+              className="flex-1 h-10 font-mono text-[12px] uppercase bg-[#4b5320] hover:bg-[#c3cc8c] text-[#bdc787] hover:text-[#2d3404] border border-[#c3cc8c] rounded-none disabled:opacity-50"
             >
               {isPending ? "Submitting..." : "Submit"}
             </Button>
           </Field>
-          <Link to="/signup" className="underline">
+          <Link to="/signup" className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground hover:text-[#ffb77d] transition-colors underline underline-offset-4">
             Or Sign Up
           </Link>
         </CardFooter>

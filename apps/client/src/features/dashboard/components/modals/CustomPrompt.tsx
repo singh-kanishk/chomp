@@ -27,7 +27,7 @@ export function CustomPrompt() {
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className="stone-slab border-4 border-[#ffb77d]/50 max-w-sm w-full p-6 relative font-mono text-xs text-[#e5e2e1]"
+            className="stone-slab border-4 border-[#ffb77d]/50 max-w-sm w-full p-6 relative font-mono text-xs text-muted-foreground"
           >
             {/* Highlight bar header */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-[#ffb77d]" />
@@ -36,7 +36,7 @@ export function CustomPrompt() {
               🔱 {customPrompt.title}
             </h3>
 
-            <div className="bg-[#0e0e0e] border border-[#47483c] p-3 text-xs text-[#c8c7b8] leading-relaxed rounded-xs whitespace-pre-line mb-5">
+            <div className="bg-input border border-border p-3 text-xs text-muted-foreground leading-relaxed rounded-xs whitespace-pre-line mb-5">
               {customPrompt.message}
             </div>
 
@@ -45,7 +45,7 @@ export function CustomPrompt() {
                 <>
                   <Button
                     onClick={onClose}
-                    className="px-4 py-2 border border-[#47483c] bg-[#1c1b1b] text-[#c8c7b8] hover:text-[#ffb77d] hover:border-[#ffb77d] uppercase text-[10px] tracking-wider transition-colors cursor-pointer"
+                    className="px-4 py-2 border border-border bg-popover text-muted-foreground hover:text-[#ffb77d] hover:border-[#ffb77d] uppercase text-[10px] tracking-wider transition-colors cursor-pointer"
                   >
                     Bypass
                   </Button>

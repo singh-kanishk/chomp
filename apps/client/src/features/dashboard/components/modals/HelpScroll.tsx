@@ -30,34 +30,34 @@ export function HelpScroll() {
                 <h4 className="text-[#c3cc8c] font-bold">
                   🛠️ Forge Dynamic Credentials
                 </h4>
-                <p className="text-[#c8c7b8] leading-relaxed text-[11px]">
+                <p className="text-muted-foreground leading-relaxed text-[11px]">
                   Build strong credentials inside the{" "}
                   <strong>Generator tab</strong>. Use the length slider to
                   increase entropy up to 32 characters.
                 </p>
               </div>
-              <div className="space-y-1 border-t border-[#47483c]/30 pt-3">
+              <div className="space-y-1 border-t border-border/30 pt-3">
                 <h4 className="text-[#c3cc8c] font-bold">
                   🔍 Sentinel Real-time Auditor
                 </h4>
-                <p className="text-[#c8c7b8] leading-relaxed text-[11px]">
+                <p className="text-muted-foreground leading-relaxed text-[11px]">
                   The <strong>Security Audit tab</strong> dynamically queries
                   duplicates/reused characters and weak passwords. Click{" "}
                   <strong>Auto-Chomp</strong> to trigger automated cryptographic
                   replacements!
                 </p>
               </div>
-              <div className="space-y-1 border-t border-[#47483c]/30 pt-3">
+              <div className="space-y-1 border-t border-border/30 pt-3">
                 <h4 className="text-[#c3cc8c] font-bold">
                   🗝️ Master Vault Gateway Code
                 </h4>
-                <p className="text-[#c8c7b8] leading-relaxed text-[11px]">
+                <p className="text-muted-foreground leading-relaxed text-[11px]">
                   Locking the vault will trigger code security gates. Open lock
                   entries using passcode: <strong>chomp</strong>.
                 </p>
               </div>
-              <div className="space-y-1 border-t border-[#47483c]/30 pt-3">
-                <h4 className="text-[#c8c7b8]/40 text-[9px] leading-relaxed">
+              <div className="space-y-1 border-t border-border/30 pt-3">
+                <h4 className="text-muted-foreground/40 text-[9px] leading-relaxed">
                   CHOMP VAULT SYSTEM RUNNING SECURELY ON CLOUD RUN PORT 3000
                   WITH NODE ENVIRONMENT IN VITE WORKSPACE.
                 </h4>
