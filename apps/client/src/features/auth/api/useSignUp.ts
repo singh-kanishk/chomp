@@ -2,7 +2,6 @@ import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import * as Comlink from "comlink";
 import { toast } from "sonner";
-import { useUserStore } from "@/store/useUserStore";
 import { apiCall } from "@/lib/api-call-wrapper";
 import { generateSaltUuid, type HashingService } from "@/workers/hash";
 import type { SignUpParams, SignUpRequest } from "@chomp/shared";
@@ -12,7 +11,6 @@ import HashWorker from "@/workers/hash?worker";
 
 export function useSignUpMutation(resetForm: () => void) {
   const navigate = useNavigate();
-  const { setMasterHash, setEmail, setEncryptionKey, setSalt } = useUserStore();
 
   return useMutation({
     mutationFn: async (data: SignUpParams) => {
@@ -63,13 +61,8 @@ export function useSignUpMutation(resetForm: () => void) {
         worker.terminate();
       }
     },
-    onSuccess: (data) => {
-      setMasterHash(data.masterHash);
-      setEmail(data.email);
-      setEncryptionKey(data.encryptionKey);
-      setSalt(data.salt);
-
-      toast.success("Signed Up Successfully Log In To Dashboard", {
+    onSuccess: () => {
+      toast.success("Signed Up Successfully. Please Log In.", {
         position: "top-right",
       });
       resetForm();
