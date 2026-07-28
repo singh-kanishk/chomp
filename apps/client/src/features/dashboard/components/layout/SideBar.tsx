@@ -10,6 +10,8 @@ import {
 import { Button } from "@/components/ui/button";
 import type { GroupType } from "../../schemas/schema";
 import { useDashboardStore } from "@/store/useDashboardStore";
+import { useUserStore } from "@/store/useUserStore";
+import { useLogoutMutation } from "@/features/auth/api/useLogout";
 
 export function Sidebar() {
   const {
@@ -21,6 +23,8 @@ export function Sidebar() {
     setShowHelp,
     setIsLocked,
   } = useDashboardStore();
+  const { setMasterHash, setEncryptionKey, setSalt, setEmail } = useUserStore();
+  const { mutate: sweepLogout } = useLogoutMutation();
 
   const onNewSecretClick = () => openPortalModal();
   const onHelpClick = () => setShowHelp(true);
@@ -153,11 +157,27 @@ export function Sidebar() {
           <Button
             variant="ghost"
             onClick={onLockClick}
+            className="flex items-center justify-start gap-3.5 bg-transparent text-muted-foreground hover:text-[#ffb77d] hover:bg-[#353534] px-3 py-1.5 transition-colors text-left h-auto"
+          >
+            <Lock className="w-4 h-4 shrink-0" />
+            <span className="text-[11px] uppercase tracking-wider">
+              Lock Vault Gate
+            </span>
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => {
+              sweepLogout();
+              setMasterHash(null);
+              setEncryptionKey(null);
+              setSalt(null);
+              setEmail(null);
+            }}
             className="flex items-center justify-start gap-3.5 bg-transparent text-muted-foreground hover:text-[#ffb4ab] hover:bg-[#353534] px-3 py-1.5 transition-colors text-left h-auto"
           >
             <LogOut className="w-4 h-4 shrink-0" />
             <span className="text-[11px] uppercase tracking-wider">
-              Lock Vault Gate
+              Log Out
             </span>
           </Button>
         </div>

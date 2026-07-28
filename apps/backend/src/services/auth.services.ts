@@ -171,4 +171,13 @@ export class AuthServices {
       throw error;
     }
   }
+  public async deleteRefreshToken(refreshToken: string) {
+    try {
+      await db.delete(sessionTable).where(eq(sessionTable.refreshToken, refreshToken));
+      logger.info("Deleted Refresh Token");
+    } catch (error) {
+      logger.warn("Error Deleting Refresh Token");
+      throw error;
+    }
+  }
 }

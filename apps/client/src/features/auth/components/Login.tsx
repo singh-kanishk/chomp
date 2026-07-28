@@ -18,9 +18,18 @@ import { fetchSalt } from "@/services/pre-login";
 import { useUserStore } from "@/store/useUserStore";
 import { useLogInMutation } from "../api/useLogin";
 
+import { useLogoutMutation } from "../api/useLogout";
+
 export function LogIn() {
   const { setSalt } = useUserStore();
   const [isSaltReceived, setIsSaltReceived] = useState<boolean>(false);
+  const { mutate: sweepLogout } = useLogoutMutation();
+
+  useEffect(() => {
+    // Proactively clear any stale backend session cookies when hitting the login page
+    // This prevents stale sessions when the frontend store is wiped but cookies remain.
+    sweepLogout();
+  }, [sweepLogout]);
   const { handleSubmit, control, reset, trigger, setError, getValues, watch } =
     useForm<LogInParams>({
       resolver: zodResolver(LogInSchema),

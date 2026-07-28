@@ -194,4 +194,30 @@ export class AuthController {
       res.status(403).json(payload);
     }
   };
+  public logout = async (req: Request, res: Response) => {
+    try {
+      const { refreshToken } = req.cookies;
+      if (refreshToken) {
+        await authServices.deleteRefreshToken(refreshToken);
+      }
+      res.clearCookie("accessToken");
+      res.clearCookie("refreshToken", { path: "/api/auth/refresh" });
+      res.clearCookie("refreshToken"); // clear standard path just in case
+      
+      const payload: ApiResponse<null> = {
+        success: true,
+        statusCode: 200,
+        message: "Successfully logged out",
+      };
+      res.status(200).json(payload);
+    } catch (error) {
+      console.error("Logout Error:", error);
+      const payload: ApiResponse<null> = {
+        success: false,
+        statusCode: 500,
+        message: "Internal Server Error",
+      };
+      res.status(500).json(payload);
+    }
+  };
 }

@@ -8,6 +8,7 @@ authRouter.post("/signup", authController.signUp);
 authRouter.get("/salt", authController.salt);
 authRouter.post("/login", authController.login);
 authRouter.post("/refresh", authController.refresh);
+authRouter.post("/logout", authController.logout);
 // authRouter.get(`/salt`, async (req: Request, res: Response) => {
 //   try {
 //     const { email } = req.query;

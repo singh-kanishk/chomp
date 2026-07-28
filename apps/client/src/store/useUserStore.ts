@@ -5,7 +5,7 @@ interface UseUserStoreInterface {
   email: string | null;
   salt: string | null;
   encryptionKey: Uint8Array | null;
-  setEncryptionKey: (key: Uint8Array) => void;
+  setEncryptionKey: (key: Uint8Array | null) => void;
   setMasterHash: (hash: Uint8Array | null) => void;
   setEmail: (email: string | null) => void;
   setSalt: (salt: string | null) => void;
