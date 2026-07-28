@@ -9,6 +9,7 @@ export const SignUpRequestZod = z.object({
   email: z.string(),
   authHash: z.string(),
   salt: z.string(),
+  protectedEncryptionKeyBase64: z.string(),
 });
 
 export type SignUpRequest = z.infer<typeof SignUpRequestZod>;

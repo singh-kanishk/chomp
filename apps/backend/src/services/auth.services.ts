@@ -48,7 +48,12 @@ export class AuthServices {
         const id = result[0].insertedId;
         await tx
           .insert(secretsTable)
-          .values({ userId: id, authHash: body.authHash, saltUuid: body.salt });
+          .values({ 
+            userId: id, 
+            authHash: body.authHash, 
+            saltUuid: body.salt,
+            protectedEncryptionKey: body.protectedEncryptionKeyBase64
+          });
       });
       logger.info(`user created `);
     } catch (error) {
@@ -90,13 +95,14 @@ export class AuthServices {
         name: usersTable.name,
         email: usersTable.email,
         authHash: secretsTable.authHash,
+        protectedEncryptionKeyBase64: secretsTable.protectedEncryptionKey,
       })
       .from(usersTable)
       .innerJoin(secretsTable, eq(usersTable.userId, secretsTable.userId))
       .where(eq(usersTable.email, email))
       .limit(1);
 
-    // result will be an array: [] if no user found, or [{ userId, name, email, authHash }]
+    // result will be an array: [] if no user found, or [{ userId, name, email, authHash, protectedEncryptionKeyBase64 }]
     if (result.length === 0) {
       return null;
     }

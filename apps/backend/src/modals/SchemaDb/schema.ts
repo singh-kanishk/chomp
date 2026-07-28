@@ -27,6 +27,7 @@ export const secretsTable = pgTable("secrets", {
     .references(() => usersTable.userId, { onDelete: "cascade" }),
   saltUuid: uuid("salt_uuid").notNull(),
   authHash: text("auth_hash").notNull(),
+  protectedEncryptionKey: text("protected_encryption_key").notNull(),
 });
 
 export const sessionTable = pgTable("session", {

@@ -122,10 +122,13 @@ export class AuthController {
         maxAge: 15 * 24 * 60 * 60 * 1000,
       });
       await authServices.storeRefreshToken(refreshToken, email);
-      const payload: ApiResponse<null> = {
+      const payload = {
         success: true,
         message: "Successfull Login",
         statusCode: 200,
+        body: {
+          protectedEncryptionKeyBase64: userData?.protectedEncryptionKeyBase64,
+        },
       };
       res.status(200).json(payload);
     } catch (error) {

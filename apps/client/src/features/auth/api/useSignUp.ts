@@ -26,20 +26,20 @@ export function useSignUpMutation(resetForm: () => void) {
           salt,
         );
         const authHash = await cryptoWorker.generateAuthHash(masterHash, salt);
-        const encryptionKey = await cryptoWorker.generateEncryptionKey(
-          masterHash,
-          salt,
+        const { rawEncryptionKey, protectedEncryptionKeyBase64 } = await cryptoWorker.generateAndWrapEncryptionKey(
+          masterHash
         );
 
         const encryptedName = await cryptoWorker.encrypt(
           data.name,
-          encryptionKey,
+          rawEncryptionKey,
         );
         const payload: SignUpRequest = SignUpRequestZod.parse({
           encryptedName: encryptedName,
           email: data.email,
           authHash,
           salt: salt,
+          protectedEncryptionKeyBase64: protectedEncryptionKeyBase64,
         });
 
         const response = await apiCall<null>({
@@ -53,7 +53,7 @@ export function useSignUpMutation(resetForm: () => void) {
         return {
           response,
           masterHash,
-          encryptionKey,
+          encryptionKey: rawEncryptionKey,
           salt,
           email: data.email,
         };

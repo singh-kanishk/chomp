@@ -56,17 +56,74 @@ const hashingService = {
     masterHash: Uint8Array,
     salt: string,
   ): Promise<string> {
-    const hasher = await createBLAKE3(256, masterHash);
-    hasher.init();
-    hasher.update(encoder.encode(salt + ":auth"));
-    return hasher.digest("hex");
+    try {
+      const hasher = await createBLAKE3(256, masterHash);
+      hasher.init();
+      hasher.update(encoder.encode(salt + ":auth"));
+      return hasher.digest("hex");
+    } catch {
+      throw new Error("Worker Error: Auth Hash calculation failed");
+    }
   },
 
-  async generateEncryptionKey(masterHash: Uint8Array, salt: string) {
-    const hasher = await createBLAKE3(256, masterHash);
-    hasher.init();
-    hasher.update(encoder.encode(salt + ":key"));
-    return hasher.digest("binary");
+  async generateAndWrapEncryptionKey(masterHash: Uint8Array): Promise<{
+    rawEncryptionKey: Uint8Array;
+    protectedEncryptionKeyBase64: string;
+  }> {
+    try {
+      // Generate a fresh, random 256-bit key
+      const rawEncryptionKey = crypto.getRandomValues(new Uint8Array(32));
+
+      // Encrypt rawEncryptionKey using masterHash via AES-GCM
+      const masterCryptoKey = await this.getCryptoKey(masterHash);
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+
+      const encryptedBuffer = await crypto.subtle.encrypt(
+        { name: "AES-GCM", iv },
+        masterCryptoKey,
+        rawEncryptionKey,
+      );
+
+      // Package IV + EncryptedKey into Base64 for server storage
+      const encryptedBytes = new Uint8Array(encryptedBuffer);
+      const combined = new Uint8Array(iv.length + encryptedBytes.length);
+      combined.set(iv, 0);
+      combined.set(encryptedBytes, iv.length);
+
+      return {
+        rawEncryptionKey,
+        protectedEncryptionKeyBase64: bytesToBase64(combined),
+      };
+    } catch {
+      throw new Error("Worker Error: Key wrapping failed");
+    }
+  },
+
+  async unwrapEncryptionKey(
+    protectedEncryptionKeyBase64: string,
+    masterHash: Uint8Array,
+  ): Promise<Uint8Array> {
+    try {
+      const masterCryptoKey = await this.getCryptoKey(masterHash);
+      const combined = base64ToBytes(protectedEncryptionKeyBase64);
+
+      if (combined.length < 12 + 32) {
+        throw new Error("Invalid protected key blob");
+      }
+
+      const iv = combined.subarray(0, 12);
+      const ciphertext = combined.subarray(12);
+
+      const decryptedBuffer = await crypto.subtle.decrypt(
+        { name: "AES-GCM", iv: iv as any },
+        masterCryptoKey,
+        ciphertext as any,
+      );
+
+      return new Uint8Array(decryptedBuffer);
+    } catch {
+      throw new Error("Worker Error: Failed to unwrap encryption key. Invalid password/hash.");
+    }
   },
 
   async getCryptoKey(keyData: Uint8Array): Promise<CryptoKey> {

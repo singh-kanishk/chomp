@@ -31,17 +31,12 @@ export function useLogInMutation(resetForm: () => void) {
           masterHash,
           saltFromServer,
         );
-        const encryptionKey = await cryptoWorker.generateEncryptionKey(
-          masterHash,
-          saltFromServer,
-        );
-
         const payload: LogInRequest = LogInRequestZod.parse({
           email: data.email,
           authHash,
         });
 
-        const response = await apiCall<null>({
+        const response = await apiCall<{ protectedEncryptionKeyBase64: string }>({
           url: "/auth/login",
           method: "POST",
           body: payload,
@@ -49,9 +44,14 @@ export function useLogInMutation(resetForm: () => void) {
             headers: { "Content-Type": "application/json" },
           },
         });
-        if (response.success === false) {
+        if (response.success === false || !response.body) {
           throw new Error(response.message);
         }
+
+        const encryptionKey = await cryptoWorker.unwrapEncryptionKey(
+          response.body.protectedEncryptionKeyBase64,
+          masterHash
+        );
 
         return {
           response,
