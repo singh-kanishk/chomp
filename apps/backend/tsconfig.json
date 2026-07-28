@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "@chomp/shared/tsconfig.base.json",
   "references": [
     { "path": "../../packages/shared" }
   ],
