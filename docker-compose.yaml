@@ -1,0 +1,31 @@
+services:
+  database:
+    image: postgres
+    container_name: chompdb
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - chomp_db:/var/lib/postgresql/data
+   
+  backend:
+    build: 
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - database
+    environment:
+      - NODE_ENV=production
+      # Use the docker service name 'database' instead of 'localhost'
+      - DATABASE_URL=${DOCKER_DATABASE_URL}
+      - JWT_SECRET_KEY_ACCESS_TOKEN=${JWT_SECRET_KEY_ACCESS_TOKEN}
+      - JWT_SECRET_KEY_REFRESH_TOKEN=${JWT_SECRET_KEY_REFRESH_TOKEN}
+
+volumes:
+  chomp_db:

@@ -7,8 +7,7 @@
   ],
   "compilerOptions": {
     "paths": {
-      "@/*": ["./src/*"],
-      "@chomp/*": ["../../packages/*/src"]
+      "@/*": ["./src/*"]
     }
   }
 }

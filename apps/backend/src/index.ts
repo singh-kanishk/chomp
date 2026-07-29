@@ -1,5 +1,12 @@
 import express, { type Request, type Response } from "express";
-import "dotenv/config";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+// Loads the root .env file for local development (in Docker, variables are injected by docker-compose)
+dotenv.config({ path: path.resolve(__dirname, "../../../../.env") });
 import { drizzle } from "drizzle-orm/postgres-js";
 import cors from "cors";
 import { authRouter } from "./routes/auth/auth.routes.js";

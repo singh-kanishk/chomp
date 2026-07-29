@@ -1,13 +1,13 @@
-import { db } from "../index";
+import { db } from "../index.js";
 import { eq, and } from "drizzle-orm";
-import { logger } from "../logger/logger";
+import { logger } from "../logger/logger.js";
 import {
   usersTable,
   secretsTable,
   sessionTable,
   credentialsTable,
-} from "../modals/SchemaDb/schema";
-import { AuthServices } from "./auth.services";
+} from "../modals/SchemaDb/schema.js";
+import { AuthServices } from "./auth.services.js";
 import { ApiResponse, GetCredentialRequest } from "@chomp/shared";
 const authService = new AuthServices();
 

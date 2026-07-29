@@ -5,7 +5,7 @@ import {
   SignUpRequest,
   SignUpRequestZod,
 } from "@chomp/shared";
-import { AuthServices } from "../services/auth.services";
+import { AuthServices } from "../services/auth.services.js";
 import { ApiResponse } from "@chomp/shared";
 import { EmailSchema } from "@chomp/shared";
 import jwt from "jsonwebtoken";

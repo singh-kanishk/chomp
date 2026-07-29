@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { AuthLocal } from "../modals/middlewareSchema/authSchema";
+import { AuthLocal } from "../modals/middlewareSchema/authSchema.js";
 
 const accessSecret = process.env.JWT_SECRET_KEY_ACCESS_TOKEN || "";
 

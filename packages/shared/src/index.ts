@@ -9,9 +9,9 @@ export const BaseUrl = {
   db: "http://localhost:5433",
 } as const;
 
-export * from "./apis/auth/auth.schema";
-export * from "./types";
-export * from "./apis/auth/auth.payload";
-export * from "./apis/apis/api.request"
-export * from "./apis/apis/api.response"
-export * from './apis/vaultSchema/credential.schema'
+export * from "./apis/auth/auth.schema.js";
+export * from "./types.js";
+export * from "./apis/auth/auth.payload.js";
+export * from "./apis/apis/api.request.js";
+export * from "./apis/apis/api.response.js";
+export * from './apis/vaultSchema/credential.schema.js';

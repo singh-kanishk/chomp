@@ -1,15 +1,15 @@
 import argon2 from "argon2";
-import { db } from "../index";
+import { db } from "../index.js";
 import {
   usersTable,
   secretsTable,
   sessionTable,
-} from "../modals/SchemaDb/schema";
+} from "../modals/SchemaDb/schema.js";
 import { SignUpRequest } from "@chomp/shared";
 import { eq, and } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 import { type JwtPayloadInterface } from "@chomp/shared";
-import { logger } from "../logger/logger";
+import { logger } from "../logger/logger.js";
 
 export class AuthServices {
   public async getUserIdFromEmail(email: string) {

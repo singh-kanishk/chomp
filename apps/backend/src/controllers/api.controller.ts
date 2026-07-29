@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 
-import { AuthLocal } from "../modals/middlewareSchema/authSchema";
+import { AuthLocal } from "../modals/middlewareSchema/authSchema.js";
 import { ApiResponse, GetCredentialResponse } from "@chomp/shared";
 import { JwtPayloadZod } from "@chomp/shared";
-import { ApiServices } from "../services/api.services";
+import { ApiServices } from "../services/api.services.js";
 import { GetCredentialRequestZod, VaultMutationRequestZod, DeleteCredentialRequestZod } from "@chomp/shared";
-import { logger } from "../logger/logger";
+import { logger } from "../logger/logger.js";
 
 const apiService = new ApiServices();
 export class ApiController {

@@ -1,0 +1,33 @@
+# Git
+.git
+.gitignore
+
+# Dependencies (Crucial: ** catches nested folders across the monorepo)
+**/node_modules
+
+# Build artifacts & caches
+**/dist
+**/build
+**/.next
+**/.turbo
+.pnpm-store
+**/*.tsbuildinfo
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment variables & secrets
+.env
+.env.*
+*.pem
+
+# Docker-related files (no need to send them into the build context)
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Docs
+README.md
