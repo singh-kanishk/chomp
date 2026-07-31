@@ -6,7 +6,7 @@ export type UserContext = {
 export const BaseUrl = {
   server: "http://localhost:3000",
   client: "http://localhost:5173",
-  db: "http://localhost:5433",
+  db: "http://localhost:5432",
 } as const;
 
 export * from "./apis/auth/auth.schema.js";
