@@ -1,34 +1,47 @@
 # ==========================================
-# Stage 1: Prune the workspace for the target app
+# Stage 1: Prune workspace for the target app
 # ==========================================
-FROM node:26-alpine AS builder
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk update && apk add --no-cache libc6-compat
+FROM node:26-alpine AS pruner
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-RUN npm install -g turbo
+# Install global tools directly via npm
+RUN npm install -g pnpm@latest turbo@^2
+
 COPY . .
-# Extracts only the packages/apps needed for 'backend'
+# Isolates only the files required for the target app
 RUN turbo prune backend --docker
 
 # ==========================================
-# Stage 2: Install dependencies and build
+# Stage 2: Install dependencies & Build
 # ==========================================
-FROM node:26-alpine AS installer
-RUN apk update && apk add --no-cache libc6-compat
+FROM node:26-alpine AS builder
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-RUN npm install -g pnpm turbo
+# Tell tools we are in an automated build
+ENV CI=true
 
-# First install dependencies (this layer caches well)
-# turbo prune --docker isolates package.jsons to out/json
-COPY --from=builder /app/out/json/ .
-RUN pnpm install --no-frozen-lockfile
+RUN npm install -g pnpm@latest turbo@^2
 
-# Now copy the pruned source code and build
-COPY --from=builder /app/out/full/ .
+# First, install dependencies using cached pruned JSON files
+COPY --from=pruner /app/out/json/ .
+COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 
-RUN turbo run build --filter=backend...
+# Leverage strict lockfile for reproducible builds
+RUN pnpm install --frozen-lockfile
+
+# Copy source code and build the targeted package
+COPY --from=pruner /app/out/full/ .
+COPY turbo.json turbo.json
+
+# Set node environment for production optimizations during build
+ENV NODE_ENV=production
+RUN pnpm turbo run build --filter=backend...
+
+# NEW: Use pnpm deploy to magically isolate the backend and its production dependencies!
+# This automatically resolves all workspace symlinks (like @chomp/shared) and strips devDependencies!
+RUN pnpm --filter backend deploy /app/out/deploy --prod --legacy
 
 # ==========================================
 # Stage 3: Minimal production runner
@@ -36,16 +49,19 @@ RUN turbo run build --filter=backend...
 FROM node:26-alpine AS runner
 WORKDIR /app
 
-# Security: Don't run production as root
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 backend-user
-USER backend-user
+ENV NODE_ENV=production
+ENV PORT=3000
 
-# Copy over the built application from the installer stage
-COPY --from=installer --chown=backend-user:nodejs /app .
+# Create unprivileged system user
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nodejsuser
+
+# Copy ONLY the fully deployed, isolated app!
+COPY --from=builder --chown=nodejsuser:nodejs /app/out/deploy .
+
+USER nodejsuser
 
 EXPOSE 3000
 
-# Adjust this path based on where 'backend' lives in your monorepo
-# (e.g., apps/backend/dist/index.js)
-CMD ["node", "apps/backend/dist/index.js"]
+# Point directly to your built bundle (it sits at the root of the deployed folder)
+CMD ["node", "dist/index.js"]

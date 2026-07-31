@@ -21,11 +21,12 @@ import * as schema from "./modals/SchemaDb/schema.js";
 const queryClient = postgres(process.env.DATABASE_URL!);
 
 const app = express();
-const PORT = 3000;
+const PORT  =  3000;
+const HOST = '0.0.0.0';
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://chomp-frontend-murex.vercel.app"],
     credentials: true,
   }),
 );
@@ -41,8 +42,8 @@ app.use(
 app.use("/auth", authRouter);
 app.use("/api", requireAuth, apiRouter);
 
-app.listen(PORT, () => {
-  console.log(`Backend running on http://localhost:${PORT}`);
+app.listen(PORT, HOST,() => {
+  console.log(`Backend running on ${HOST}:${PORT}`);
 });
 
 export const db = drizzle(queryClient, { schema });

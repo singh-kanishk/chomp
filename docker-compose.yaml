@@ -13,6 +13,8 @@ services:
       - chomp_db:/var/lib/postgresql/data
    
   backend:
+    depends_on:
+      - database
     build: 
       context: .
       dockerfile: apps/backend/Dockerfile
@@ -22,8 +24,6 @@ services:
     image: skanishk/chomp:latest
     ports:
       - "3000:3000"
-    depends_on:
-      - database
     environment:
       - NODE_ENV=production
       # Use the docker service name 'database' instead of 'localhost'
