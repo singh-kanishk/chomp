@@ -1,6 +1,6 @@
 import * as Comlink from "comlink";
 import { apiCall } from "@/lib/api-call-wrapper";
-import { type HashingService } from "@/workers/hash";
+import type { HashingService } from "@/workers/hash";
 import HashWorker from "@/workers/hash?worker";
 import type { CredentialBody,  GetCredentialRequest, VaultMutationRequest, DeleteCredentialRequest } from "@chomp/shared";
 import type { GetCredentialResponse } from "@chomp/shared";

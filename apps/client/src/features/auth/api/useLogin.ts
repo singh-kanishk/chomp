@@ -4,7 +4,7 @@ import * as Comlink from "comlink";
 import { toast } from "sonner";
 import { useUserStore } from "@/store/useUserStore";
 import { apiCall } from "@/lib/api-call-wrapper";
-import { type HashingService } from "@/workers/hash";
+import type { HashingService } from "@/workers/hash";
 import type { LogInParams, LogInRequest } from "@chomp/shared";
 import z from "zod";
 import { LogInRequestZod } from "@chomp/shared";
@@ -17,9 +17,11 @@ export function useLogInMutation(resetForm: () => void) {
   return useMutation({
     mutationFn: async (data: LogInParams) => {
       //Doing Crypto Work On Worker threads
-
       const worker = new HashWorker();
-      const cryptoWorker = Comlink.wrap<HashingService>(worker); //Wrapper for Worker thread functions
+      worker.onerror = (err) => {
+        console.error("HashWorker runtime error:", err);
+      };
+      const cryptoWorker = Comlink.wrap<HashingService>(worker);
 
       try {
         const saltFromServer = salt || "";

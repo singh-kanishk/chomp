@@ -47,8 +47,9 @@ const hashingService = {
         parallelism: 1,
         outputType: "binary", // Returns Uint8Array
       });
-    } catch {
-      throw new Error("Worker Error: Master Hash failed");
+    } catch (err) {
+      console.error("Worker generateMasterHash error:", err);
+      throw new Error("Worker Error: Master Hash failed: " + (err instanceof Error ? err.message : String(err)));
     }
   },
 
@@ -61,8 +62,9 @@ const hashingService = {
       hasher.init();
       hasher.update(encoder.encode(salt + ":auth"));
       return hasher.digest("hex");
-    } catch {
-      throw new Error("Worker Error: Auth Hash calculation failed");
+    } catch (err) {
+      console.error("Worker generateAuthHash error:", err);
+      throw new Error("Worker Error: Auth Hash calculation failed: " + (err instanceof Error ? err.message : String(err)));
     }
   },
 
@@ -94,8 +96,9 @@ const hashingService = {
         rawEncryptionKey,
         protectedEncryptionKeyBase64: bytesToBase64(combined),
       };
-    } catch {
-      throw new Error("Worker Error: Key wrapping failed");
+    } catch (err) {
+      console.error("Worker generateAndWrapEncryptionKey error:", err);
+      throw new Error("Worker Error: Key wrapping failed: " + (err instanceof Error ? err.message : String(err)));
     }
   },
 
@@ -121,7 +124,8 @@ const hashingService = {
       );
 
       return new Uint8Array(decryptedBuffer);
-    } catch {
+    } catch (err) {
+      console.error("Worker unwrapEncryptionKey error:", err);
       throw new Error("Worker Error: Failed to unwrap encryption key. Invalid password/hash.");
     }
   },
@@ -156,8 +160,9 @@ const hashingService = {
       combined.set(encryptedBytes, iv.length);
 
       return bytesToBase64(combined);
-    } catch {
-      throw new Error("Encryption Failed");
+    } catch (err) {
+      console.error("Worker encrypt error:", err);
+      throw new Error("Encryption Failed: " + (err instanceof Error ? err.message : String(err)));
     }
   },
 
@@ -183,12 +188,15 @@ const hashingService = {
       );
 
       return decoder.decode(decryptedBuffer);
-    } catch {
+    } catch (err) {
+      console.error("Worker decrypt error:", err);
       throw new Error("Decryption failed. Invalid key or corrupted data.");
     }
   },
 };
 
-Comlink.expose(hashingService);
+if (typeof self !== "undefined") {
+  Comlink.expose(hashingService);
+}
 
 export type HashingService = typeof hashingService;

@@ -4,10 +4,14 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "build": "tsc"
+    "dev": "tsx watch --env-file=../../.env src/index.ts",
+    "build": "tsc",
+    "db:push": "drizzle-kit push",
+    "db:generate": "drizzle-kit generate",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@aws-sdk/client-ssm": "^3.1101.0",
     "@chomp/shared": "workspace:*",
     "argon2": "^0.44.0",
     "cookie-parser": "^1.4.7",

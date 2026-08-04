@@ -2,14 +2,13 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { AuthLocal } from "../modals/middlewareSchema/authSchema.js";
 
-const accessSecret = process.env.JWT_SECRET_KEY_ACCESS_TOKEN || "";
-
 export const requireAuth = (
   req: Request,
   res: Response<any, AuthLocal>,
   next: NextFunction,
 ): void => {
   const { accessToken } = req.cookies;
+  const accessSecret = process.env.JWT_SECRET_KEY_ACCESS_TOKEN || "";
 
   if (!accessToken) {
     res

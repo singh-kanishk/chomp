@@ -13,8 +13,6 @@ services:
       - chomp_db:/var/lib/postgresql/data
    
   backend:
-    depends_on:
-      - database
     build: 
       context: .
       dockerfile: apps/backend/Dockerfile

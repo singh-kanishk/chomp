@@ -3,7 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import * as Comlink from "comlink";
 import { toast } from "sonner";
 import { apiCall } from "@/lib/api-call-wrapper";
-import { generateSaltUuid, type HashingService } from "@/workers/hash";
+import type { HashingService } from "@/workers/hash";
 import type { SignUpParams, SignUpRequest } from "@chomp/shared";
 import z from "zod";
 import { SignUpRequestZod } from "@chomp/shared";
@@ -15,12 +15,14 @@ export function useSignUpMutation(resetForm: () => void) {
   return useMutation({
     mutationFn: async (data: SignUpParams) => {
       //Doing Crypto Work On Worker threads
-
       const worker = new HashWorker();
-      const cryptoWorker = Comlink.wrap<HashingService>(worker); //Wrapper for Worker thread functions
+      worker.onerror = (err) => {
+        console.error("HashWorker runtime error:", err);
+      };
+      const cryptoWorker = Comlink.wrap<HashingService>(worker);
 
       try {
-        const salt = generateSaltUuid();
+        const salt = crypto.randomUUID();
         const masterHash = await cryptoWorker.generateMasterHash(
           data.password,
           salt,
