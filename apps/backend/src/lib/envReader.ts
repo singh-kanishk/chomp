@@ -1,5 +1,5 @@
 import { SSMClient, GetParameterCommand } from "@aws-sdk/client-ssm";
-import { logger } from "../logger/logger";
+import { logger } from "../logger/logger.js";
 const ssm = new SSMClient({ region: "us-east-1" });
 
 export class GetEnv {
