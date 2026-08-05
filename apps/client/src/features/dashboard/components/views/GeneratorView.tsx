@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Copy,
@@ -16,8 +16,7 @@ import type { CredentialBody } from "@chomp/shared";
 
 export default function GeneratorView() {
   const addMutation = useAddCredential();
-  const { setActiveTab, setSelectedGroup, setSearchQuery } =
-    useDashboardStore();
+  const { setActiveTab } = useDashboardStore();
   const [password, setPassword] = useState("");
   const [length, setLength] = useState(16);
   const [includeUppercase, setIncludeUppercase] = useState(true);
@@ -25,11 +24,6 @@ export default function GeneratorView() {
   const [includeNumbers, setIncludeNumbers] = useState(true);
   const [includeSymbols, setIncludeSymbols] = useState(true);
   const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    setSelectedGroup("All");
-    setSearchQuery("Forge");
-  }, [setSelectedGroup, setSearchQuery]);
 
   const onAddSecurely = (generatedPassword: string) => {
     const payload: CredentialBody = {
