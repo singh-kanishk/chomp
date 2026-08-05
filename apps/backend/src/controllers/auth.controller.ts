@@ -1,17 +1,25 @@
-import { Request, Response } from "express";
+import { Request, Response, type CookieOptions } from "express";
 import {
   LogInRequest,
   LogInRequestZod,
   SignUpRequest,
   SignUpRequestZod,
+  ApiResponse,
+  EmailSchema,
+  JwtPayloadZod,
 } from "@chomp/shared";
 import { AuthServices } from "../services/auth.services.js";
-import { ApiResponse } from "@chomp/shared";
-import { EmailSchema } from "@chomp/shared";
-import jwt from "jsonwebtoken";
-import { JwtPayloadZod } from "@chomp/shared";
 
 const authServices = new AuthServices();
+const isProduction = process.env.NODE_ENV === "production";
+const getAuthCookieOptions = (maxAge?: number): CookieOptions => ({
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: isProduction ? "none" : "lax",
+  path: "/",
+  ...(maxAge ? { maxAge } : {}),
+});
+
 export class AuthController {
   public signUp = async (req: Request, res: Response) => {
     try {
@@ -43,7 +51,7 @@ export class AuthController {
       const response: ApiResponse<null> = {
         success: false,
         statusCode: 500,
-        message: "Internal Server Error",
+        message: errorMessage || "Internal Server Error",
       };
       res.status(500).json(response);
     }
@@ -76,11 +84,12 @@ export class AuthController {
       const response: ApiResponse<null> = {
         success: false,
         statusCode: 500,
-        message: "Internal Server Error",
+        message: errorMessage || "Internal Server Error",
       };
       res.status(500).json(response);
     }
   };
+
   public login = async (req: Request, res: Response) => {
     try {
       const { email, authHash }: LogInRequest = LogInRequestZod.parse(req.body);
@@ -108,19 +117,19 @@ export class AuthController {
         res.status(401).json(payload);
         return;
       }
-      const accessToken = authServices.generateAccessToken({ email });
-      const refreshToken = authServices.generateRefreshToken({ email });
+      const accessToken = await authServices.generateAccessToken({ email });
+      const refreshToken = await authServices.generateRefreshToken({ email });
 
-      res.cookie("accessToken", accessToken, {
-        httpOnly: true,
-        sameSite: "strict",
-        maxAge: 15 * 60 * 1000,
-      });
-      res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        sameSite: "strict",
-        maxAge: 15 * 24 * 60 * 60 * 1000,
-      });
+      res.cookie(
+        "accessToken",
+        accessToken,
+        getAuthCookieOptions(15 * 60 * 1000),
+      );
+      res.cookie(
+        "refreshToken",
+        refreshToken,
+        getAuthCookieOptions(15 * 24 * 60 * 60 * 1000),
+      );
       await authServices.storeRefreshToken(refreshToken, email);
       const payload = {
         success: true,
@@ -138,11 +147,12 @@ export class AuthController {
       const payload: ApiResponse<null> = {
         success: false,
         statusCode: 500,
-        message: "Internal Server Error",
+        message: errorMessage || "Internal Server Error",
       };
       res.status(500).json(payload);
     }
   };
+
   public refresh = async (req: Request, res: Response) => {
     const { refreshToken } = req.cookies;
     if (!refreshToken) {
@@ -155,7 +165,7 @@ export class AuthController {
       return;
     }
     try {
-      const decoded = authServices.checkRefreshToken(refreshToken);
+      const decoded = await authServices.checkRefreshToken(refreshToken);
       const { email } = JwtPayloadZod.parse(decoded);
       const isRefreshTokenRelatedToUSer =
         await authServices.verifyRefreshTokenToUser(email, refreshToken);
@@ -168,23 +178,21 @@ export class AuthController {
         res.status(409).json(payload);
         return;
       }
-      const newAccessToken = authServices.generateAccessToken({ email });
+      const newAccessToken = await authServices.generateAccessToken({ email });
 
-      // 5. Attach the new Access Token to the response as a cookie
-      res.cookie("accessToken", newAccessToken, {
-        httpOnly: true,
-        sameSite: "strict",
-        maxAge: 15 * 60 * 1000,
-      });
+      res.cookie(
+        "accessToken",
+        newAccessToken,
+        getAuthCookieOptions(15 * 60 * 1000),
+      );
 
-      // 6. Send success response so the frontend knows it can retry its failed request
       res.status(200).json({ message: "Access token successfully refreshed" });
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
       console.error("Refresh Token Error:", errorMessage);
-      res.clearCookie("accessToken");
-      res.clearCookie("refreshToken", { path: "/api/auth/refresh" });
+      res.clearCookie("accessToken", getAuthCookieOptions());
+      res.clearCookie("refreshToken", getAuthCookieOptions());
 
       const payload: ApiResponse<null> = {
         statusCode: 403,
@@ -194,16 +202,16 @@ export class AuthController {
       res.status(403).json(payload);
     }
   };
+
   public logout = async (req: Request, res: Response) => {
     try {
       const { refreshToken } = req.cookies;
       if (refreshToken) {
         await authServices.deleteRefreshToken(refreshToken);
       }
-      res.clearCookie("accessToken");
-      res.clearCookie("refreshToken", { path: "/api/auth/refresh" });
-      res.clearCookie("refreshToken"); // clear standard path just in case
-      
+      res.clearCookie("accessToken", getAuthCookieOptions());
+      res.clearCookie("refreshToken", getAuthCookieOptions());
+
       const payload: ApiResponse<null> = {
         success: true,
         statusCode: 200,

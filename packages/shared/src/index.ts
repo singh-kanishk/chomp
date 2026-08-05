@@ -7,7 +7,7 @@ export const BaseUrl = {
   server: "http://localhost:3000",
   deployedServer: "https://3-231-121-16.nip.io",
   client: "http://localhost:5173",
-  deployedClient: "https://chomp-frontend-murex.vercel.app",
+  deployedClient: "https://chomp-client.vercel.app",
   db: "http://localhost:5432",
 } as const;
 

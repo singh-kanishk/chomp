@@ -13,24 +13,35 @@ import * as schema from "./modals/SchemaDb/schema.js";
 const queryClient = postgres(process.env.DATABASE_URL!);
 
 const app = express();
-const PORT  =  3000;
-const HOST = '0.0.0.0';
+const PORT = 3000;
+const HOST = "0.0.0.0";
+
+app.set("trust proxy", 1);
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://chomp-frontend-murex.vercel.app"],
+    origin: [
+      "http://localhost:5173",
+      "https://chomp-client.vercel.app",
+      ...(process.env.CLIENT_ORIGIN ? [process.env.CLIENT_ORIGIN] : []),
+    ],
     credentials: true,
   }),
 );
 
-app.use(cookieParser())
+app.use(cookieParser());
 app.use(express.json());
 
 app.use(
   pinoHttp({
-    logger, 
+    logger,
   }),
 );
+
+app.get("/health", (_req: Request, res: Response) => {
+  res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
 app.use("/auth", authRouter);
 app.use("/api", requireAuth, apiRouter);
 
