@@ -5,8 +5,8 @@ FROM node:26-alpine AS pruner
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Install global tools directly via npm
-RUN npm install -g pnpm@latest turbo@^2
+# Install global tools matching the project's exact version
+RUN npm install -g pnpm@10.33.0 turbo@^2
 
 COPY . .
 # Isolates only the files required for the target app
@@ -21,8 +21,9 @@ WORKDIR /app
 
 # Tell tools we are in an automated build
 ENV CI=true
+ENV COREPACK_ENABLE_STRICT=0
 
-RUN npm install -g pnpm@latest turbo@^2
+RUN npm install -g pnpm@10.33.0 turbo@^2
 
 # First, install dependencies using cached pruned JSON files
 COPY --from=pruner /app/out/json/ .
