@@ -1,14 +1,16 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { AuthLocal } from "../modals/middlewareSchema/authSchema.js";
+import { GetEnv } from "../lib/envReader.js";
 
-export const requireAuth = (
+export const requireAuth = async (
   req: Request,
   res: Response<any, AuthLocal>,
   next: NextFunction,
-): void => {
+) => {
+  const env = new GetEnv();
   const { accessToken } = req.cookies;
-  const accessSecret = process.env.JWT_SECRET_KEY_ACCESS_TOKEN || "";
+  const accessSecret = await env.getJwtAccessKey();
 
   if (!accessToken) {
     res

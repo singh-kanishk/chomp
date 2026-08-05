@@ -10,6 +10,9 @@ import { eq, and } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 import { type JwtPayloadInterface } from "@chomp/shared";
 import { logger } from "../logger/logger.js";
+import { GetEnv } from "../lib/envReader.js";
+
+const env = new GetEnv();
 
 export class AuthServices {
   public async getUserIdFromEmail(email: string) {
@@ -113,9 +116,9 @@ export class AuthServices {
     return await argon2.verify(dbHash, receivedHash);
   }
 
-  public checkRefreshToken(token: string) {
+  public async checkRefreshToken(token: string) {
     try {
-      const refreshTokenKey = process.env.JWT_SECRET_KEY_REFRESH_TOKEN || "";
+      const refreshTokenKey = await env.getJwtRefreshKey();
       const jwtToken= jwt.verify(token, refreshTokenKey);
       if(jwtToken){
         logger.info("Valid Refresh Token")
@@ -146,14 +149,14 @@ export class AuthServices {
     logger.info("Valid Refresh Token")
     return true;
   }
-  public generateAccessToken(payload: JwtPayloadInterface) {
-    const accessKey = process.env.JWT_SECRET_KEY_ACCESS_TOKEN || "";
+  public async generateAccessToken(payload: JwtPayloadInterface) {
+    const accessKey = await env.getJwtAccessKey();
     const token= jwt.sign(payload, accessKey, { expiresIn: 15 * 60 });
     logger.info("Generated Access Token")
     return token;
   }
-  public generateRefreshToken(payload: JwtPayloadInterface) {
-    const refreshKey = process.env.JWT_SECRET_KEY_REFRESH_TOKEN || "";
+  public async generateRefreshToken(payload: JwtPayloadInterface) {
+    const refreshKey = await env.getJwtRefreshKey();
     const token= jwt.sign(payload, refreshKey, { expiresIn: 15 * 24 * 60 * 60 });
     logger.info("Generated Refresh Token")
     return token;
