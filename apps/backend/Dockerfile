@@ -60,9 +60,12 @@ RUN addgroup --system --gid 1001 nodejs && \
 # Copy ONLY the fully deployed, isolated app!
 COPY --from=builder --chown=nodejsuser:nodejs /app/out/deploy .
 
+# Copy Drizzle SQL migration files
+COPY --from=builder --chown=nodejsuser:nodejs /app/apps/backend/drizzle ./drizzle
+
 USER nodejsuser
 
 EXPOSE 3000
 
-# Point directly to your built bundle (it sits at the root of the deployed folder)
-CMD ["node", "dist/index.js"]
+# Automatically run pending migrations before booting the backend server
+CMD ["sh", "-c", "node dist/migrate.js && node dist/index.js"]

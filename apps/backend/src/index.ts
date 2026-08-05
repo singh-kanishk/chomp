@@ -8,9 +8,18 @@ import postgres from "postgres";
 import pinoHttp from "pino-http";
 import { logger } from "./logger/logger.js";
 import cookieParser from "cookie-parser";
-
+import { GetEnv } from "./lib/envReader.js";
 import * as schema from "./modals/SchemaDb/schema.js";
-const queryClient = postgres(process.env.DATABASE_URL!);
+
+const env = new GetEnv();
+const dbUrl = await env.getDatabaseUrl();
+
+const isProduction = process.env.NODE_ENV === "production";
+const isRds = dbUrl.includes("rds.amazonaws.com");
+const ssl = isRds || isProduction ? { rejectUnauthorized: false } : undefined;
+
+const queryClient = postgres(dbUrl, ssl ? { ssl } : {});
+export const db = drizzle(queryClient, { schema });
 
 const app = express();
 const PORT = 3000;
@@ -45,8 +54,6 @@ app.get("/health", (_req: Request, res: Response) => {
 app.use("/auth", authRouter);
 app.use("/api", requireAuth, apiRouter);
 
-app.listen(PORT, HOST,() => {
-  console.log(`Backend running on ${HOST}:${PORT}`);
+app.listen(PORT, HOST, () => {
+  logger.info(`Backend running on ${HOST}:${PORT}`);
 });
-
-export const db = drizzle(queryClient, { schema });
