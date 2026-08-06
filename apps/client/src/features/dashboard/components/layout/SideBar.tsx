@@ -1,6 +1,5 @@
 import {
   Lock,
-  HelpCircle,
   LogOut,
   Plus,
   Key,
@@ -22,8 +21,6 @@ export function Sidebar() {
     selectedGroup,
     setSelectedGroup,
     openPortalModal,
-    setShowHelp,
-    setIsLocked,
     isSidebarOpen,
     setSidebarOpen,
   } = useDashboardStore();
@@ -45,14 +42,7 @@ export function Sidebar() {
     openPortalModal();
     setSidebarOpen(false);
   };
-  const onHelpClick = () => {
-    setShowHelp(true);
-    setSidebarOpen(false);
-  };
-  const onLockClick = () => {
-    setIsLocked(true);
-    setSidebarOpen(false);
-  };
+
 
   return (
     <>
@@ -194,26 +184,7 @@ export function Sidebar() {
           <Plus className="w-4 h-4 text-[#ffb77d]" /> Secure New Secret
         </Button>
         <div className="flex flex-col gap-1.5 font-mono text-xs">
-          <Button
-            variant="ghost"
-            onClick={onHelpClick}
-            className="flex items-center justify-start gap-3.5 bg-transparent text-muted-foreground hover:text-[#ffb77d] hover:bg-[#353534] px-3 py-1.5 transition-colors text-left h-auto"
-          >
-            <HelpCircle className="w-4 h-4 shrink-0" />
-            <span className="text-[11px] uppercase tracking-wider">
-              Vault Help Scroll
-            </span>
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={onLockClick}
-            className="flex items-center justify-start gap-3.5 bg-transparent text-muted-foreground hover:text-[#ffb77d] hover:bg-[#353534] px-3 py-1.5 transition-colors text-left h-auto"
-          >
-            <Lock className="w-4 h-4 shrink-0" />
-            <span className="text-[11px] uppercase tracking-wider">
-              Lock Vault Gate
-            </span>
-          </Button>
+          
           <Button
             variant="ghost"
             onClick={() => {
