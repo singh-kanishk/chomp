@@ -125,7 +125,7 @@ export default function PortalModal() {
             animate={{ scale: 1, y: 0, opacity: 1 }}
             exit={{ scale: 0.95, y: 15, opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 350 }}
-            className="stone-slab border-4 border-border w-full max-w-lg p-6 overflow-hidden relative text-muted-foreground"
+            className="stone-slab border-4 border-border w-full max-w-lg p-4 sm:p-6 max-h-[90vh] overflow-y-auto relative text-muted-foreground"
           >
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#ffb77d]/60 to-transparent" />
 

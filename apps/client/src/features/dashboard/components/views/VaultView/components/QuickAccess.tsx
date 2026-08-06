@@ -1,4 +1,4 @@
-import { Copy, PlusCircle } from "lucide-react";
+import { Copy, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useVaultStore } from "@/store/useVaultStore";
 import { useDashboardStore } from "@/store/useDashboardStore";
@@ -7,89 +7,72 @@ import { useVaultUIStore } from "@/store/useVaultUiStore";
 export function QuickAccess() {
   const credentials = useVaultStore((state) => state.credentials);
   const openPortalModal = useDashboardStore((state) => state.openPortalModal);
-  
-  // Now correctly pulling your specific function names
   const { expandedId, toggleExpand, triggerCopy } = useVaultUIStore();
 
-  return (
-    <section className="space-y-4">
-      <h3 className="font-headline text-xl text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-        <span className="text-[#ffb77d]">✦</span> Quick Access
-      </h3>
+  const quickList = credentials.slice(0, 3);
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {credentials.slice(0, 3).map((cred) => {
+  return (
+    <section className="space-y-1.5 font-mono">
+      <div className="flex items-center justify-between text-[11px] text-muted-foreground uppercase tracking-wider">
+        <span className="flex items-center gap-1.5 text-xs text-muted-foreground/80">
+          <span className="text-[#ffb77d]">✦</span> Quick Access
+        </span>
+        <span className="text-[10px] text-muted-foreground/40 hidden sm:inline">
+          Fast Keys
+        </span>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+        {quickList.map((cred) => {
           const firstChar = cred.name.charAt(0).toUpperCase();
+          const isExpanded = expandedId === cred.id;
+
           return (
             <div
               key={`quick-${cred.id}`}
-              onClick={() => toggleExpand(cred.id)} // Updated
-              className={`stone-slab hover-ignite p-5 cursor-pointer flex flex-col justify-between aspect-square group transition-all ${
-                expandedId === cred.id ? "border-[#ffb77d] bg-[#353534]/50" : ""
+              onClick={() => toggleExpand(cred.id)}
+              className={`stone-slab hover-ignite p-2 cursor-pointer flex items-center justify-between gap-2 border transition-all h-[42px] ${
+                isExpanded ? "border-[#ffb77d] bg-[#353534]/50" : "border-border"
               }`}
             >
-              <div className="flex justify-between items-start">
-                <div className="w-12 h-12 bg-[#2a2a2a] border-2 border-border flex items-center justify-center text-xl font-headline text-[#ffb77d] group-hover:border-[#ffb77d] transition-colors shadow-inner">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-6 h-6 bg-[#2a2a2a] border border-border flex items-center justify-center text-xs font-headline text-[#ffb77d] shrink-0">
                   {firstChar}
                 </div>
-                <div className="flex gap-1.5">
-                  <Button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      triggerCopy(cred.password, cred.id, "password"); // Updated
-                    }}
-                    size="icon-sm"
-                    variant="outline"
-                    className="border-border hover:border-[#ffb77d] hover:text-[#ffb77d] text-muted-foreground bg-background"
-                    title="Copy Password"
-                  >
-                    <Copy className="w-4 h-4" />
-                  </Button>
+                <div className="min-w-0">
+                  <p className="font-bold text-xs text-muted-foreground group-hover:text-[#ffb77d] transition-colors truncate leading-tight">
+                    {cred.name}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground/60 truncate leading-tight">
+                    {cred.username}
+                  </p>
                 </div>
               </div>
 
-              <div className="pt-4">
-                <h4 className="font-body text-base font-bold text-muted-foreground group-hover:text-[#ffb77d] transition-colors truncate">
-                  {cred.name}
-                </h4>
-                <p className="font-mono text-xs text-muted-foreground/60 mt-1 truncate">
-                  {cred.username}
-                </p>
-                <div className="mt-2 flex justify-between items-center text-[10px] font-mono">
-                  <span className="px-1.5 py-0.5 bg-[#47483c]/30 text-muted-foreground border border-border/50">
-                    {cred.group}
-                  </span>
-                  <span
-                    className={`font-bold ${
-                      cred.strength === "Strong"
-                        ? "text-[#c3cc8c]"
-                        : cred.strength === "Medium"
-                          ? "text-[#ffb77d]"
-                          : "text-[#ffb4ab]"
-                    }`}
-                  >
-                    • {cred.strength}
-                  </span>
-                </div>
-              </div>
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  triggerCopy(cred.password, cred.id, "password");
+                }}
+                size="icon-xs"
+                variant="ghost"
+                className="h-6 w-6 text-muted-foreground/60 hover:text-[#ffb77d] hover:bg-transparent shrink-0 p-0"
+                title="Copy Password"
+              >
+                <Copy className="w-3 h-3" />
+              </Button>
             </div>
           );
         })}
 
-        <div
+        <button
+          type="button"
           onClick={() => openPortalModal()}
-          className="stone-slab hover-ignite p-5 cursor-pointer flex flex-col justify-between aspect-square border-dashed border-border hover:bg-[#ffb77d]/5 group transition-all"
+          className="stone-slab hover-ignite px-2.5 py-1.5 cursor-pointer flex items-center justify-center gap-1.5 border-dashed border-border hover:border-[#ffb77d] hover:bg-[#ffb77d]/5 transition-all text-muted-foreground/60 hover:text-[#ffb77d] text-xs uppercase tracking-wider h-[42px]"
         >
-          <div className="flex-1 flex flex-col items-center justify-center text-center">
-            <PlusCircle className="w-10 h-10 text-muted-foreground/40 group-hover:text-[#ffb77d] transition-colors mb-2" />
-            <span className="font-mono text-xs text-muted-foreground/60 group-hover:text-[#ffb77d] transition-colors uppercase tracking-widest">
-              Add Shortcut
-            </span>
-          </div>
-          <div className="text-center font-mono text-[9px] text-muted-foreground/30">
-            SLAB SECURE KEY
-          </div>
-        </div>
+          <Plus className="w-3.5 h-3.5 text-[#ffb77d]" />
+          <span className="text-[11px] truncate">Add Key</span>
+        </button>
       </div>
     </section>
   );

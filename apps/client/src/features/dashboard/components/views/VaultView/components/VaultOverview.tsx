@@ -1,70 +1,77 @@
+import { Lock } from "lucide-react";
+
 interface VaultOverviewProps {
   totalCrypts: number;
   strongSeals: number;
   securityScore: number;
 }
 
-export function VaultOverview({ totalCrypts, strongSeals, securityScore }: VaultOverviewProps) {
+export function VaultOverview({
+  totalCrypts,
+  strongSeals,
+  securityScore,
+}: VaultOverviewProps) {
   const getHealthLevelText = (score: number) => {
-    if (score >= 80) return "Security Health: Strong";
-    if (score >= 50) return "Security Health: Guarded";
-    return "Security Health: Critical Danger";
+    if (score >= 80) return "Strong";
+    if (score >= 50) return "Guarded";
+    return "Danger";
   };
 
   const getHealthLevelColor = (score: number) => {
-    if (score >= 80) return "text-[#c3cc8c] bg-[#4b5320]/40 border-[#c3cc8c]";
-    if (score >= 50) return "text-[#ffb77d] bg-[#fd8b00]/10 border-[#ffb77d]";
-    return "text-[#ffb4ab] bg-[#93000a]/20 border-[#ffb4ab] animate-pulse";
+    if (score >= 80) return "text-[#c3cc8c] border-[#c3cc8c] bg-[#4b5320]/30";
+    if (score >= 50) return "text-[#ffb77d] border-[#ffb77d] bg-[#fd8b00]/10";
+    return "text-[#ffb4ab] border-[#ffb4ab] bg-[#93000a]/20 animate-pulse";
   };
 
-  const needleRotation = -90 + (securityScore / 100) * 180;
+  const getBarColor = (score: number) => {
+    if (score >= 80) return "bg-[#c3cc8c]";
+    if (score >= 50) return "bg-[#ffb77d]";
+    return "bg-[#ffb4ab]";
+  };
 
   return (
-    <section className="stone-slab p-6 sm:p-8 border-4 border-border relative">
-      <div className="absolute top-2 left-2 text-[9px] font-mono text-muted-foreground/20 tracking-tighter">
-        ⊞ S_SLAB_00
-      </div>
-      <div className="absolute bottom-2 right-2 text-[9px] font-mono text-muted-foreground/20 tracking-tighter">
-        🔒 MONSTER_ACTIVE
-      </div>
-
-      <div className="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
-        <div>
-          <h2 className="font-headline text-2xl sm:text-3xl text-[#ffb77d] uppercase tracking-wider mb-2">
-            Monster Vault Overview
-          </h2>
-          <p className="font-body text-sm text-muted-foreground max-w-lg leading-relaxed">
-            Your secrets are currently heavily guarded. The monster's hunger is
-            satisfied by strong cryptography. Keep key entropy maximum.
-          </p>
-          <div className="mt-4 flex flex-wrap gap-4 text-xs font-mono">
-            <div className="bg-popover border border-border px-3 py-1 text-muted-foreground">
-              TOTAL CRYPTS: <span className="text-[#ffb77d] font-bold">{totalCrypts}</span>
-            </div>
-            <div className="bg-popover border border-border px-3 py-1 text-muted-foreground">
-              STRONG SEALS: <span className="text-[#c3cc8c] font-bold">{strongSeals}</span>
-            </div>
+    <section className="stone-slab px-3.5 py-2.5 sm:px-5 sm:py-3 border-2 border-border flex items-center justify-between gap-3 text-xs font-mono">
+      {/* Left: Vault Title & Mini Badges */}
+      <div className="flex items-center gap-2.5 sm:gap-4 min-w-0">
+        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-[#2a2a2a] border border-border flex items-center justify-center text-[#ffb77d] shrink-0">
+          <Lock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#ffb77d]" />
+        </div>
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <h2 className="font-headline text-xs sm:text-sm text-[#ffb77d] uppercase tracking-wider truncate">
+              Vault Overview
+            </h2>
+            <span
+              className={`text-[9px] uppercase tracking-widest px-1.5 py-0.5 border shrink-0 ${getHealthLevelColor(securityScore)}`}
+            >
+              {getHealthLevelText(securityScore)}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-[10px] text-muted-foreground/80 mt-0.5">
+            <span>
+              Crypts: <strong className="text-[#ffb77d]">{totalCrypts}</strong>
+            </span>
+            <span>•</span>
+            <span>
+              Strong: <strong className="text-[#c3cc8c]">{strongSeals}</strong>
+            </span>
           </div>
         </div>
+      </div>
 
-        <div className="flex flex-col items-center">
-          <div className="relative w-48 h-24 overflow-hidden mb-2">
-            <div className="monster-gauge w-48 h-48 absolute top-0 left-0" />
-            <div className="gauge-cover w-40 h-40 absolute top-4 left-4 flex items-end justify-center pb-3">
-              <span className="font-headline text-3xl font-black text-[#c3cc8c] tracking-tighter mb-1 select-none">
-                {securityScore}%
-              </span>
-            </div>
+      {/* Right: Compact Score & Progress Bar */}
+      <div className="flex items-center gap-3 shrink-0">
+        <div className="w-20 sm:w-28 space-y-1">
+          <div className="flex justify-between text-[10px]">
+            <span className="text-muted-foreground/60 uppercase">Entropy</span>
+            <span className="font-bold text-foreground">{securityScore}%</span>
+          </div>
+          <div className="h-1.5 w-full bg-[#1c1b1b] border border-border/60 overflow-hidden">
             <div
-              className="absolute bottom-0 left-1/2 w-1.5 h-18 bg-[#ffb77d] origin-bottom rounded-full shadow-[0_0_8px_#ffb77d] transition-transform duration-1000 ease-out"
-              style={{ transform: `translateX(-50%) rotate(${needleRotation}deg)` }}
+              className={`h-full transition-all duration-700 ${getBarColor(securityScore)}`}
+              style={{ width: `${securityScore}%` }}
             />
           </div>
-          <span
-            className={`text-[11px] font-mono uppercase tracking-widest px-3 py-1 border transition-colors ${getHealthLevelColor(securityScore)}`}
-          >
-            {getHealthLevelText(securityScore)}
-          </span>
         </div>
       </div>
     </section>

@@ -26,10 +26,10 @@ export function Dashboard() {
 
       <Sidebar />
 
-      <div className="ml-64 flex-1 flex flex-col min-h-screen">
+      <div className="lg:ml-64 ml-0 flex-1 flex flex-col min-h-screen w-full min-w-0">
         <Topbar />
 
-        <main className="p-8 md:p-16 max-w-[1250px] mx-auto w-full relative flex-1">
+        <main className="p-4 sm:p-6 md:p-10 lg:p-16 max-w-[1250px] mx-auto w-full relative flex-1 min-w-0">
           <BackgroundWatermark />
 
           <div className="relative z-10">

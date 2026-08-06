@@ -78,10 +78,10 @@ export function LogIn() {
 
   return (
     <div
-      className={`h-screen w-screen bg-cover bg-center`}
+      className="min-h-screen w-full bg-cover bg-center bg-fixed flex items-center justify-center p-4 py-8 overflow-y-auto selection:bg-[#ffb77d] selection:text-[#131313]"
       style={{ backgroundImage: `url(${authBg})` }}
     >
-      <Card className="stone-slab fixed top-1/4 left-1/2 -translate-x-1/2 w-full max-w-md p-6 border-4 border-border bg-popover text-muted-foreground shadow-2xl relative overflow-hidden">
+      <Card className="stone-slab w-full max-w-md p-4 sm:p-6 border-4 border-border bg-popover text-muted-foreground shadow-2xl relative overflow-hidden my-auto">
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#ffb77d]/60 to-transparent" />
         
         <CardHeader>

@@ -6,12 +6,14 @@ import {
   Key,
   ShieldCheck,
   Settings,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { GroupType } from "../../schemas/schema";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { useUserStore } from "@/store/useUserStore";
 import { useLogoutMutation } from "@/features/auth/api/useLogout";
+import { motion, AnimatePresence } from "motion/react";
 
 export function Sidebar() {
   const {
@@ -22,30 +24,81 @@ export function Sidebar() {
     openPortalModal,
     setShowHelp,
     setIsLocked,
+    isSidebarOpen,
+    setSidebarOpen,
   } = useDashboardStore();
   const { setMasterHash, setEncryptionKey, setSalt, setEmail } = useUserStore();
   const { mutate: sweepLogout } = useLogoutMutation();
 
-  const onNewSecretClick = () => openPortalModal();
-  const onHelpClick = () => setShowHelp(true);
-  const onLockClick = () => setIsLocked(true);
+  const handleTabClick = (tab: "vault" | "generator" | "audit" | "settings") => {
+    setActiveTab(tab);
+    setSidebarOpen(false);
+  };
+
+  const handleGroupClick = (grp: GroupType) => {
+    setActiveTab("vault");
+    setSelectedGroup(grp);
+    setSidebarOpen(false);
+  };
+
+  const onNewSecretClick = () => {
+    openPortalModal();
+    setSidebarOpen(false);
+  };
+  const onHelpClick = () => {
+    setShowHelp(true);
+    setSidebarOpen(false);
+  };
+  const onLockClick = () => {
+    setIsLocked(true);
+    setSidebarOpen(false);
+  };
 
   return (
-    <nav className="fixed left-0 top-0 h-screen w-64 bg-[#2a2a2a] border-r-4 border-[#353534] shadow-[5px_0_0_0_rgba(0,0,0,0.3)] flex flex-col z-40">
-      <div className="p-6 border-b-2 border-border select-none">
-        <h1 className="font-headline text-3xl font-black text-[#ffb77d] uppercase tracking-tighter leading-none flex items-center gap-2">
-          CHOMP
-        </h1>
-        <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/60 mt-2">
-          Vault Security Active
-        </p>
-      </div>
+    <>
+      {/* Mobile backdrop */}
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setSidebarOpen(false)}
+            className="fixed inset-0 bg-black/70 backdrop-blur-xs z-40 lg:hidden"
+          />
+        )}
+      </AnimatePresence>
+
+      <nav
+        className={`fixed left-0 top-0 h-screen w-64 bg-[#2a2a2a] border-r-4 border-[#353534] shadow-[5px_0_0_0_rgba(0,0,0,0.3)] flex flex-col z-50 transition-transform duration-300 ease-in-out ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        }`}
+      >
+        <div className="p-6 border-b-2 border-border select-none flex items-center justify-between">
+          <div>
+            <h1 className="font-headline text-3xl font-black text-[#ffb77d] uppercase tracking-tighter leading-none flex items-center gap-2">
+              CHOMP
+            </h1>
+            <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/60 mt-2">
+              Vault Security Active
+            </p>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => setSidebarOpen(false)}
+            className="lg:hidden text-muted-foreground hover:text-[#ffb77d] hover:bg-transparent"
+          >
+            <X className="w-5 h-5" />
+          </Button>
+        </div>
 
       <div className="flex-1 py-6 flex flex-col gap-1.5 select-none font-mono">
         <Button
           variant="ghost"
           onClick={() => {
-            setActiveTab("vault");
+            handleTabClick("vault");
             setSelectedGroup("All");
           }}
           className={`flex items-center gap-4 px-4 py-3 text-left transition-all relative border-r-2 rounded-none h-auto ${
@@ -62,7 +115,7 @@ export function Sidebar() {
         {/* Key Generator Tab */}
         <Button
           variant="ghost"
-          onClick={() => setActiveTab("generator")}
+          onClick={() => handleTabClick("generator")}
           className={`flex items-center gap-4 px-4 py-3 text-left transition-all relative border-r-2 rounded-none h-auto ${
             activeTab === "generator"
               ? "bg-[#4b5320] text-[#bdc787] border-[#c3cc8c] shadow-[0_0_15px_rgba(195,204,140,0.25)] hover:bg-[#4b5320] hover:text-[#bdc787]"
@@ -78,7 +131,7 @@ export function Sidebar() {
         {/* Security Tab */}
         <Button
           variant="ghost"
-          onClick={() => setActiveTab("audit")}
+          onClick={() => handleTabClick("audit")}
           className={`flex items-center gap-4 px-4 py-3 text-left transition-all relative border-r-2 rounded-none h-auto ${
             activeTab === "audit"
               ? "bg-[#4b5320] text-[#bdc787] border-[#c3cc8c] shadow-[0_0_15px_rgba(195,204,140,0.25)] hover:bg-[#4b5320] hover:text-[#bdc787]"
@@ -94,7 +147,7 @@ export function Sidebar() {
         {/* Settings Tab */}
         <Button
           variant="ghost"
-          onClick={() => setActiveTab("settings")}
+          onClick={() => handleTabClick("settings")}
           className={`flex items-center gap-4 px-4 py-3 text-left transition-all relative border-r-2 rounded-none h-auto ${
             activeTab === "settings"
               ? "bg-[#4b5320] text-[#bdc787] border-[#c3cc8c] shadow-[0_0_15px_rgba(195,204,140,0.25)] hover:bg-[#4b5320] hover:text-[#bdc787]"
@@ -117,10 +170,7 @@ export function Sidebar() {
                 <Button
                   variant="ghost"
                   key={grp}
-                  onClick={() => {
-                    setActiveTab("vault");
-                    setSelectedGroup(grp);
-                  }}
+                  onClick={() => handleGroupClick(grp)}
                   className={`flex items-center justify-start gap-3 px-3 py-2 text-left text-xs tracking-wider uppercase transition-colors rounded-sm h-auto ${
                     activeTab === "vault" && selectedGroup === grp
                       ? "text-[#ffb77d] font-bold bg-background hover:bg-background hover:text-[#ffb77d]"
@@ -167,6 +217,7 @@ export function Sidebar() {
           <Button
             variant="ghost"
             onClick={() => {
+              setSidebarOpen(false);
               sweepLogout();
               setMasterHash(null);
               setEncryptionKey(null);
@@ -183,5 +234,6 @@ export function Sidebar() {
         </div>
       </div>
     </nav>
+    </>
   );
 }

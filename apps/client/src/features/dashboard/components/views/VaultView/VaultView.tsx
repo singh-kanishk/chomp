@@ -12,7 +12,7 @@ export default function VaultView() {
   const copiedState = useVaultUIStore((state) => state.copiedState);
 
   return (
-    <div className="space-y-10 select-none">
+    <div className="space-y-3.5 sm:space-y-5 md:space-y-6 select-none">
       <AnimatePresence>
         {copiedState && (
           <motion.div
@@ -44,7 +44,7 @@ export default function VaultView() {
 
       <QuickAccess />
 
-      <section className="space-y-4">
+      <section className="space-y-2.5 sm:space-y-3.5">
         <VaultControls />
         <VaultTable />
       </section>

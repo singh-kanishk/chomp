@@ -14,6 +14,7 @@ interface DashboardState {
 
   // Security & App State
   isLocked: boolean;
+  isSidebarOpen: boolean;
 
   // Modals & Overlays
   isModalOpen: boolean;
@@ -26,6 +27,8 @@ interface DashboardState {
   setSelectedGroup: (group: GroupType) => void;
   setSearchQuery: (query: string) => void;
   setIsLocked: (locked: boolean) => void;
+  setSidebarOpen: (open: boolean) => void;
+  toggleSidebar: () => void;
   openPortalModal: (credentialFrontend?: CredentialFrontend | null) => void;
   closePortalModal: () => void;
   setShowHelp: (show: boolean) => void;
@@ -37,6 +40,7 @@ export const useDashboardStore = create<DashboardState>((set) => ({
   selectedGroup: "All",
   searchQuery: "",
   isLocked: false,
+  isSidebarOpen: false,
   isModalOpen: false,
   editingCredential: null,
   showHelp: false,
@@ -46,6 +50,8 @@ export const useDashboardStore = create<DashboardState>((set) => ({
   setSelectedGroup: (group) => set({ selectedGroup: group }),
   setSearchQuery: (query) => set({ searchQuery: query }),
   setIsLocked: (locked) => set({ isLocked: locked }),
+  setSidebarOpen: (open) => set({ isSidebarOpen: open }),
+  toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
 
   openPortalModal: (credentialFrontend = null) =>
     set({ isModalOpen: true, editingCredential: credentialFrontend }),
